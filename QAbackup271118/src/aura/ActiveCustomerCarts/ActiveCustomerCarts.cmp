@@ -1,6 +1,6 @@
 <aura:component controller="ManageCustomerCarts" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" access="global" >
 	<aura:handler name="init" value="{!this}" action="{!c.Init}"/>
-    <aura:attribute type="Integer" name="pageNumber" default="1" />
+    <aura:attribute type="Integer" name="pageNumber" default="11" />
     <aura:attribute type="Integer" name="maxPage" default="1" />
     <aura:attribute name="currentList" type="List[]"/>
     <aura:attribute name="CartGuestId" type="string"/>

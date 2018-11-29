@@ -1,0 +1,28 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <div class="slds-p-top_medium">
+         <lightning:button variant="brand"
+                          label="Delivery Video"
+                          title="Delivery Video"
+                          onclick="{! c.openModel }" />
+                               <aura:if isTrue="{!v.isOpen}">
+                                
+                               <div aura:id="Videocontainer" role="dialog" class="slds-modal slds-fade-in-open slds-p-top_xx-large slds-var-p-top_xx-large">
+                                    
+                                    <div class="slds-modal__container ">
+                                       <header class="slds-modal__header">
+                                       
+
+                                        </header>
+                                        <div class="slds-modal__content slds-p-around--medium">
+                                            <i class="fa fa-times float-right" data-record="Videocontainer" onclick="{!c.closeModel}"></i>
+                                             <iframe width="100%" height="315" src="https://www.youtube.com/embed/j1kUkq46z0Y?autoplay=1" frameborder="0" allowfullscreenid="clearmySound"></iframe>	
+
+                                        </div>
+                                       
+                                    </div>
+                                   </div>
+                                  
+                            </aura:if>
+                        </div> 
+</aura:component>

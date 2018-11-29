@@ -1,0 +1,618 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForRecordHome" 
+                access="global" controller="TechSchedulingController">
+	<lightning:workspaceAPI aura:id="workspace"/>
+	<aura:attribute name="selectedItems" type="object[]"/>
+    <aura:attribute name="caseObj" type="Case" default="{ 'sobjectType': 'Case' }"/>
+    <aura:attribute name="caseItemObj" type="Case_Line_Item__c" default="{ 'sobjectType': 'Case_Line_Item__c' }"/>
+    <aura:attribute name="salesOrderObj" type="SalesOrder__x" default="{ 'sobjectType': 'SalesOrder__x' }"/>
+    <aura:attribute name="saleslineitem" type="SalesOrderItem__x" default="{ 'sobjectType': 'SalesOrderItem__x' }"/>
+    <aura:attribute name="caseId" type="String" access="global"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="displayShipAddress" type="boolean" default="false"/>
+    <aura:attribute name="selectedReasonCode" type="String" access="global"/>
+    <aura:attribute name="selectedPriority" type="String" access="global"/>
+    <aura:attribute name="selectedRequestStatus" type="String" access="global"/>
+    <aura:attribute name="selectedAssignee" type="String" access="global"/>
+    <aura:attribute name="minValue" type="string" access="global"/>
+    <aura:attribute name="maxValue" type="string" access="global"/>
+    <aura:attribute name="incrementValue" type="string" access="global"/>
+    <aura:attribute name="meetingRoomValue" type="string" access="global"/>
+    <aura:attribute name="estimatedtimeforstopwithminutes" type="string" access="global"/>
+    <aura:attribute name="value" type="Integer" default="25" />
+    <aura:attribute name="inputVal" type="Integer" default="25" />
+    <aura:attribute name="timeoutRef" type="object" />
+    <aura:attribute name="selectedCount" type="integer" default="0"/>
+    <aura:attribute name="isopenfortech" type="boolean" default="false"/>
+    <aura:attribute name="isOpenForLine" type="boolean" default="false"/>
+    <aura:attribute name="isOpenForComments" type="boolean" default="false"/>
+    <aura:attribute name="dateopened" type="Date" default=""/>
+    <aura:attribute name="selectedCompany" type="String" />
+    <aura:attribute name="selected" type="String" />
+    <aura:attribute name="ListOfCompanies" type="List"/>
+    <aura:attribute name="listoflinevalues" type="List"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="responseObj" type="Map"/>
+    <aura:attribute name="responseAssigneeObj" type="Map"/>
+    <aura:attribute name="optionsCaseItem" type="List" access="global" default="0"/>
+    <aura:attribute name="totalSize" type="Integer"/>
+    <aura:attribute name="selecteddesc" type="List" access="global" />
+
+    <aura:attribute name="MaxWorkingHours" type="Integer" access="global" default="0"/>
+    <aura:attribute name="CurrentWorkingHours" type="Integer" access="global" default="0"/>
+    <aura:attribute name="CurrentWorkingHoursProgValue" type="Integer" access="global" default="0"/>
+    <aura:attribute name="workingHoursprogvalue" type="Integer" access="global" default="0"/>
+    <aura:attribute name="MaxRepairStops" type="Integer" access="global" default="0"/>
+    <aura:attribute name="CurrentRepairStops" type="Integer" access="global" default="0"/>
+    <aura:attribute name="CurrentRepairStopsprogvalue" type="Integer" access="global" default="0"/>
+    <aura:attribute name="RepairStopsprogvalue" type="Integer" access="global" default="0"/>
+    <aura:attribute name="MaxPiecesDay" type="Integer" access="global" default="0"/>
+    <aura:attribute name="CurrentPieces" type="Integer" access="global" default="0"/>
+    <aura:attribute name="CurrentPiecesRepairprogvalue" type="Integer" access="global" default="0"/>
+    <aura:attribute name="PiecesRepairprogvalue" type="Integer" access="global" default="0"/>
+    <aura:attribute name="maxHours" type="Integer" access="global" default="0"/>
+    <aura:attribute name="maxRepair" type="Integer" access="global" default="0"/>
+    <aura:attribute name="maxPieces" type="Integer" access="global" default="0"/>
+    <aura:attribute name="upHostery" type="Integer" access="global" default="0"/>
+    <aura:attribute name="casegoods" type="Integer" access="global" default="0"/>
+    <aura:attribute name="leather" type="Integer" access="global" default="0"/>
+
+    <aura:attribute name="workingHoursProgValueNew" type="Integer" access="global" default="0"/>
+    <aura:attribute name="ListOfEmployees" type="List"/>
+    <aura:attribute name="ListOfReasonCodes" type="List"/>
+    <aura:attribute name="ListOfRequestStatus" type="List"/>
+    <aura:attribute name="ListOfPriority" type="List"/>
+    <aura:attribute name="ListOfAssignees" type="List"/>
+    <aura:attribute name="selectedEmployee" type="String"/>
+    <aura:attribute name="dateValidationError" type="boolean" />
+    <aura:attribute name="today" type="date" />
+    <aura:attribute name="datevalue" type="date" />
+    <aura:attribute name="datePickerVar" type="string" />
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="myDate" type="date" />
+    <aura:attribute name="weeklyScheduleVar" type="string" />
+    <aura:attribute name="progressMap" type="Map" />
+    <aura:attribute name="zipcode" type="string" />
+    <aura:attribute name="salesOrder" type="string" />
+    <aura:attribute name="soextid" type="string" />
+    <aura:attribute name="allrows" type="object[]"/>
+    <aura:attribute name="allrowssku" type="object[]"/>
+    <aura:attribute name="selectedrowvaluesforlines" type="List"/>
+    <aura:attribute name="datajsonstringify" type="Object"/>
+    <aura:attribute name="democolumns" type="List"/>
+    <aura:attribute name="selectedvals" type="List" />
+    <aura:attribute name="democolumnssku" type="List"/>
+    <aura:attribute name="selectedvalssku" type="List" />
+    <aura:attribute name="sosrnumber" type="String" />
+
+    <aura:attribute name="dterror" type="string" />
+    <aura:attribute name="conferror" type="string" />
+    <aura:attribute name="selectedAssociateItems" type="List" />
+    <aura:attribute name="draftItems" type="List" />
+    <aura:attribute name="confirmItems" type="List" />
+
+    <aura:attribute name="dterr" type="Object" default="[]"/>
+    <aura:attribute name="draftValues" type="Object" default="[]"/>
+
+    <aura:attribute name="cMonth" type="String" access="global"/>
+    <aura:attribute name="cYear" type="String" access="global"/>
+    <aura:attribute name="cMonthInc" type="String" access="global" default="0"/>
+    <aura:attribute name="cLeaveDates" type="List" />
+    <aura:attribute name="cSelectedDate" type="String" access="global"/>
+    <aura:attribute name="techScheduleHours" type="List"/>
+    <aura:attribute name="techScheduleMins" type="List"/>
+    <aura:attribute name="pliList" type="List" />
+
+    <aura:attribute name="shipToAdd1" type="String"/>
+    <aura:attribute name="shipToAdd2" type="String"/>
+    <aura:attribute name="shipToCity" type="String"/>
+    <aura:attribute name="shipToState" type="String"/>
+    <aura:attribute name="shipToZip" type="String"/>
+    <aura:attribute name="fulfillID" type="String"/>
+    <aura:attribute name="CustId" type="String"/>
+
+    <ltng:require styles="{!join(',',$Resource.JqueryCSS,$Resource.JqueryDatePickerCSS)}" scripts="{!join(',',$Resource.jquery,$Resource.JQueryUI)}"/>
+    <ltng:require scripts="{!$Resource.momentjs}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.myAction}"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+
+    <div class="slds-box slds-theme--inverse">
+        <p align = "center"> 
+            <strong> Schedule a Technician </strong> 
+        </p>
+    </div>
+    
+    <!--Detail panel-->
+    <article class="slds-card">
+        <div class ="background">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-standard-contact" title="description of icon when needed">
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <div class="sec1">
+
+                            <div class="slds-p-around--none slds-panel__section slds-has-divider--bottom">
+                                <div class="slds-section slds-is-open">
+                                    <div class="slds-grid slds-grid slds-wrap slds-grid--pull-padded">
+                                        <div class="slds-p-horizontal--small slds-size--1-of-3">
+                                            <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                                <label class="slds-form-element__label"> Case Number </label>
+                                                <force:outputField value="{!v.caseObj.CaseNumber}"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-p-horizontal--small slds-size--1-of-3">
+                                            <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                                <label class="slds-form-element__label"> Full Name </label>
+                                                <force:outputField value="{!v.caseObj.Contact.Name}"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-p-horizontal--small slds-size--1-of-3">
+                                            <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                                <label class="slds-form-element__label"> Status </label>
+                                                <force:outputField value="{!v.caseObj.Status}"/>
+                                            </div>
+                                        </div>
+                                        <br></br>
+                                        <div class="slds-p-horizontal--small slds-size--1-of-1">
+                                            <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                                <label class="slds-form-element__label"> Description </label>
+                                                <force:outputField value="{!v.caseObj.Description}"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-size_4-of-12 slds-p-around--x-small hasDiv">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- BASIC GRID EXAMPLE -->
+                            <div class="slds-p-around--none slds-panel__section slds-has-divider--bottom">
+                                <div class="slds-grid">
+
+                                    <!-- Bill To Address Section -->
+                                    <div class="slds-col slds-size--1-of-5">
+                                        <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                            <label class="slds-form-element__label" align="center"> Bill To  </label>
+                                            <ui:inputText aura:id="fullname" value="{!v.caseObj.Contact.Name}" disabled="true" />
+                                        </div>
+                                        <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                            <ui:inputText aura:id="billAddress1" value="{!v.caseObj.Address__r.Address_Line_1__c}" disabled="true" />
+                                        </div>
+                                        <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                            <ui:inputText aura:id="billAddress2" value="{!v.caseObj.Address__r.Address_Line_2__c}" disabled="true" />
+                                        </div>
+                                        <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                            <ui:inputText aura:id="billCity" value="{!v.caseObj.Address__r.City__c}" disabled="true" />
+                                        </div>
+                                        <div class=" slds-grid slds-wrap ">
+                                            <div class="slds-size_4-of-12 slds-p-around--x-small hasDiv">
+                                                <ui:inputText aura:id="billState" value="{!v.caseObj.Address__r.StatePL__c}" disabled="true" />
+                                            </div>
+                                            <div class="slds-size_4-of-12 slds-p-around--x-small hasDiv">
+                                                <ui:inputText aura:id="billZipCode" value="{!v.caseObj.Address__r.Zip_Code__c}" disabled="true" />
+                                            </div>
+                                            <div class="slds-size_4-of-12 slds-p-around--x-small hasDiv">
+                                                <ui:inputText aura:id="billCountry" value="{!v.caseObj.Address__r.Country__c}" disabled="true" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="slds-col slds-size--1-of-5">
+                                        <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                            <label class="slds-form-element__label" align="center"> Ship To</label>
+                                            <ui:inputText value="{!v.caseObj.Contact.Name}" disabled="true"/>
+                                        </div>
+                                        <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                            <ui:inputText aura:id="address1" value="{!v.shipToAdd1}" placeholder="Address line 1"/>
+                                        </div>
+                                        <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                            <ui:inputText aura:id="address2" value="{!v.shipToAdd2}" placeholder="Address line 2" />
+
+                                        </div>
+                                        <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                            <ui:inputText aura:id="city" value="{!v.shipToCity}" placeholder="City"/>
+                                        </div>
+                                        <div class=" slds-grid slds-wrap ">
+                                            <div class="slds-size_4-of-8 slds-p-around--x-small hasDiv">
+                                                <!--ui:inputText aura:id="state" value="{!v.shipToState}" placeholder="State"/-->
+                                                <ui:inputSelect aura:id="state" />
+                                            </div>
+                                            <div class="slds-size_4-of-8 slds-p-around--x-small hasDiv">
+                                                <ui:inputText aura:id="zip" value="{!v.shipToZip}" placeholder="Zip" required="true" class="field" maxlength="5" />
+                                            </div>
+                                            <div class="slds-size_4-of-8 slds-p-around--x-small hasDiv">
+                                                <lightning:button label="Change Ship Add" onclick="{! c.refreshAPI}" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="slds-col slds-size--1-of-7">
+                                        <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                            <label class="slds-form-element__label" > Phone/Email </label>
+                                            <ui:inputEmail aura:id="email1" value="{!v.caseObj.Contact.Email}" placeholder="Email Address 1"/>
+                                        </div>
+                                        <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv" html-placeholder = "Phone1">
+                                            <ui:inputEmail aura:id="email2" value="{!v.caseObj.Contact.Email_2__c}" placeholder="Email Address 2"/>
+                                        </div>
+                                        <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                            <ui:inputPhone aura:id="phone1" value="{!v.caseObj.Contact.Phone}" placeholder="Phone 1" />
+                                        </div>
+                                        <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                            <ui:inputPhone aura:id="phone2" value="{!v.caseObj.Contact.Phone_2__c}" placeholder="Phone 2" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="slds-p-around--none slds-panel__section ">
+                                <div class="slds-section slds-is-open">
+                                    <div class="slds-grid slds-grid slds-wrap slds-grid--pull-padded">
+                                        <div class="slds-p-horizontal--small slds-size--1-of-7">
+                                            <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                                <label  for="select-01">Date Opened</label>
+                                                <ui:inputDate aura:id="dateopened" 
+                                                              displayDatePicker="false"
+                                                              value="{!v.caseObj.CreatedDate}"
+                                                              disabled="true" />
+                                            </div>
+                                        </div>
+                                        <div class="slds-p-horizontal--small slds-size--1-of-7">
+                                            <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                                <ui:inputSelect label="Company" aura:id="myCompany" value="{!v.selectedCompany}" required="true" change="{!c.onCompanyChange}" >
+                                                    <option value="">Choose Company</option>
+                                                    <aura:iteration items="{!v.ListOfCompanies}" var="item">
+                                                        <option value="{!item}" text="{!item}"></option>
+                                                    </aura:iteration>
+                                                </ui:inputSelect>
+                                            </div>
+                                        </div>
+                                        <div class="slds-p-horizontal--small slds-size--1-of-7">
+                                            <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                                <ui:inputSelect label="Technician" aura:id="technician" value="{!v.caseObj.Tech_Scheduled_Company__c}" required="true" change="{!c.onEmployeeChange}">
+                                                    <option value="">Choose Technician </option>
+                                                    <aura:iteration items="{!v.ListOfEmployees}" var="item">
+                                                        <option value="{!item.ResourceId}" text="{!item.Name}" ></option>
+                                                    </aura:iteration>
+                                                </ui:inputSelect>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="slds-p-around--none slds-panel__section">
+                                <div class="slds-section slds-is-open">
+                                    <div class="slds-grid slds-grid slds-wrap slds-grid--pull-padded">
+                                        <div class="slds-p-horizontal--small slds-size--1-of-7">
+                                            <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv" onclick="{!c.openModel}">
+                                                <ui:inputText label="Estimated Time For Stop" class="field" value="{!v.meetingRoomValue}" required="true" placeholder="Click Here To Open" aura:id="myTimeEstimated" />
+                                            </div>
+                                        </div>
+                                        <div class="slds-p-horizontal--small slds-size--1-of-7">
+                                            <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv" onclick="{!c.openModal}">
+                                                <ui:inputText label="Tech Scheduled Date" class="field" value="{!v.datevalue}" required="true" placeholder="Click Here To Open" aura:id="techscheduleddate"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-p-horizontal--small slds-size--1-of-7">
+                                            <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                                <ui:inputText aura:id="Salesorder" label="Sales Order"  value="{!v.salesOrderObj.phhSalesOrder__c}" required="true" disabled="true"/>
+                                            </div>
+                                        </div>
+                                        <div class="slds-hidden">
+                                            <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv" onclick="{!c.openModel}">
+                                                <ui:inputText label="Estimated Time For Stop" class="field" value="{!v.estimatedtimeforstopwithminutes}" required="true" placeholder="Click Here To Open" aura:id="techscheduleddate1" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="slds-p-around--none slds-panel__section">
+                                <div class="slds-section slds-is-open">
+                                    <div class="slds-grid slds-grid slds-wrap slds-grid--pull-padded ">
+                                        <div class="slds-p-horizontal--small slds-size--1-of-1" align="center">
+                                            <div style="color:red;">
+                                                <ui:outputText value="{!v.conferror}" />
+                                            </div>
+                                            <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv hasDiv hasDiv hasDiv hasDiv hasDiv hasDiv hasDiv hasDiv hasDiv">
+                                                <lightning:button variant="neutral" label="Click Here to Schedule for Items" iconName="utility:up" iconPosition="left"  onclick="{!c.openLineItem}"  />
+                                                <lightning:button variant="neutral" label="Cancel" iconName="utility:back" iconPosition="left" onclick="{!c.GobackToRecord}" />
+                                                <lightning:button variant="brand" label="Schedule" iconName="utility:forward" iconPosition="right" onclick="{!c.generatePostCall}" />
+                                                <lightning:input aura:id="addressId" name="name" label="Name" value="{!v.caseObj.Address__r.Id}" required="true" class="slds-hidden" />
+                                                <lightning:input aura:id="soextid" name="name" label="Name" value="{!v.salesOrderObj.fulfillerID__c}"  class="slds-hidden" />
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-p-around--none slds-panel__section">
+                                <div class="slds-section slds-is-open">
+                                    <div class="slds-grid slds-grid slds-wrap slds-grid--pull-padded ">
+                                        <div class="slds-p-horizontal--small slds-size--1-of-1" align="center">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </header>
+                
+                <div class="slds-m-around--xx-large">
+                    <aura:if isTrue="{!isOpenForComments}">
+                        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+                            <div class="slds-modal__container">
+                                <!-- ###### MODAL BOX HEADER Part Start From Here ######-->
+                                <div class="slds-modal__header">
+                                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeCommentSection}">
+                                        X
+                                        <span class="slds-assistive-text">Close</span>
+                                    </button>
+                                    <h2 id="header99" class="slds-text-heading--medium">Schedule a Technician </h2>
+                                    
+                                </div>
+                                <div class="slds-modal__content slds-p-around--medium">
+                                    <div class="slds-section slds-is-open">
+                                        <div class="slds-grid slds-grid slds-wrap slds-grid--pull-padded">
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label" for="textarea-id-01">Textarea Label</label>
+                                                <div class="slds-form-element__control">
+                                                    <textarea id="textarea-id-01" class="slds-textarea" placeholder="Placeholder Text"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </aura:if>
+                    
+                </div>
+                
+                <div class="slds-m-around--xx-large">
+                    
+                    <div style="{!if(v.isopenfortech,'display:','display:none')}">
+                        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+                            <div class="slds-modal__container">
+                                <div class="slds-modal__header">
+                                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModal}">
+                                        X
+                                        <span class="slds-assistive-text">Close</span>
+                                    </button>
+                                    <h2 id="header99" class="slds-text-heading--medium">Schedule a Technician </h2>
+                                    
+                                </div>
+                                
+                                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_offline" role="alert">
+                                    <span class="slds-assistive-text">offline</span>
+                                    <span class="slds-icon_container slds-icon-utility-offline slds-m-right_x-small" title="Description of icon when needed">
+                                    </span>
+                                    <h2 color="black">NOTE: Please select a Company and Technician before scheduling a date for technician</h2>
+                                    <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" title="Close">
+                                        <span class="slds-assistive-text">Close</span>
+                                    </button>
+                                </div>
+                                <div class="slds-modal__content slds-p-around--medium">
+                                    <div class="slds-section slds-is-open">
+
+                                        <div class="slds-grid slds-wrap slds-grid--pull-padded">
+                                            <div class="slds-p-horizontal--small slds-size--1-of-2" >
+
+                                                <div class="workloaddetails">WorkLoad details</div>
+                                                Maximum Hours worked per day: &nbsp;<ui:outputText value="{!v.maxHours}"/> <br></br>
+                                                Maximum Repair stops per day: &nbsp;&nbsp;<ui:outputText value="{!v.maxRepair}"/> <br></br>
+                                                Maximum pieces repaired per day: <ui:outputText value="{!v.maxPieces}"/> <br></br>
+                                                Upholstery:&emsp;<ui:outputText value="{!v.upHostery}"/> <br></br> 
+                                                CaseGoods:&emsp;<ui:outputText value="{!v.casegoods}"/> <br></br>
+                                                Leather:&emsp;<ui:outputText value="{!v.leather}"/> <br></br>
+												<p>&nbsp;</p>
+
+                                                <div class="workloaddetails" style="padding-top:10px;">Calendar color denotes Technician availability:</div>
+                                                <div class="tech-avail" style="clear:both;float:left;"><a>&nbsp;Fully Available&nbsp;</a></div>
+                                                <div class="tech-partially-avail" style="float:right;"><a>&nbsp;Partially Available&nbsp;</a></div>
+                                                <div class="tech-not-avail" style="clear:both;float:left;"><a>&nbsp;Fully Occupied&nbsp;</a></div>
+                                                <div class="tech-leave" style="float:right;"><a>&nbsp;On Leave&nbsp;</a></div>
+                                            </div>
+
+                                            <div class="slds-p-horizontal--small slds-size--1-of-2" align="right">
+                                                <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                                    <div id="datepicker"></div>
+                                                    <div class="workloaddetails" style="text-align: left;padding-left: 35px;">Scheduled Date: &nbsp;<ui:outputText value="{!v.cSelectedDate}"/></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            
+                                            <div class="slds-p-horizontal--small slds-size--4-of-6">
+                                                <label class="slds-form-element__label"> Working Hours <ui:outputText value="{!v.workingHoursprogvalue}"/> </label>
+                                                <div class="slds-progress-bar slds-progress-bar_large slds-progress-bar_circular" aria-valuemin="0" aria-valuemax="{!v.MaxWorkingHours}" aria-valuenow="{!v.CurrentWorkingHours}" role="progressbar">
+                                                    <span class="slds-progress-bar__value slds-progress-bar__value_success" style="{!'width: ' + v.CurrentWorkingHoursProgValue + '%' }" > 
+                                                        <span class="slds-assistive-text">Progress: {!v.CurrentWorkingHoursProgValue} %</span>
+                                                    </span>
+                                                </div>
+                                                <br></br>
+                                                
+                                                <label class="slds-form-element__label"> Repair Stops <ui:outputText value="{!v.RepairStopsprogvalue}"/></label>
+                                                <div class="slds-progress-bar slds-progress-bar_large slds-progress-bar_circular" aria-valuemin="0" aria-valuemax="{!v.MaxRepairStops}" aria-valuenow="{!v.CurrentRepairStops}" role="progressbar">
+                                                    <span class="slds-progress-bar__value progress-bar--style-custom" style="{!'width: ' + v.CurrentRepairStopsprogvalue + '%'}" > 
+                                                        <span class="slds-assistive-text">Progress: {!v.CurrentRepairStopsprogvalue} %</span>
+                                                    </span>
+                                                </div><br></br>
+                                                
+                                                <label class="slds-form-element__label"> Pieces Repair <ui:outputText value="{!v.PiecesRepairprogvalue}"/></label>
+                                                <div class="slds-progress-bar slds-progress-bar_large slds-progress-bar_circular" aria-valuemin="0" aria-valuemax="{!v.MaxPiecesDay}" aria-valuenow="{!v.CurrentPieces}" role="progressbar">
+                                                    <span class="slds-progress-bar__value" style="{!'width: ' + v.CurrentPiecesRepairprogvalue + '%'}"> 
+                                                        <span class="slds-assistive-text">Progress: {!v.CurrentPiecesRepairprogvalue} %</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-p-horizontal--small slds-size--1-of-3">
+                                                <div class="slds-media__figure">
+                                                    <span class="slds-icon_container slds-icon-standard-contact" title="description of icon when needed">
+                                                        
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-p-horizontal--small slds-size--1-of-3">
+                                            </div>
+                                            <div class="slds-p-horizontal--small slds-size--1-of-3">
+                                            </div>
+                                        </div> 
+                                    </div>
+                                </div>
+                                
+                                <div class="slds-modal__footer">
+                                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">Close</button>
+                                    <button class="slds-button slds-button--brand" onclick="{!c.onDatePickerValue}" >Save</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-backdrop slds-backdrop--open"></div>
+                    </div>
+                </div>
+                
+                
+                <aura:if isTrue="{!v.Spinner}">
+                    <div aura:id="spinnerId" class="slds-spinner_container">
+                        <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                            <span class="slds-assistive-text">Loading</span>
+                            <div class="slds-spinner__dot-a"></div>
+                            <div class="slds-spinner__dot-b"></div>
+                        </div>
+                    </div>
+                </aura:if>
+                
+                <div class="slds-m-around--xx-large"> 
+                    <aura:if isTrue="{!v.isOpen}">
+                        
+                        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+                            <div class="slds-modal__container">
+                                <!-- ###### MODAL BOX HEADER Part Start From Here ######-->
+                                <div class="slds-modal__header">
+                                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                                        X
+                                        <span class="slds-assistive-text">Close</span>
+                                    </button>
+                                    <h2 id="header99" class="slds-text-heading--medium">Estimated Time for Stop</h2>
+                                </div>
+                                <!--###### MODAL BOX BODY Part Start From Here ######-->
+                                <div class="slds-modal__content slds-p-around--medium">
+                                    <div class="slds-section slds-is-open">
+                                        <div class="slds-grid slds-grid slds-wrap slds-grid--pull-padded">
+                                            
+                                            <div class="slds-p-horizontal--small slds-size--1-of-1">
+                                                <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                                    <lightning:select name="minValTechSch" label="Minimum Value (In Hours)" aura:id="minValTechSch" value="{!v.minValue}">
+                                                        <option value="">choose one...</option>
+														<aura:iteration items="{!v.techScheduleHours}" var="minHrs">
+												            <option text="{!minHrs}" value="{!minHrs}" />
+												        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-p-horizontal--small slds-size--1-of-1">
+                                                <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                                    <lightning:select name="customer_po1" label="Maximum Value (In Hours)" aura:id="customer_po1" value="{!v.maxValue}">
+                                                        <option value="">choose one...</option>
+														<aura:iteration items="{!v.techScheduleHours}" var="maxHrs">
+												            <option text="{!maxHrs}" value="{!maxHrs}" />
+												        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="slds-p-horizontal--small slds-size--1-of-1">
+                                                <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+                                                    <lightning:select name="selectItem" label="Increments of (In Minutes)" value="{!v.incrementValue}">
+                                                        <option value="">choose one...</option>
+														<aura:iteration items="{!v.techScheduleMins}" var="mins">
+												            <option text="{!mins}" value="{!mins}" />
+												        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <ui:outputText value="{!v.errorstime}"/>
+                                    </div>
+                                </div>
+                                <div class="slds-modal__footer">
+                                    <button class="slds-button slds-button--neutral" onclick="{!c.closeModel}">Close</button>
+                                    <button class="slds-button slds-button--brand" onclick="{!c.saveMeetingTime}" >Save</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-backdrop slds-backdrop--open"></div>
+                        <!--###### MODAL BOX Part END Here ######-->
+                        
+                    </aura:if>
+                </div>
+                
+                <div class="slds-m-around--xx-large">
+                    <aura:if isTrue="{!v.isOpenForLine}">
+                        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+                            <div class="slds-modal__container"  style="max-width: 70rem">
+                                <!-- ###### MODAL BOX HEADER Part Start From Here ######-->
+                                <div class="slds-modal__header">
+                                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeLineItem}">
+                                        X
+                                        <span class="slds-assistive-text">Close</span>
+                                    </button>
+                                    <h2 id="header99" class="slds-text-heading--medium" style="font-weight:bold">Associate Items</h2>
+                                    
+                                </div>
+                                <!--###### MODAL BOX BODY Part Start From Here ######-->
+                                <div class="slds-modal__content slds-p-around--medium">
+                                    <div style="color:red;">
+                                        <ui:outputText value="{!v.dterror}" />
+                                    </div>
+                                    <div class="slds-section slds-is-open">
+                                        <div class="slds-grid slds-grid slds-wrap slds-grid--pull-padded slds-scrollable_x slds-scrollable_y">
+                                            <lightning:datatable aura:id="AssociateItems"
+																	data="{!v.allrows}" 
+																	columns="{!v.democolumns}" 
+																	keyField="keyId"
+																	hideCheckboxColumn="true"
+																	onsave="{!c.handleSaveEdition}"
+																	onrowaction="{!c.handleRowAction}" />
+                                            <!-- table end-->
+                                        </div>
+                                        <br></br>
+                                        <div class="table-test">
+                                            <div>  <h2 id="header99" class="slds-text-heading--medium" style="font-weight:bold" align="center">Star Sku Items(Read-Only)</h2>
+                                            </div>
+                                            
+                                            <lightning:datatable data="{!v.allrowssku}" 
+                                                                 columns="{!v.democolumnssku}" 
+                                                                 keyField="id"
+                                                                 hideCheckboxColumn="true" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <ui:outputText value="{!v.errors}"/>
+                                    </div>
+                                </div>
+                                
+                                <div class="slds-modal__footer">
+                                    <button class="slds-button slds-button--neutral" onclick="{!c.closeLineItem}">Close</button>
+                                    <button class="slds-button slds-button--brand" onclick="{!c.closeLineItem}">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-backdrop slds-backdrop--open"></div>
+                    </aura:if>
+                </div>
+            </div>
+        </div>
+    </article>
+</aura:component>

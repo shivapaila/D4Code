@@ -1,0 +1,27 @@
+<aura:component implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global" >
+    <aura:attribute name="guestId" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="pageReference" type="Object"/>
+    <aura:attribute name="rendSubComponent" type="Boolean" />
+    <aura:attribute name="rSubComponent" type="Boolean" />
+    
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/> 
+ 	<aura:handler name="change" value="{!v.pageReference}" action="{!c.init}" />
+    
+    <aura:registerEvent name="NotifyHeaderComponentEvent" type="c:NotifyHeaderComponentEvent"/>
+    <ui:scrollerWrapper>
+        <!-- This not work for ipad, can not scroll, for test, I put scrollerWrapper back.and comment below. JoJoToAndrew-->
+      <!--<div style="height:100%;overflow: auto;">-->
+        <div>
+            <c:RSAAccountInfo/>
+            <c:concierge_header /> 
+            
+            
+            <aura:if isTrue="{!v.rendSubComponent}">
+                <c:checkout guestId="{!v.guestId}" rSubComponent="{!v.rSubComponent}"/>
+            </aura:if>
+            <c:NavigatorCmp />
+        </div>
+    </ui:scrollerWrapper>
+</aura:component>

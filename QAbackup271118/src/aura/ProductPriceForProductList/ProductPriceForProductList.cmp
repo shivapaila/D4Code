@@ -1,0 +1,12 @@
+<aura:component extends="c:ProductPriceBase">
+    <aura:attribute name="productDetailId" type="String"/>
+    <aura:attribute name="productPrice" type="ProductPriceWrapper"/>
+
+    <!-- NEED LOGIC TO ADD CLASS "strikeThrough" to the OriginalPrice IF SALE PRICE EXISTS -->
+    <h4 class="{!v.productPrice.SalePrice!=null ? 'originalPrice strikeThrough':'originalPrice'}">${!v.productPrice.OriginalPrice}</h4>
+    	
+    <aura:if isTrue="{!v.productPrice.SalePrice!=null}">
+      <h4 class="salePrice">{!v.productPrice.SalePrice}</h4>
+    </aura:if>
+  
+</aura:component>

@@ -1,0 +1,8 @@
+<apex:page showHeader="false" sidebar="false"  
+           standardController="Contract" extensions="EDQ.RedirectToDataQualityPageController" 
+           action="{!Execute}">
+           
+         <c:RedirectToDataQualityPage RedirectToDataQualityPage="{!RedirectToDataQualityPage}" 
+                        DataQualityPageUrl="{!DataQualityPageUrl}"
+                        PackagePrefix="EDQ__" /> 
+</apex:page>

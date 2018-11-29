@@ -1,0 +1,73 @@
+<aura:component controller="salesOrderRouting" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:attribute name="lineItemId" type="string"/>
+	<aura:attribute name="orderSfdcId" type="string"/>
+    <aura:attribute name="typeOfData" type="string"/>
+    <aura:attribute name="quantityItem" type="Attributable"/>
+	<aura:attribute name="lineItemWrapper" type="Attributable"/>
+	<aura:attribute name="inEditMode" type="boolean" default="false"/>
+    <aura:attribute name="items" type="SORoutingItems.SOLineItem[]"/>
+    <aura:attribute name="itemsList" type="SORoutingItems.SOLineItem[]"/>
+	
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+			
+	<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+		
+		<div class="slds-modal__container">
+			<!-- modal header--> 	
+			<div class="slds-modal__header">
+                <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.defaultCloseAction}">
+                X
+                <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 id="header99" class="slds-text-heading--medium">Line Items</h2>
+              </div>
+
+			<!-- modal body--> 
+			<div class="slds-modal__content slds-p-around_medium">	
+				<aura:if isTrue="{!v.totalSize}">
+                        <div class="slds-text-color_error">
+                            <b><lightning:formattedText value="{!v.errorMsgShowLneItms}" /></b> 
+                        </div>
+                </aura:if> 
+                    <!--<b><lightning:formattedText value="{!'Record Count: '+v.totalSize}" /></b> <br/><br/>-->
+                    <table class="slds-table slds-table--bordered slds-table--striped slds-table--cell-buffer slds-table--fixed-layout">
+                        <thead>
+                            <tr class="slds-text-heading--label">
+                                <th scope="col">  Item SKU </th>                  
+                                <th scope="col">  Item Description </th>                  
+                                <th scope="col">  Quantity </th>                  
+                           </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.itemsList}" var="IL">
+                                <tr>
+                                    <th data-label="Item SKU"> 
+                                        <div class="slds-cell-wrap" title="{!IL.SKU}">{!IL.SKU}</div>
+                                    </th>
+                                    <th data-label="Item Description">
+                                        <div class="slds-cell-wrap" title="{!IL.ItemDescription}">{!IL.ItemDescription}</div>
+                                    </th>
+                                    <th data-label="Quantity">
+                                        <div class="slds-cell-wrap" title="{!IL.Quantity}">{!IL.Quantity}</div>
+                                    </th>
+                                    
+                                </tr>
+                                <tr><br/></tr>
+                            </aura:iteration>
+                            <br/><br/>            
+                           <tr><br/></tr>
+                        </tbody>
+                    </table>
+			</div>
+			<!-- end modal body--> 
+
+			<!-- modal footer--> 
+			<footer class="slds-modal__footer">
+				  <lightning:button variant="neutral" label="{!$Label.c.Sales_Order_Line_Button_Label_Close}" onclick="{!c.defaultCloseAction}" />
+                
+			</footer>
+		</div>
+	</section>
+	<div class="slds-modal-backdrop slds-modal-backdrop--open"></div>
+</aura:component>

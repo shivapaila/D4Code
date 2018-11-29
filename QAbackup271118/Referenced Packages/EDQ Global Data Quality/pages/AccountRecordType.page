@@ -1,0 +1,25 @@
+<apex:page standardcontroller="Account" extensions="EDQ.RecordTypeExt" applybodytag="false">
+    <body id="lightningStyle">
+        <apex:stylesheet value="{!URLFOR($Resource.EDQ__DynamicPageCss)}" />
+        <apex:stylesheet value="{!IF(IsSalesforce1 == true, urlfor($Resource.EDQ__EDQAssets, 'styles/LightningCss.css') , '' )}" />
+        <apex:form styleClass="customRecordType">
+            <span class="label">Account Record Type</span>
+            <span class="value">{!RecordTypeName}</span>
+            <apex:commandButton value="[Change]" oncomplete="change()"  styleClass="btn" rendered="{!hasRecordTypes}" />
+        </apex:form>
+    </body>
+    <script>
+	function change() {
+		var returnUrl = '{!JSENCODE(RecordTypeUrl)}';
+		var isSalesforce1 = {!IF((IsSalesforce1),"true", "false")};
+		if (returnUrl != null){
+			if(isSalesforce1){
+	  			sforce.one.navigateToURL(returnUrl);
+	  		}else{
+	  			window.parent.location.href = returnUrl;
+	  		}
+	  	return false;
+		}
+	}
+    </script>
+</apex:page>

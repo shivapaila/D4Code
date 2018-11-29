@@ -1,0 +1,141 @@
+.THIS {
+}
+
+.THIS .tech-avail a {
+     background: linear-gradient(
+    to right, 
+    #f4f4f4 0%, 
+    #f4f4f4 50%,
+    #f4f4f4 75%, 
+    #008000 75%, 
+    #008000 100%
+  );
+}
+
+.THIS.container {
+   min-height: 100px;
+     top:30%;
+     right:-2%;
+   	 width:300px;
+ 	 border-right: 1px solid #000000;
+	 border-left: 1px solid #000000;
+	 border-top: 1px solid #000000;
+	 border-bottom: 1px solid #000000;
+}
+
+.THIS.message {
+   min-height: 100px;
+     top:30%;
+     right:-2%;
+   	 width:300px;
+ 	 
+}
+
+.THIS .tech-availa a {
+    background-color: #000000 !important;
+    background-image :none !important;
+    color: #fff !important;
+}
+/*.THIS .slds-badge  {
+    background-color:#C0C0C0;  
+    color:#fff;
+    font-size:100%;
+}*/
+.THIS .slds-badge selected {
+    background-color:#014a01;  
+  	 color:#fff;
+    font-size:100%;
+    
+}
+.THIS .slds-badge.red {
+    background-color:#FF0000;  
+  	 color:#fff;
+    font-size:80%;
+    
+}
+.THIS .slds-badge.White {
+    background-color:#f7f7f7;  
+  	 color:#000000;
+    font-size:80%;
+    
+}
+.THIS .slds-badge.LightGray {
+    background-color:#eeeeee;  
+  	 color:#000000;
+    font-size:80%;
+    
+}
+.THIS .slds-badge.Blue {
+    background-color:#0000ff;  
+  	 color:#fff;
+    font-size:80%;
+    
+}
+
+.THIS .slds-badge.yellow {
+    background-color:#ead61c;
+  	 color:	#fff;
+    font-size:80%;
+    
+}
+.THIS .slds-badge.blue {
+    background-color:#0000FF;
+  	 color:#fff;
+    font-size:80%;
+    
+}
+.THIS .slds-badge.gray {
+    background-color:#797980;
+  	 color:#000000;
+    font-size:80%;
+    
+}
+
+.THIS.slds-popover {
+   	 min-height: 100px;
+     top:15%;
+     right:-35%;
+   	 width:300px;
+ 	 border-right: 1px solid #000000;
+	 border-left: 1px solid #000000;
+	 border-top: 1px solid #000000;
+	 border-bottom: 1px solid #000000;
+}
+
+.THIS slds-badge.Whitegreen {
+    background: linear-gradient(
+    to right, 
+    #FFFFFF 0%, 
+    #FFFFFF 50%,
+    #FFFFFF 75%, 
+    #008000 75%, 
+    #008000 100%
+    );
+}
+.THIS .greencolor {
+    background-color:#2DED31;  
+  	 color:#fff;
+    font-size:100%;
+    
+}
+
+.THIS slds-badge.redgreen {
+    background: linear-gradient(
+    to right, 
+    #FF0000 0%, 
+    #FF0000 50%,
+    #FF0000 75%, 
+    #008000 75%, 
+    #008000 100%
+    );
+}
+.THIS .greenleaf {
+     background: linear-gradient(
+    to right, 
+    #f4f4f4 0%, 
+    #f4f4f4 50%,
+    #f4f4f4 75%, 
+    #320069 75%, 
+    #320069 100%
+  );
+}

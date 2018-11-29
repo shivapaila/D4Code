@@ -1,0 +1,56 @@
+.THIS .uiInputCheckbox input[type="checkbox"] {
+   float:left;
+}
+.THIS .uiInputCheckbox label {
+   display:inline-block !important;
+}
+.THIS .checkboxWrapper {
+   width:100%;
+   display:block;
+   margin-bottom:10px;
+}
+.THIS .signatureArea {
+   margin-top:45px;
+}
+.THIS .footerRow {
+   width:100%;
+   display:block;
+   margin-top:25px;
+}
+.THIS .footerRow .greyButton {
+   margin-right:10px;
+}
+.THIS .BGSIGCAPSignatureCapture button {
+   background:#f68c2c;
+   color:#fff !important;
+   border:none;
+   border-radius:0;
+ }
+ .THIS .BGSIGCAPSignatureCapture button:last-child {
+   background:#999;
+   color:#fff !important;
+   border:none;
+   border-radius:0;
+ }
+.THIS canvas {
+   scroll-behavior: unset;
+   -webkit-overflow-scrolling: unset;
+}
+.THIS canvas#paint {
+   height: 175px !important;
+   width:100%;
+   scroll-behavior:unset;
+   display:static;
+}
+
+.THIS section {
+   overflow: scroll;
+}
+.THIS label.uiLabel-left.form-element__label.uiLabel {
+   float:none;
+   width:auto;
+   margin-top:5px;
+}
+.THIS canvas {
+   margin-bottom:10px;
+}

@@ -1,0 +1,32 @@
+<aura:component controller="SignatureController" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute type="String"   name="customerId" />
+    
+    <aura:attribute type="Id[]"   name="signaturePics" />
+    <aura:attribute name="inSvcConsole" type="Boolean" default="false" />
+    <aura:registerEvent name="NotifyParentCloseModal" type="c:CloseModalEvent"/>
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    
+    <div>
+        <section aura:id="createDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container adjust_container">
+                
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading--medium">Signature List</h2>  
+                    <small>Please tap guest's signature</small>
+                </header>
+                <ui:scrollerWrapper >
+                <div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap">
+                    <aura:iteration items="{!v.signaturePics}" var="pic">
+                        <div data-record="{!pic}" onclick="{!c.saveRecords}"> <img src="{!'/servlet/servlet.FileDownload?file='+pic}"/></div>
+                        <hr />
+                    </aura:iteration>
+                </div>
+                </ui:scrollerWrapper>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="Cancel" onclick="{!c.cancelDialog}" />
+                </footer>
+            </div>
+        </section>
+    </div>
+</aura:component>

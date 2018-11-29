@@ -1,0 +1,7 @@
+<aura:component implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global" >
+    <ui:scrollerWrapper>
+        <c:concierge_header />
+        <c:ViewALLTasksCmp />
+        <c:NavigatorCmp />
+    </ui:scrollerWrapper>
+</aura:component>

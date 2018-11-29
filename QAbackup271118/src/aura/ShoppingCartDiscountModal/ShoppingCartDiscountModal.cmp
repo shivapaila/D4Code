@@ -1,0 +1,358 @@
+<aura:component controller="ShoppingCartDiscountModalCtrl" implements="c:ShoppingCartConstants" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:attribute name="shoppingCartLineItems" type="list[]" />    
+    <aura:attribute name="shoppingCartLineItemsForCancel" type="list[]" />
+    <aura:attribute name="lineItem" type="Shopping_cart_line_item__c" default="{ 'sobjectType' : 'Shopping_cart_line_item__c' }"
+                    />
+    <aura:attribute name="isCurrentItemDiscountSelected" type="Boolean" default="true"/>
+    <aura:attribute name="productDetail" type="ProductWrapper" />
+    <aura:attribute name="discountReasonList" type="PairObj[]" />
+    
+    <aura:attribute name="SelectedTotalOriginalPrice" type="Decimal" />
+	<aura:attribute name="SelectedAverageDiscount" type="Decimal" />
+    
+    <aura:attribute name="SelectedFlatDiscountAmount" type="Decimal"/>
+    
+    <aura:attribute name="SelectedTotalDiscountedPrice" type="Decimal" />
+
+    
+    <aura:attribute name="CartTotalOriginalPrice" type="Decimal"/>
+    <aura:attribute name="CartAverageDiscount" type="Decimal" />
+    
+    <aura:attribute name="CartFlatDiscountAmount" type="Decimal"/>
+    
+    <aura:attribute name="CartTotalDiscountedPrice" type="Decimal" />
+    
+    <aura:attribute name="selectedDiscountType" type="String" />
+    <aura:attribute name="itemTotalPrice" type="Decimal" default="{!v.lineItem.List_Price__c}"/>
+    <aura:attribute name="opp" type="Opportunity" />
+    <aura:attribute name="averageDiscountCriteria" type="Decimal" default="0.00" />
+    
+    <aura:attribute name="cartDiscount" type="Decimal"/>
+    <aura:attribute name="flatDiscountAmount" type="Decimal" default="0.00" />
+    <aura:attribute name="showApproverSelectBox" type="Boolean" default="false" />
+    <aura:attribute name="locked" type="Boolean" default="false"/>
+    <aura:attribute name="modalTitle"   type="String" />
+    <aura:attribute name="haslockedItem" type="Boolean" default="false"/>
+    <aura:attribute name="selectedApprover" type="String" />
+    <aura:attribute name="accountStoreInfo" type="String" />
+    
+    <aura:registerEvent name="NotifyParentCloseDiscountModal" type="c:CloseModalEvent"/>
+    <aura:registerEvent name="shoppingCartLineItemEvent" type="c:ShoppingCartLineItemEvent"/>
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    
+    <div style="height:100%;">
+        <section aura:id="saveCartDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+            
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <i class="fa fa-times float-right" data-record="popUpContainer" onclick="{!c.cancelModal}"></i>
+                    
+                    <h4 class="slds-text-heading--medium">Discount for: {!v.modalTitle}</h4>
+                </div>
+                
+                
+                <div class="slds-modal__content slds-p-around--medium" style="height:50%;">
+                    <ui:scrollerWrapper>
+                        
+                        <div class="row">
+                            <div class="col-sm-4">
+                                
+                            </div>
+                            <div class="col-sm-4">
+                                
+                            </div>
+                            <div class="col-sm-4">
+                                <strong>Selected Total Price: </strong>
+                                <br />
+                                <h4 class="totalPrice">
+                                    <lightning:formattedNumber value="{!v.SelectedTotalOriginalPrice}" style="currency" currencyCode="USD" />
+                                </h4>
+                            </div>
+                        </div>
+                        <br /> 
+                        <div class="row">
+                            <div class="col-sm-4 labelShrink">
+                                <label>Discount %</label>                         
+                                <lightning:input type="number" 
+                                                 aura:id="percentDiscountAmount" name="percentDiscountAmount" 
+                                                 value="{!v.cartDiscount}" formatter="percent-fixed" step="0.01"
+                                                 max="100" min="0"
+                                                 onblur="{!c.changeDiscount}"
+                                                 
+                                                 />
+                            </div>
+                            
+                            
+                            <div class="col-sm-4 labelShrink">
+                                
+                                <label>Flat Discount Amount $</label>
+                                <lightning:input type="number" 
+                                                 aura:id="flatDiscountAmount" name="flatDiscountAmount"  
+                                                 value="{!v.opp.Cart_Flat_Discount_Amount__c}"
+                                                 onblur="{!c.changeDiscount}" 
+                                                 formatter="currency" step="0.01"
+                                                 max="{!v.opp.SelectedTotalOriginalPrice}" min="0"
+                                                 />
+                                
+                                
+                                
+                            </div>
+                            <div class="col-sm-4 labelShrink">
+                                
+                                <label>Price $</label>
+                                <lightning:input type="number" 
+                                                 aura:id="itemsPrice" name="itemsPrice"  value="{!v.opp.Cart_Discount_Price__c}"
+                                                 onblur="{!c.changeDiscount}" 
+                                                 formatter="currency" step="0.01"
+                                                 max="{!v.opp.SelectedTotalOriginalPrice}"
+                                                 />
+                                
+                                
+                            </div>
+                            
+                        </div>
+                        
+                        <aura:if isTrue="{!v.showApproverSelectBox}">
+                            <div class="row">
+                                
+                                <aura:if isTrue="{!!v.haslockedItem}">
+                                    <div class="col-sm-12">
+                                        <label>Approver:</label>
+                                        <c:LookupComponent objectName="User" fieldSet="['Name','Id']"   whereCondition="{!' AND One_Source_ID__c =\''+v.accountStoreInfo+'\' AND Id != \''+v.currentUserId+'\' AND  ProfileId != \''+$Label.c.ProfileId+'\' '}"
+                                                           placeholder="Start Typing Approver's Name" comparisonField="['Name']" primaryDisplayField="Name"
+                                                           alternateDisplayField="['Name']" minimumCharacter="2" lightningIconName="standard:user" uniqueLookupIdentifier="testUser"
+                                                           lookupId="{!v.lineItem.Discount_Approver__c}" value="{!v.value}" readOnly="false" required="true"
+                                                           requiredErrorMessage="Approver is required" />
+                                    </div>
+                                    <aura:set attribute="else">
+                                        <div class="col-sm-12">
+                                            <label>Approver:</label>
+                                            <ui:outputText value="{!v.selectedApprover}" />
+                                        </div>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                        </aura:if>
+                        <div class="hideLabel" style="margin-top:15px;">
+                            <small>Discount Reason</small>
+                            <lightning:select aura:id="discountReasonOption" name="selectedDiscountReason" class="">
+                                <option value="null">--None--</option>
+                                <aura:iteration items="{!v.discountReasonList}" var="discountReason">
+                                    <option value="{!discountReason.value}">{!discountReason.label}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        <div class="discountModal">
+                            <div class="row itemRow discountTableHeader">
+                                <div class="col-sm-1"> 
+                                    <lightning:input type="checkbox" aura:id="setAllDiscount" name="setAllDiscount" onchange="{!c.selectAllItems}"  value="ALL" />
+                                </div>
+                                <div class="col-sm-3"><small>ITEM NAME ( SKU )</small></div>
+                                <div class="col-sm-1"><small>QTY</small></div>
+                                <div class="col-sm-2"><small>ORIG TOTAL</small></div>
+                                <div class="col-sm-3"><small>(DIS %) SAVINGS</small></div>   
+                                <div class="col-sm-2"><small>EXT PRICE</small></div>
+                                <!-- <div class="col-sm-1"><small>Remove Discount</small></div>-->
+                                <!-- <div class="col-sm-1"><strong>Discount Critarie</strong></div>-->
+                            </div>
+                            <aura:renderIf  isTrue="{!v.lineItem.Id}">
+                                
+                                <div class="row itemRow">
+                                    <div class="col-sm-1"> 
+                                        <lightning:input type="checkbox" aura:id="setCurrentItemDiscount" name="setCurrentItemDiscount"  checked="true"
+                                                         value="{!v.lineItem.Id}" onchange="{!c.operateCheckbox}" 
+                                                         />
+                                    </div>
+                                    <div class="col-sm-3"><small>{!v.lineItem.Product_Title__c+' ('+v.lineItem.Product_SKU__c+')'}</small></div>
+                                    <!--  <div class="col-sm-2"><small>{!v.lineItem.Product_SKU__c}</small></div>-->
+                                    <div class="col-sm-1"><small>{!v.lineItem.Quantity__c}</small></div>
+                                    <div class="col-sm-2"><small>  
+                                        <lightning:formattedNumber value="{!v.lineItem.List_Price__c * v.lineItem.Quantity__c}" style="currency" currencyCode="USD" />
+                                        </small></div>
+                                    
+                                    
+                                    <div class="col-sm-3"><small>(<ui:outputNumber           value="{!v.isCurrentItemDiscountSelected ? v.opp.Discount__c/100 : v.lineItem.Discount__c/100}" format="##0.00%" />)
+                                        <lightning:formattedNumber  value="{!v.isCurrentItemDiscountSelected ? v.lineItem.List_Price__c * v.lineItem.Quantity__c - ((v.lineItem.List_Price__c * (1- v.opp.Discount__c/100)*100-mod(v.lineItem.List_Price__c * (1- v.opp.Discount__c/100)*100,1)+ (mod(v.lineItem.List_Price__c * (1- v.opp.Discount__c/100)*100,1)>=0.5?1:0))/100)*v.lineItem.Quantity__c: (v.lineItem.List_Price__c - v.lineItem.Discount_Price__c)*v.lineItem.Quantity__c }" style="currency" currencyCode="USD" />
+                                        
+                                        </small>
+                                        
+                                    </div>
+                                    <div class="col-sm-2"><small>
+                                        <lightning:formattedNumber  value="{!v.isCurrentItemDiscountSelected ? ((v.lineItem.List_Price__c * (1- v.opp.Discount__c/100)*100-mod(v.lineItem.List_Price__c * (1- v.opp.Discount__c/100)*100,1) + (mod(v.lineItem.List_Price__c * (1- v.opp.Discount__c/100)*100,1)>=0.5?1:0))/100)*v.lineItem.Quantity__c : v.lineItem.Discount_Price__c*v.lineItem.Quantity__c }" style="currency" currencyCode="USD" />
+                                        
+                                        </small>
+                                        
+                                    </div>
+                                    <!--  <div class="col-sm-1"><small>
+                                            
+                                            <lightning:formattedNumber value="{!v.averageDiscountCriteria/100}" style="percent" />
+                                            
+                                            </small>
+                                            
+                                        </div>-->
+                                </div>
+                            </aura:renderIf>
+                            <aura:iteration items="{!v.shoppingCartLineItems}" var="lineItem">
+                                <aura:renderIf  isTrue="{!and(lineItem.item.Id!=v.lineItem.Id,and(lineItem.item.Product_SKU__c[0]!='*', lineItem.isLocked!=true)) ? true:false}">
+                                    
+                                    <div class="row itemRow">
+                                        <div class="col-sm-1">              
+                                            <lightning:input type="checkbox" aura:id="setDiscount" name="setDiscount" 
+                                                                         value="{!lineItem.item.Id}" onchange="{!c.operateCheckbox}" 
+                                                                         />
+                                        </div>
+                                        <div class="col-sm-3"><small>{!lineItem.item.Product_Title__c+' ('+lineItem.item.Product_SKU__c+')'}</small></div>
+                                        <div class="col-sm-1"><small>{!lineItem.item.Quantity__c}</small></div>
+                                        <div class="col-sm-2"><small>
+                                            <lightning:formattedNumber value="{!lineItem.item.List_Price__c*lineItem.item.Quantity__c}" style="currency" currencyCode="USD" />
+                                            
+                                            </small></div>
+                                        <div class="col-sm-3"><small>(<ui:outputNumber           value="{!lineItem.isDiscountSelected ? v.opp.Discount__c/100: lineItem.item.Discount__c/100}" format="##0.00%" />)
+                                            <lightning:formattedNumber  value="{!lineItem.isDiscountSelected ? lineItem.item.List_Price__c*lineItem.item.Quantity__c -((lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100-mod(lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100,1)+ (mod(lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100,1)>=0.5?1:0))/100) *lineItem.item.Quantity__c : (lineItem.item.List_Price__c - lineItem.item.Discount_Price__c)*lineItem.item.Quantity__c }" style="currency" currencyCode="USD" />
+                                            
+                                            </small>
+                                        </div>
+                                        <div class="col-sm-2"><small>
+                                            <lightning:formattedNumber  value="{!lineItem.isDiscountSelected ? ((lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100-mod(lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100,1) + (mod(lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100,1)>=0.5?1:0))/100) *lineItem.item.Quantity__c : lineItem.item.Discount_Price__c*lineItem.item.Quantity__c }" style="currency" currencyCode="USD" />
+                                            
+                                            </small>
+                                        </div>
+                                        <!-- <div class="col-sm-1">
+                                            <small>
+                                                <lightning:formattedNumber value="{!lineItem.averageDiscountCriteria/100}" style="percent"  />
+                                                </small>
+                                            
+                                            </div>-->
+                                    </div>
+                                </aura:renderIf>
+                            </aura:iteration>
+                            
+                             <aura:iteration items="{!v.shoppingCartLineItems}" var="lineItem">
+                                <aura:renderIf  isTrue="{!lineItem.item.Product_SKU__c[0]=='*'}">
+                                    
+                                    <div class="row itemRow">
+                                        <div class="col-sm-1">                                                                              
+                                        </div>
+                                        <div class="col-sm-3"><small>{!lineItem.item.Product_Title__c+' ('+lineItem.item.Product_SKU__c+')'}</small></div>
+                                        <div class="col-sm-1"><small>{!lineItem.item.Quantity__c}</small></div>
+                                        <div class="col-sm-2"><small>
+                                            <lightning:formattedNumber value="{!lineItem.item.List_Price__c*lineItem.item.Quantity__c}" style="currency" currencyCode="USD" />
+                                            
+                                            </small></div>
+                                        <div class="col-sm-3"><small>(
+                                            <ui:outputNumber           value="{!lineItem.isDiscountSelected ? v.opp.Discount__c/100: lineItem.item.Discount__c/100}" format="##0.00%" />
+      										)
+                                            <lightning:formattedNumber  value="{!lineItem.isDiscountSelected ? lineItem.item.List_Price__c*lineItem.item.Quantity__c -((lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100-mod(lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100,1)+ (mod(lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100,1)>=0.5?1:0))/100) *lineItem.item.Quantity__c : (lineItem.item.List_Price__c - lineItem.item.Discount_Price__c)*lineItem.item.Quantity__c }" style="currency" currencyCode="USD" />
+                                            
+                                            </small>
+                                        </div>
+                                        <div class="col-sm-2"><small>
+                                            <lightning:formattedNumber  value="{!lineItem.isDiscountSelected ? ((lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100-mod(lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100,1) + (mod(lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100,1)>=0.5?1:0))/100) *lineItem.item.Quantity__c : lineItem.item.Discount_Price__c*lineItem.item.Quantity__c }" style="currency" currencyCode="USD" />
+                                            
+                                            </small>
+                                        </div>
+                                    </div>
+                                </aura:renderIf>
+                            </aura:iteration>
+                              <aura:iteration items="{!v.shoppingCartLineItems}" var="lineItem">
+                                <aura:renderIf  isTrue="{!and(lineItem.isLocked,lineItem.item.Id!=v.lineItem.Id)}">
+                                    
+                                    <div class="row itemRow">
+                                        <div class="col-sm-1">                                                                              
+                                        </div>
+                                        <div class="col-sm-3"><small>{!lineItem.item.Product_Title__c+' ('+lineItem.item.Product_SKU__c+')'}</small></div>
+                                        <div class="col-sm-1"><small>{!lineItem.item.Quantity__c}</small></div>
+                                        <div class="col-sm-2"><small>
+                                            <lightning:formattedNumber value="{!lineItem.item.List_Price__c*lineItem.item.Quantity__c}" style="currency" currencyCode="USD" />
+                                            
+                                            </small></div>
+                                        <div class="col-sm-3"><small>(
+                                            <ui:outputNumber           value="{!lineItem.isDiscountSelected ? v.opp.Discount__c/100: lineItem.item.Discount__c/100}" format="##0.00%" />
+                                            )
+                                            <lightning:formattedNumber  value="{!lineItem.isDiscountSelected ? lineItem.item.List_Price__c*lineItem.item.Quantity__c -((lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100-mod(lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100,1)+ (mod(lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100,1)>=0.5?1:0))/100) *lineItem.item.Quantity__c : (lineItem.item.List_Price__c - lineItem.item.Discount_Price__c)*lineItem.item.Quantity__c }" style="currency" currencyCode="USD" />
+                                            
+                                            </small>
+                                        </div>
+                                        <div class="col-sm-2"><small>
+                                            <lightning:formattedNumber  value="{!lineItem.isDiscountSelected ? ((lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100-mod(lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100,1) + (mod(lineItem.item.List_Price__c * (1-v.opp.Discount__c/100) *100,1)>=0.5?1:0))/100) *lineItem.item.Quantity__c : lineItem.item.Discount_Price__c*lineItem.item.Quantity__c }" style="currency" currencyCode="USD" />
+                                            
+                                            </small>
+                                        </div>
+                                    </div>
+                                </aura:renderIf>
+                            </aura:iteration>
+                            <div class="row itemRow">
+                                <div class="col-sm-2"> </div>
+                                <div class="col-sm-3"><b>Selected Total</b> </div>
+                                <div class="col-sm-2"><small>  
+                                    <lightning:formattedNumber value="{!v.SelectedTotalOriginalPrice}" style="currency" currencyCode="USD" />
+                                    </small></div>
+                                <div class="col-sm-3"><small>(
+                                    <ui:outputNumber           value="{!v.SelectedAverageDiscount}" format="##0.00%" />
+                                   )
+                                    <lightning:formattedNumber  value="{!v.SelectedFlatDiscountAmount}" style="currency" currencyCode="USD" />
+                                    
+                                    </small>
+                                    
+                                </div>
+                                <div class="col-sm-2"><small>
+                                    <lightning:formattedNumber  value="{!v.SelectedTotalDiscountedPrice}" style="currency" currencyCode="USD" />
+                                    
+                                    </small>
+                                    
+                                </div>
+                            </div>
+                            <div class="row itemRow">
+                                <div class="col-sm-2"> </div>
+                                <div class="col-sm-3"><b>Cart Total</b> </div>
+                                <div class="col-sm-2"><small>  
+                                    <lightning:formattedNumber value="{!v.CartTotalOriginalPrice}" style="currency" currencyCode="USD" />
+                                    </small></div>
+                                <div class="col-sm-3"><small>(
+                                    <ui:outputNumber           value="{!v.CartAverageDiscount}" format="##0.00%" />
+                                    )
+                                    
+                                    <lightning:formattedNumber  value="{!v.CartFlatDiscountAmount}" style="currency" currencyCode="USD" />
+                                    
+                                    </small>
+                                    
+                                </div>
+                                <div class="col-sm-2"><small>
+                                    <lightning:formattedNumber  value="{!v.CartTotalDiscountedPrice}" style="currency" currencyCode="USD" />
+                                    
+                                    </small>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </ui:scrollerWrapper>
+                </div>
+                
+                
+                <div class="slds-modal__footer">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <aura:if isTrue="{!v.lineItem.Discount_Status__c != 'Not Applicable'}">
+                                <ui:outputText value="{!v.lineItem.Discount_Status__c}" />
+                            </aura:if>
+                        </div>
+                        <div class="col-sm-4">
+                            
+                            <a  class="greyButton" onclick="{!c.cancelModal}">Cancel</a>
+                            
+                            <aura:if isTrue="{!!v.haslockedItem}">
+                                <a class="orangeButton" onclick="{!c.updateDiscount}">Finalize</a>
+                            </aura:if>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+            
+        </section>
+    </div>
+    
+</aura:component>

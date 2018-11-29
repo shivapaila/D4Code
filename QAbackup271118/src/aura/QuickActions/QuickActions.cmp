@@ -1,0 +1,42 @@
+<aura:component controller="SignatureController" implements="flexipage:availableForAllPageTypes">
+	<aura:attribute name="overlayPanel" type="Aura.Component[]" />
+    <aura:attribute name="showGuestModal" type="Boolean" default="false" />
+    <aura:attribute name="showSignature" type="Boolean" default="false" />
+    <aura:attribute name="userId" type="Id" />
+    <aura:handler name="NotifyParentCloseModal" event="c:CloseModalEvent" action="{!c.closeGuestModal}"/>
+    <aura:handler name="NotifyParentSignatureModal" event="c:SignatureModalEvent" action="{!c.closeSignatureModal}" />
+	
+    <!-- AURA EVENTS -->
+    <aura:registerEvent name="NavigateToWrapperComponentAppEvent" type="c:NavigateToWrapperComponentAppEvent" />
+    <!-- /AURA EVENTS --> 
+
+    <div>
+ 
+        <aura:if isTrue="{!v.showSignature}">
+        	<c:ConciergeSignature recordId="{!v.userId}"/>
+        </aura:if>
+        
+        <div class="slds-backdrop" aura:id="Modalbackdrop"></div>
+
+        <div class="quickActionsWrapper container">
+            <div class="row">
+                <div class="col text-left">
+                    <a href="" onclick="{!c.openProducts}" class="orangeButtonLarge"><i class="far fa-shopping-bag"></i> Find a Product</a>
+                </div>
+                <div class="col text-center">
+                    <a href="" onclick="{!c.addCustomer}" class="orangeButtonLarge"><i class="far fa-user"></i> Add a Guest</a>
+                </div>
+                <div class="col text-right">
+                    <a href="" onclick="{!c.openMyCustomers}" class="orangeButtonLarge"><i class="fa fa-search"></i> Find a Guest</a>
+                </div>
+            </div>
+        </div>
+    	
+        <!-- create customer modal --> 
+        <aura:if isTrue="{!v.showGuestModal}">
+            <c:AddCustomer />
+        </aura:if>
+        <div class="slds-backdrop" aura:id="overlay"></div>    
+    </div>
+
+</aura:component>

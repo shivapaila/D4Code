@@ -1,0 +1,223 @@
+<aura:component controller="DeliveryWindowLookupController">
+    <aura:attribute name="orderId" type="string"/>	
+    <aura:attribute name="orderLineId" type="string" />
+    <aura:attribute name="TdeliveryType" type="object" />
+    <aura:attribute name="accountNumber" type="string" />	
+    <aura:attribute name="rdcId" type="string" />		
+    <aura:attribute name="deliveryCalendar" type="Attributable"/>
+    <aura:attribute name="lineItemDeliveryDate" type="Date"/>
+    <aura:attribute name="isLoading" type="Boolean" default="false"/>
+    <aura:attribute name="selectedMonth" type="Attributable"/>	
+    <aura:attribute name="TselectedMonth" type="Attributable"/>
+    <aura:attribute name="isConciergeApp" type="Boolean" default="false"/>
+    <aura:attribute name="deliveryMode" type="String"/>
+    <aura:attribute name="shipToAddr" type="String"/>
+    
+    <aura:attribute name="dwProcessingStartDate" 
+                    type="Integer" 
+                    access="PRIVATE" 
+                    description="Delivery window request should be no earlier than the processing start date"/>    
+    <aura:attribute name="dwEarliestMonthStartDate" 
+                    type="Date" 
+                    access="PRIVATE" 
+                    description="Earliest Month Start date of the delivery window"/>
+    <aura:attribute name="dwCurrentMonthStartDate" 
+                    type="Date" 
+                    access="PRIVATE" 
+                    description="Current Month Start date of the delivery window"/> 					    
+    
+    <ltng:require scripts="{!join(',', $Resource.moment_2_20_1_min, $Resource.moment_timezone)}" afterScriptsLoaded="{!c.init}" />
+    
+    <aura:registerEvent name="deliveryWindowEvent" type="c:DeliveryWindowEvent"/>	
+    <aura:if isTrue="{!v.deliveryMode == 'HD'}">
+        <aura:if isTrue="{!v.TdeliveryType.DeliveryType__c == 'THD'}">
+            <div class="slds-p-around_medium">
+                <aura:if isTrue="{!v.isLoading}">
+                    <lightning:spinner aura:id="spinner" alternativeText="loading..."/>
+                </aura:if>
+                <aura:if isTrue="{!v.TselectedMonth != undefined}">  
+                  <div style="overflow: hidden;">
+                <div class="tech-availa" style="clear:both;float:left;"> 
+                 </div>
+                <h4 style="float:left;">****Threshold Delivery Available Day****</h4>
+                 </div>
+                    <aura:if isTrue="{!not(empty(v.deliveryCalendar))}">
+                        <div class="slds-text-align_center">
+                            <aura:if isTrue="{!or( not(v.selectedMonth.isFirst), notequals(v.dwEarliestMonthStartDate, v.dwCurrentMonthStartDate) ) }">
+                                <lightning:buttonIcon iconName="utility:chevronleft" variant="bare" alternativeText="previous"
+                                                      iconClass="dark" onclick="{!c.previousMonth}" class="orangeButton slds-float_left"/>
+                            </aura:if>
+                            {!v.TselectedMonth.Tname}
+                            <lightning:buttonIcon iconName="utility:chevronright" variant="bare" alternativeText="next"
+                                                  iconClass="dark" onclick="{!c.nextMonth}" class="orangeButton slds-float_right"/>
+                        </div>
+                        <div class="slds-scrollable--x">
+                            <table class="slds-table slds-table--bordered slds-table_col-bordered slds-table--cell-buffer slds-no-row-hover">
+                                <thead>
+                                    <tr class="slds-text-title--caps">								    	
+                                        <aura:iteration var="weekDayName" items="{!v.deliveryCalendar.weekDayNames}">	
+                                            <th scope="col" class="slds-text-align_center">
+                                                <div class="slds-truncate" title="{!$weekDayName}">{!weekDayName}</div>
+                                            </th>	
+                                        </aura:iteration>								    	     
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <aura:iteration var="week" items="{!v.TselectedMonth.thresholdweeks}">	
+                                        <tr>
+                                            <aura:iteration var="day" items="{!week}">
+                                                <td class="slds-text-align_center">
+                                                    <aura:if isTrue="{!day.TdateIsInCurrentMonth}">
+                                                        <aura:if isTrue="{!day.TNopastdays}">
+                                                            <aura:if isTrue="{!day.TavailableForDelivery}">
+                                                                <!--REQ-451-->
+                                                                <aura:if isTrue="{!v.isConciergeApp}">
+                                                                    <div class="tech-avail" style="float:right;">
+                                                                        <a ><span class="{!v.lineItemDeliveryDate==day.da ?'slds-badge selected':'slds-badge'}" onclick="{!c.returnDeliveryDate}" data-date="{!day.da}">{!day.TdateStringForDisplay}</span></a>
+                                                                        <aura:set attribute="else">
+                                                                            <a><span class="slds-badge" onclick="{!c.returnDeliveryDate}" data-date="{!day.da}">{!day.TdateStringForDisplay}</span></a>
+                                                                        </aura:set>
+                                                                    </div> 
+                                                                </aura:if>
+                                                                <aura:set attribute="else">
+                                                                    <aura:if isTrue="{!day.ATCdates}">
+                                                                        <a><span class="slds-badge" onclick="{!c.alertmessage}">{!day.TdateStringForDisplay}</span></a>
+                                                                        <aura:set attribute="else">
+                                                                            {!day.TdateStringForDisplay}           
+                                                                        </aura:set>	     
+                                                                    </aura:if> </aura:set>	
+                                                            </aura:if>
+                                                            <aura:set attribute="else">
+                                                                {!day.TdateStringForDisplay}           
+                                                            </aura:set>	  
+                                                        </aura:if>	
+                                                    </aura:if>      
+                                                </td>
+                                            </aura:iteration>		
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                        </div>
+                    </aura:if>
+                    <aura:set attribute="else">	
+                        <div>    
+                            <h4>****No Available Threshold Days****</h4> 
+                        </div>
+                    </aura:set>
+                </aura:if>
+            </div>
+            <aura:set attribute="else">
+                <div class="slds-p-around_medium">
+                    <aura:if isTrue="{!v.isLoading}">
+                        <lightning:spinner aura:id="spinner" alternativeText="loading..."/>
+                    </aura:if>
+                    <aura:if isTrue="{!not(empty(v.deliveryCalendar))}">
+                        <div class="slds-text-align_center">
+                            <aura:if isTrue="{!or( not(v.selectedMonth.isFirst), notequals(v.dwEarliestMonthStartDate, v.dwCurrentMonthStartDate) ) }">
+                                <lightning:buttonIcon iconName="utility:chevronleft" variant="bare" alternativeText="previous"
+                                                      iconClass="dark" onclick="{!c.previousMonth}" class="orangeButton slds-float_left"/>
+                            </aura:if>
+                            {!v.selectedMonth.name}
+                            <lightning:buttonIcon iconName="utility:chevronright" variant="bare" alternativeText="next"
+                                                  iconClass="dark" onclick="{!c.nextMonth}" class="orangeButton slds-float_right"/>
+                        </div>
+                        <div class="slds-scrollable--x">
+                            <table class="slds-table slds-table--bordered slds-table_col-bordered slds-table--cell-buffer slds-no-row-hover">
+                                <thead>
+                                    <tr class="slds-text-title--caps">								    	
+                                        <aura:iteration var="weekDayName" items="{!v.deliveryCalendar.weekDayNames}">	
+                                            <th scope="col" class="slds-text-align_center">
+                                                <div class="slds-truncate" title="{!$weekDayName}">{!weekDayName}</div>
+                                            </th>	
+                                        </aura:iteration>								    	     
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <aura:iteration var="week" items="{!v.selectedMonth.weeks}">	
+                                        <tr>
+                                            <aura:iteration var="day" items="{!week}">
+                                                <td class="slds-text-align_center">
+                                                    <aura:if isTrue="{!day.dateIsInCurrentMonth}">
+                                                        <aura:if isTrue="{!day.availableForDelivery}">
+                                                            <!--REQ-451-->
+                                                            <aura:if isTrue="{!v.isConciergeApp}">
+                                                                <a ><span class="{!v.lineItemDeliveryDate==day.d ?'slds-badge selected':'slds-badge'}" onclick="{!c.returnDeliveryDate}" data-date="{!day.d}">{!day.dateStringForDisplay}</span></a>
+                                                                <aura:set attribute="else">
+                                                                    <a><span class="slds-badge" onclick="{!c.returnDeliveryDate}" data-date="{!day.d}">{!day.dateStringForDisplay}</span></a>
+                                                                </aura:set>
+                                                            </aura:if>
+                                                            <aura:set attribute="else">														
+                                                                {!day.dateStringForDisplay}
+                                                            </aura:set>			
+                                                        </aura:if>	
+                                                    </aura:if>												
+                                                </td>
+                                            </aura:iteration>		
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                        </div>
+                    </aura:if>
+                </div>
+            </aura:set>
+        </aura:if> 
+        <aura:set attribute="else">
+            <div class="slds-p-around_medium">
+                <aura:if isTrue="{!v.isLoading}">
+                    <lightning:spinner aura:id="spinner" alternativeText="loading..."/>
+                </aura:if>
+                <aura:if isTrue="{!not(empty(v.deliveryCalendar))}">
+                    <div class="slds-text-align_center">
+                        <aura:if isTrue="{!or( not(v.selectedMonth.isFirst), notequals(v.dwEarliestMonthStartDate, v.dwCurrentMonthStartDate) ) }">
+                            <lightning:buttonIcon iconName="utility:chevronleft" variant="bare" alternativeText="previous"
+                                                  iconClass="dark" onclick="{!c.previousMonth}" class="orangeButton slds-float_left"/>
+                        </aura:if>
+                        {!v.selectedMonth.name}
+                        <lightning:buttonIcon iconName="utility:chevronright" variant="bare" alternativeText="next"
+                                              iconClass="dark" onclick="{!c.nextMonth}" class="orangeButton slds-float_right"/>
+                    </div>
+                    <div class="slds-scrollable--x">
+                        <table class="slds-table slds-table--bordered slds-table_col-bordered slds-table--cell-buffer slds-no-row-hover">
+                            <thead>
+                                <tr class="slds-text-title--caps">								    	
+                                    <aura:iteration var="weekDayName" items="{!v.deliveryCalendar.weekDayNames}">	
+                                        <th scope="col" class="slds-text-align_center">
+                                            <div class="slds-truncate" title="{!$weekDayName}">{!weekDayName}</div>
+                                        </th>	
+                                    </aura:iteration>								    	     
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <aura:iteration var="week" items="{!v.selectedMonth.weeks}">	
+                                    <tr>
+                                        <aura:iteration var="day" items="{!week}">
+                                            <td class="slds-text-align_center">
+                                                <aura:if isTrue="{!day.dateIsInCurrentMonth}">
+                                                    <aura:if isTrue="{!day.availableForDelivery}">
+                                                        <!--REQ-451-->
+                                                        <aura:if isTrue="{!v.isConciergeApp}">
+                                                            <a ><span class="{!v.lineItemDeliveryDate==day.d ?'slds-badge selected':'slds-badge'}" onclick="{!c.returnDeliveryDate}" data-date="{!day.d}">{!day.dateStringForDisplay}</span></a>
+                                                            <aura:set attribute="else">
+                                                                <a><span class="slds-badge" onclick="{!c.returnDeliveryDate}" data-date="{!day.d}">{!day.dateStringForDisplay}</span></a>
+                                                            </aura:set>
+                                                        </aura:if>
+                                                        <aura:set attribute="else">														
+                                                            {!day.dateStringForDisplay}
+                                                        </aura:set>			
+                                                    </aura:if>	
+                                                </aura:if>												
+                                            </td>
+                                        </aura:iteration>		
+                                    </tr>
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                    </div>
+                </aura:if>
+            </div>
+        </aura:set>
+    </aura:if>
+    
+</aura:component>

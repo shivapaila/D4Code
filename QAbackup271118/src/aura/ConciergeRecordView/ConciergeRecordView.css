@@ -1,0 +1,63 @@
+.THIS {
+	padding-bottom:95px !important;
+}
+.THIS .slds-modal__content  .full {
+	width:100%;
+}
+.THIS .override--slds-form-element a {
+	pointer-events:none;
+	color:#2b2826;
+}
+.THIS .slds-has-flexi-truncate.slds-p-horizontal_small.full.forcePageBlockItem.forcePageBlockItemView {
+	padding-left:15px;
+}
+.THIS .runtime_sales_activitiesTaskRecurringCreate div.hideEl:first-child {
+	display:block;
+}
+
+.THIS .uiInput .uiImage {
+	display:none;
+}
+.THIS .slds-modal__content.slds-p-around--medium.slds-grid.slds-wrap {
+	height:90%;
+	display:block;
+	overflow-y:scroll;
+}
+.THIS .slds-radio--button [type=radio]:checked+.slds-radio--button__label {
+	background:rgb(0, 112, 210);
+	border:2px solid #fff;
+}
+.THIS .slds-radio_button__label, 
+.THIS .slds-radio--button__label {
+	background:transparent;
+	border:2px solid #fff;
+}
+.THIS .intervalMenu .uiLabel:after {
+    content: "\f0d7";
+    font-family: 'Font Awesome 5 Pro';
+    top: 31px !important;
+    z-index: 1;
+    width: 6% !important;
+    right: 0;
+    position: absolute;
+    font-size: 14px;
+}
+.THIS .recurringTaskExtraFields .slds-form-element .uiLabel:after {
+	content: "\f0d7";
+    font-family: 'Font Awesome 5 Pro';
+    top: 40px;
+    z-index: 1;
+    width: 5%;
+    right: 0;
+    position: absolute;
+    font-size: 14px;
+}
+.THIS .slds-modal__footer .slds-button.slds-button--brand {
+	margin-top:-2px;
+}
+.THIS .slds-modal__footer .greyButton {
+	margin-right:15px;
+}
+.THIS .forcePageBlockSection .slds-section__title {
+	border:none !important; 
+}

@@ -1,0 +1,225 @@
+<aura:component controller="AddressCreationController"
+                implements="flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride,force:hasSObjectName"
+                access="global">
+
+    <aura:attribute name="newAddress" type="Address__c" default="{ 'sobjectType': 'Address__c'}"/>
+    <aura:attribute name="Addresses" type="Address__c"/>
+    <aura:attribute name="stateValues" type="Object"/>
+    <aura:attribute name="AddTypeValues" type="Object"/>
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="isEdit" type="Boolean" default="false"/>
+
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+    <c:PickListValues sObjectName="Address__c" fieldName="StatePL__c" picklistValues="{!v.stateValues}"/>
+    <c:PickListValues sObjectName="Address__c" fieldName="Address_Type__c" picklistValues="{!v.AddTypeValues}"/>
+
+    <!-- EDQ Validation attributes Start -->
+    <ltng:require styles="{!$Resource.LightningValidationStylesheet}"/>
+    <aura:attribute name="suggestions" type="Object[]" access="private" description="Suggestions"/>
+    <aura:attribute name="hasSuggestions" type="Boolean" access="private" default="false"/>
+    <aura:attribute name="timeoutIdentifier" type="Integer" access="private"/>
+    <aura:attribute name="AddressObjectSnapshot" type="sObject" access="private" default="null"/>
+    <!-- EDQ Validation attributes End -->
+
+    <div>
+        <section aura:id="modalIdForAddressCreation" role="dialog" tabindex="-1" aria-labelledby="header41"
+                 class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- header -->
+                <div class="slds-modal__header">
+                    <aura:if isTrue="{!!v.isEdit}">
+                        <h2 id="header43" class="slds-text-heading--medium">
+                            Create New Address
+                        </h2>
+                    </aura:if>
+                    <aura:if isTrue="{!v.isEdit}">
+                        <h2 id="header43" class="slds-text-heading--medium">
+                            Edit Address
+                        </h2>
+                    </aura:if>
+                </div>
+                <!--/ header -->
+                <!-- modal body -->
+                <form class="col">
+                    <div class="slds-form slds-grid slds-wrap slds-modal__content">
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <label>Account Name</label>
+                                <force:inputField aura:id="account" value="{!v.newAddress.AccountId__c}"/>
+                            </div>
+                        </div>
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:input type="checkbox" aura:id="addPreffer" label="Preferred"
+                                                 name="Preferred"
+                                                 messageWhenValueMissing="Preferred Status is Mandatory"
+                                                 checked="{!v.newAddress.Preferred__c}"
+                                                 required="false"/>
+                            </div>
+                        </div>
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <!-- EDQ added DIV container for address suggestions -->
+                            <div class="slds-form-element search-result-wrapper search-result-wrapper-wider"
+                                 onfocusout="{!c.onElementFocusedOut}">
+                                <!-- EDQ added SPAN wrapper -->
+                                <span onkeydown="{!c.handleSuggestionNavigation}">
+                                 <lightning:input aura:id="AddLine1" label="Address Line 1"
+                                                  name="Address Line 1"
+                                                  messageWhenValueMissing=" Address Line 1 is Mandatory"
+                                                  required="true" value="{!v.newAddress.Address_Line_1__c}"
+                                                  onchange="{!c.handleSearchChange}"/>
+                                </span>
+                                <!-- EDQ added Shipping validation loader -->
+                                <div aura:id="loader" class="slds-spinner_container spinner-inner invisible">
+                                    <div class="slds-spinner slds-spinner--small" aria-hidden="false" role="alert">
+                                        <div class="slds-spinner__dot-a"></div>
+                                        <div class="slds-spinner__dot-b"></div>
+                                    </div>
+                                </div>
+                                <!-- EDQ added Shipping validation search results dropdown -->
+                                <div class="searchResults">
+                                    <aura:renderif isTrue="{!v.hasSuggestions}">
+                                        <ul class="searchResults">
+                                            <aura:iteration items="{!v.suggestions}" var="suggestion">
+                                                <li class="resultItem">
+                                                    <a id="{!globalId + '-suggestion-index-' + suggestion.index}"
+                                                       tabindex="0"
+                                                       href="javascript:void(0);"
+                                                       title="{!suggestion.format}"
+                                                       onclick="{!c.handleResultSelect}"
+                                                       onkeyup="{!c.onSuggestionKeyUp}">{!suggestion.suggestion}</a>
+                                                </li>
+                                            </aura:iteration>
+                                        </ul>
+                                    </aura:renderif>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:input type="text" aura:id="addLine2" label="Address Line 2"
+                                                 messageWhenValueMissing=" Address Line 2 is Mandatory"
+                                                 name="Address Line 2"
+                                                 value="{!v.newAddress.Address_Line_2__c}"
+                                                 required="true"
+                                                 onchange="{!c.onAddressChanged}"/>
+                            </div>
+                        </div>
+                        <lightning:select aura:id="addType" label="Address Type"
+                                          messageWhenValueMissing=" Address Type is Mandatory"
+                                          class="slds-size--1-of-2 slds-p-horizontal_x-small"
+                                          required="true"
+                                          value="{!v.newAddress.Address_Type__c}"
+                                          name="AddressType">
+                            <option value="">{!v.newAddress.Address_Type__c}</option>
+                            <aura:iteration items="{!v.AddTypeValues}" var="item">
+                                <option value="{!item}">{!item}</option>
+                            </aura:iteration>
+                        </lightning:select>
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:input type="text" aura:id="addValStatus"
+                                                 label="Address Validation Status"
+                                                 messageWhenValueMissing=" Address Validation Status is Mandatory"
+                                                 name="Address Validation Status"
+                                                 value="{!v.newAddress.Address_Validation_Status__c}"
+                                                 required="true"/>
+                            </div>
+                        </div>
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:input type="text" aura:id="addCity" label="City"
+                                                 messageWhenValueMissing=" City Status is Mandatory"
+                                                 name="City"
+                                                 value="{!v.newAddress.City__c}"
+                                                 onchange="{!c.onAddressChanged}"
+                                                 required="true"/>
+                            </div>
+                        </div>
+
+                        <lightning:select aura:id="addState" label="State"
+                                          messageWhenValueMissing=" State Status is Mandatory"
+                                          class="slds-size--1-of-2 slds-p-horizontal_x-small"
+                                          value="{!v.newAddress.StatePL__c}"
+                                          onchange="{!c.onAddressChanged}"
+                                          required="true"
+                                          name="state">
+                            <option value="">{!v.newAddress.StatePL__c}</option>
+                            <aura:iteration items="{!v.stateValues}" var="item">
+                                <option value="{!item}">{!item}</option>
+                            </aura:iteration>
+                        </lightning:select>
+
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:input type="Number" aura:id="addZip" label="Zip Code"
+                                                 messageWhenValueMissing=" Zip Code Status is Mandatory"
+                                                 name="Zip Code"
+                                                 value="{!v.newAddress.Zip_Code__c}"
+                                                 onchange="{!c.onAddressChanged}" 
+                                                 required="true"/>
+                            </div>
+                        </div>
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:input type="text" aura:id="addCountry" label="Country"
+                                                 messageWhenValueMissing=" Country Status is Mandatory"
+                                                 name="Country"
+                                                 value="{!v.newAddress.Country__c}"
+                                                 onchange="{!c.onAddressChanged}"
+                                                 required="true"/>
+                            </div>
+                        </div>
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:input type="text" aura:id="addTimeStamp"
+                                                 name="Address Validation Timestamp"
+                                                 label="Address Validation Timestamp"
+                                                 value="{!v.newAddress.Address_Validation_Timestamp__c}"/>
+
+
+                            </div>
+                        </div>
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:inputLocation label="Geolocation"
+                                                         aura:id="addGeo"
+                                                         messageWhenValueMissing=" Geolocation Status is Mandatory"
+                                                         latitude="{!v.newAddress.Geocode__Latitude__s}"
+                                                         longitude="{!v.newAddress.Geocode__Longitude__s}"
+                                                         required="false"/>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="slds-modal__footer">
+                        <lightning:button aura:id="cancelId"
+                                          label="Cancel"
+                                          variant="brand"
+                                          onclick="{!c.doCancel}"/>
+                        <lightning:button aura:id="save"
+                                          label="Save"
+                                          variant="brand"
+                                          onclick="{!c.clickCreate}"/>
+
+
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+    <div aura:id="backdropIdForCreationAddress" class="slds-backdrop slds-backdrop--open"/>
+</aura:component>

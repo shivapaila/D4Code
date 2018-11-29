@@ -1,0 +1,9 @@
+<aura:component implements="flexipage:availableForAllPageTypes">
+    <lightning:navigation aura:id="navService" />
+    <aura:attribute name="pageReference" type="Object" />
+    <aura:handler event="c:NavigateToWrapperComponentAppEvent" action="{!c.handleNavigateCmpAppEvent}"/>
+    <aura:handler event="c:NavigateToTabAppEvent" action="{!c.handleNavigateTabAppEvent}"/>
+
+	<c:ConciergeService aura:id="conciergeService" />
+
+</aura:component>

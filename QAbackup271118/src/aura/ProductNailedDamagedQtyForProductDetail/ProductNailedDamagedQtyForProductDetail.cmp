@@ -1,0 +1,8 @@
+<aura:component extends="c:ProductPriceBase">
+    <aura:attribute name="productDetailId" type="String"/>
+    <aura:attribute name="productPrice" type="ProductPriceWrapper"/>
+ 
+		<span class="">
+			- ({!v.productPrice.NailedDamagedQty})
+		</span> 
+</aura:component>

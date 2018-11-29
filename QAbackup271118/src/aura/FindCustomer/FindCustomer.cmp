@@ -1,0 +1,112 @@
+<aura:component controller="MyCustomerController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="showView"   type="String"/>
+    <aura:attribute name="showSelectButton" type="Boolean" default="false" />
+    <aura:attribute name="pageNumber"  type="Integer" default="1" />
+    <aura:attribute name="maxPage"  type="Integer" default="1" />
+    <aura:attribute name="accounts" type="Account[]"/>
+    <aura:attribute name="currentList" type="Account[]"/>
+    <aura:attribute name="searchKeyword" type="String"/>
+    <aura:attribute name="sortOrder" type="String"/>
+    <aura:attribute name="Message" type="boolean" default="false" description="use for display no record found message"/>
+    <aura:handler name="change"         value="{!v.pageNumber}" action="{!c.renderPage}" />
+    <!--aura:attribute name="numOfShoppingCart" type="Integer"/-->
+    
+    <aura:registerEvent name="NotifyParentOpenModal" type="c:NotifyParentComponentEvent"/>
+	<aura:registerEvent name="NotifyParentAddToCart" type="c:NotifyParentComponentEvent"/>
+	
+    <div class="container">
+        <aura:if isTrue="{!v.showView == 'My Guests'}">
+            
+            <h2 class="pageTitle">My Guests</h2>
+            
+        </aura:if>
+        <aura:if isTrue="{!v.showView == 'All Guests'}">
+            
+            <h2 class="pageTitle">Search All Guests</h2>
+        </aura:if>
+        <div class="customerSearchWrapper">
+            <ui:inputText aura:id="searchId" class="customerSearch" value="{!v.searchKeyword}" required="true" placeholder="{!'Search '+v.showView}"/>
+        	<a href="" onclick="{!c.search}" class="orangeButton"><i class="far fa-search"></i> Search</a>
+            <lightning:select class="lastContacted" name="selectOrder" label="Last Contacted " value="{!v.sortOrder}" onchange="{!c.search}">
+                <option value="DESC">Descending</option>
+                <option value="ASC">Ascending</option>
+            </lightning:select>
+        </div>
+        
+        <aura:if isTrue="{!v.Message}">
+            <div class="cardWrapper">
+                <div class="cardContent">
+                    <div class="slds-text-color--error"> No results found. Please modify your search.</div>
+                </div>
+            </div>
+        </aura:if>
+        <aura:if isTrue="{!v.accounts != null}">
+            <div class="row">
+                <aura:iteration var="account" items="{!v.currentList}">
+                    <div class="col-sm-6">
+                          <!-- Show Select button for selecting customer-->
+                        <aura:if isTrue="{!v.showSelectButton}">
+                            <div class="cardWrapper cartCustomerSelect" data-record="{!account.Id}" onclick="{!c.addtocart}">
+                                <div class="row">
+                                    <div class="col-sm-8 accountName">    
+                                        <i class="far fa-user"></i>&nbsp;{!account.Name}
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="selectCustomer orangeButton smallButton text-center"><i class="far fa-shopping-cart" /> &nbsp; Select</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+                            <aura:set attribute="else">
+                                
+                                <div class="cardWrapper">
+                                    <div class="cardContent">  
+                                        <aura:iteration var="opp" items="{!account.Opportunities}" end="1">
+                                            <div class="hasCart">
+                                                <a data-record="{!account.Id}" onclick="{!c.goToRecord}"><i class="far fa-shopping-cart"></i></a>	
+                                            </div>
+                                        </aura:iteration>
+                                        <a data-record="{!account.Id}" onclick="{!c.attachSignature}">
+                                            <i class="far fa-user"></i>&nbsp;{!account.Name}
+                                        	<aura:if isTrue="{!account.Last_Activity_Date__pc !=null}">
+                                                     Last Active on: {!account.Last_Activity_Date__pc}
+                                            </aura:if>
+                                            <br/>
+                                        
+                                            <aura:if isTrue="{!account.Phone != null}">
+                                                <span class="gray"><i class="far fa-phone"></i>&nbsp;{!account.Phone}</span>
+                                                <aura:set attribute="else">
+                                                    <aura:if isTrue="{!account.Phone_2__pc != null}">
+                                                        <span class="gray"><i class="far fa-phone"></i>&nbsp;{!account.Phone_2__pc}</span>
+                                                        <aura:set attribute="else">
+                                                            <aura:if isTrue="{!account.Phone_3__pc != null}">
+                                                                <span class="gray"><i class="far fa-phone"></i>&nbsp;{!account.Phone_3__pc}</span>
+                                                                <aura:set attribute="else">
+                                                                	<span class="gray"><i class="far fa-phone-slash"></i>&nbsp;N/A</span>
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </aura:set>
+                                            </aura:if>
+
+                                            <aura:iteration var="address" items="{!account.Addresses__r}" end="1">
+                                                <span class="gray"> &#8226; <i class="far fa-home"></i>&nbsp;{!address.City__c}, {!address.State__c}</span>
+                                            </aura:iteration>
+                                        </a>                                                
+                                    </div>
+                                </div>
+
+                            </aura:set>
+                        </aura:if> 
+                    </div>
+                </aura:iteration>
+            </div>
+            <div class="paginationWrapper">
+                <c:Pagination currentPageNumber="{!v.pageNumber}" maxPageNumber="{!v.maxPage}" />
+            </div>
+        </aura:if>
+    </div>
+</aura:component>

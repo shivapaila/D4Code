@@ -1,0 +1,30 @@
+<aura:component implements="flexipage:availableForAllPageTypes" access="global" >
+
+	<!-- Attribute Definitions -->
+	<aura:attribute name="rsaAccountInfo" type="RSAAccountInfoWrapper" access="PRIVATE" />
+
+    <!-- Event Handlers -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+	<!--Include Concierge Service -->
+	<c:ConciergeService aura:id="conciergeService" />	
+
+	<!-- html body -->
+    <div>
+        <div class="rsaAccountInfoWrapper container">
+        	<aura:if isTrue="{! !empty(v.rsaAccountInfo)}">
+	            <div class="row">
+	                <div class="col text-left">
+	                    <strong>RSA Name:</strong>&nbsp;&nbsp;{!v.rsaAccountInfo.rsaName}
+	                </div>
+	                <div class="col text-center">
+	                    <strong>RSA ID:</strong>&nbsp;&nbsp;{!v.rsaAccountInfo.rsaId}
+	                </div>
+	                <div class="col text-right">
+	                    <strong>Profit Center:</strong>&nbsp;&nbsp;{!v.rsaAccountInfo.profitCenter}
+	                </div>
+	            </div>
+	        </aura:if>
+        </div>
+    </div>	
+</aura:component>

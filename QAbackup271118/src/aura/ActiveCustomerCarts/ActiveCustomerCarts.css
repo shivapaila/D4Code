@@ -1,0 +1,69 @@
+.THIS .customerSearch {
+	width:40% !important;
+	margin:15px 0;
+	padding-top:3px !important;
+}
+.THIS .customerSearchWrapper {
+    background: #f6f6f6;
+    margin-bottom: 7px;
+    text-align: center;
+}
+.THIS .paginationWrapper {
+	float:right;
+	margin-top:5px;
+}
+.THIS .slds-text-color--error {
+	font-weight:bold;
+}
+.THIS .cardWrapper:hover, .THIS .cardWrapper:active, .THIS .cardWrapper:focus {
+	background:#e8e8e8;
+}
+.THIS .guestTypeWrapper {
+	width:200px;
+	float:right;
+	margin:-7px 25px 10px 0;
+}
+.THIS .fa-times {
+	color:red;
+}
+.THIS .pageTitle {
+	margin-top:-3px;
+}
+.THIS .contactName {
+	padding-top: 3px;
+    width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.THIS .activeCartWrapper {
+	position:relative;
+}
+.THIS .removeActiveCart {
+	position:absolute;
+	right:25px;
+	top:25px;
+	z-index:2;
+}
+.THIS .cardContent {
+	background:#f6f6f6;
+}
+.THIS .confirm {
+	text-align:center;
+	position:absolute;
+    top: -21px;
+    right: -2px;
+    width: 150px;
+    padding: 10px;
+	background:#fff;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+.THIS .confirmText {
+	margin-bottom:8px;
+}
+.THIS .confirm .marginRight {
+	margin-right:10px;
+}
+.THIS .confirmButtons {
+	margin-bottom:6px;
+}

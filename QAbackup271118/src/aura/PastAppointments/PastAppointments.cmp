@@ -1,0 +1,172 @@
+<aura:component controller="Manage_AppointmentsAndTasksController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.Init}"/> 
+    <aura:handler name="change" value="{!v.pageNumber}" action="{!c.renderPage}" />
+    <!-- <ltng:require styles="{! $Resource.SLDSv2 + '/assets/styles/salesforce-lightning-design-system.css'}"/> -->
+    <aura:attribute name="AllEvents" type="Object[]"/>  
+    <aura:attribute name="currentList" type="List[]"/>
+    <aura:attribute type="Integer"      name="pageNumber"       default="1" />
+    <aura:attribute type="Integer"      name="maxPage"          default="1" />
+    <aura:attribute type="String"       name="sortField" />
+    <aura:attribute type="Boolean"		name="sortAsc" />
+    <aura:attribute name="showEdit" type="Boolean" default="true"/>
+    <aura:attribute name="Message" type="boolean" default="false" description="use for display no record found message"/>
+    <aura:attribute name="date" type="Date" access="GLOBAL"/>
+    <aura:handler name="change" value="{!v.date}" action="{!c.filterByDate}"/>    
+    <div class="container" >
+        <div class="float-right filterWrapper">
+            <small style="display:block">Filter By StartDate</small><ui:inputDate aura:id="filterDate"  value="{!v.date}" displayDatePicker="true"  format="YYYY-MM-DD" updateOn="keyup"/>
+        </div>
+        <h2 class="pageTitle">My Past Appointments</h2>
+
+        <div class="cardWrapper appointmentTableWrapper">
+            <div class="cardContent">
+                
+                <div id="Appointment-table"> 
+                    <table class="table">
+                        <thead>
+                            <tr class="slds-text-title--caps">
+                                <th scope="col">
+                                    <div onclick="{!c.sortBySub}"
+                                         class="slds-truncate"
+                                         title="Subject">
+                                        Subject
+                                        <aura:if isTrue="{!v.sortField=='eventSub'}">
+                                            <span>
+                                                <aura:if isTrue="{!v.sortAsc}">
+                                                    &#8593;
+                                                    <aura:set attribute="else">
+                                                        &#8595;
+                                                    </aura:set>
+                                                </aura:if>
+                                            </span>
+                                        </aura:if>
+                                    </div>
+                                </th>
+                                <th scope="col">
+                                    <div onclick="{!c.sortByCustomer}"
+                                         class="slds-truncate"
+                                         title="Customer Name">
+                                        Customer
+                                        <aura:if isTrue="{!v.sortField=='eventWhatName'}">
+                                            <span>
+                                                <aura:if isTrue="{!v.sortAsc}">
+                                                    &#8593;
+                                                    <aura:set attribute="else">
+                                                        &#8595;
+                                                    </aura:set>
+                                                </aura:if>
+                                            </span>
+                                        </aura:if>
+                                    </div>
+                                </th>
+                                <th scope="col">
+                                    <div onclick="{!c.sortBystartdateTime}"
+                                         class="slds-truncate"
+                                         title="Start date">
+                                        Start date 
+                                        <aura:if isTrue="{!v.sortField=='eventstartDate'}">
+                                            <span>
+                                                <aura:if isTrue="{!v.sortAsc}">
+                                                    &#8593;
+                                                    <aura:set attribute="else">
+                                                        &#8595;
+                                                    </aura:set>
+                                                </aura:if>
+                                            </span>
+                                        </aura:if>
+                                    </div>
+                                </th>
+                                <th scope="col">
+                                    <div onclick="{!c.sortByenddateTime}"
+                                         class="slds-truncate"
+                                         title="End date ">
+                                        End date 
+                                        <aura:if isTrue="{!v.sortField=='eventendDate'}">
+                                            <span>
+                                                <aura:if isTrue="{!v.sortAsc}">
+                                                    &#8593;
+                                                    <aura:set attribute="else">
+                                                        &#8595;
+                                                    </aura:set>
+                                                </aura:if>
+                                            </span>
+                                        </aura:if>
+                                    </div>
+                                </th>
+                                <th>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.currentList}" var="evt" indexVar="i">
+                                <aura:if isTrue="{!evt.isEdit}">
+                                    <tr>
+                                        <td class="subjectColumn">
+                                            <ui:inputText value="{!evt.eventSub}" />
+                                        </td>
+                                        <td class="customerColumn">
+                                            <ui:inputText value="{!evt.eventWhatName}" disabled="true"/>
+                                        </td>
+                                       
+                                        <aura:if isTrue="{!!evt.allDayEvent}">
+                                        <td class="dateTime">
+                                            <ui:inputDateTime aura:id="startDate"  value="{!evt.eventstartDate}" displayDatePicker="true"   updateOn="change"/>
+                                            </td>
+                                         <td class="dateTime">
+                                            <ui:inputDateTime aura:id="endDate" value="{!evt.eventendDate}" displayDatePicker="true"  format="h:mm a" updateOn="change"/>
+                                        </td>
+                                            <aura:set attribute="else">
+                                                    <td class="dateTime">
+                                                        <label class="startLabel"><small>Start</small></label>
+                                                        <ui:inputDate aura:id="startDate"  value="{!evt.eventstartDate}" displayDatePicker="true"   updateOn="change"/>
+                                                        <label><small>End</small></label>
+                                                        <ui:inputDate aura:id="endDate"  value="{!evt.eventendDate}" displayDatePicker="true"   updateOn="change"/>
+                                                        
+                                                    </td>  
+                                                </aura:set>
+                                        </aura:if>
+                                        <td class="saveCancel">
+                                            <a id="{!i}" data-record="" onclick="{!c.submitEvent}" class="marginRight">
+                                                <i class="fa fa-save"></i> Save
+                                            </a><br />
+                                            <a id="{!i}" data-record="" onclick="{!c.cancelEdit}">
+                                                <i class="fa fa-times"></i> Cancel
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <aura:set attribute="else">
+                                        <tr>
+                                            <td><a data-record="{!evt.eventId}" onclick="{!c.openAppointmentDetail}">{!evt.eventSub}</a></td>
+                                            
+                                            <td>
+                                                <a data-record="{!evt.eventWhatId}" onclick="{!c.openCustomerDetail}">{!evt.eventWhatName}</a></td>
+                                            <td>
+                                                <ui:outputDate value="{!evt.eventstartDate}" format="YYYY-MM-DD hh:mm:a"/></td>
+                                            <td>
+                                                <ui:outputDate value="{!evt.eventendDate}" format="YYYY-MM-DD hh:mm:a"/>
+                                            </td>
+                                            <td>
+                                                <aura:if isTrue="{!v.showEdit}">
+                                                    <a class="tableIcon" id="{!i}" data-record="{!evt.eventObj.Id}" onclick="{!c.editClick}">
+                                                        <i class="far fa-pencil"></i>
+                                                    </a>
+                                                </aura:if>
+                                            </td>
+                                        </tr>
+                                    </aura:set>
+                                </aura:if>
+                            </aura:iteration>
+                            <aura:if isTrue="{!v.Message}">
+                                <div class="slds-text-color--error">There are no Appointments</div>
+                            </aura:if>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="paginationWrapper">
+            <c:Pagination currentPageNumber="{!v.pageNumber}" maxPageNumber="{!v.maxPage}" />
+        </div>
+        
+    </div>
+</aura:component>

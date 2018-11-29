@@ -1,0 +1,60 @@
+.THIS label {
+	margin-top:15px;
+}
+.THIS {
+	margin-top:15px;
+}
+.THIS .labelNoPad label {
+	margin-top:0;
+}
+.THIS .addNewAddress {
+	margin-top:20px;
+	margin-bottom:15px;
+}
+.THIS .newAddressFields input {
+	width:100%;
+}
+.THIS .newAddressFields {
+	margin:20px 0 15px;
+}
+.THIS .newAddressFields .row {
+	margin-bottom:15px;
+}
+.THIS .buttonRow a {
+	margin-right:15px;
+}
+.THIS select.slds-input.select {
+	width:100%;
+    -webkit-appearance: inherit;
+}
+.THIS label.selectLabel:after {
+	content:"\f0d7";
+	font-family: 'Font Awesome 5 Pro';
+	top: 40px;
+    z-index: 1;
+    width: 7%;
+}
+.THIS .clickable {
+    cursor:pointer;
+}
+.THIS .editing {
+    background: #f68c2c;
+    padding:8px 6px 8px 8px;
+    border-radius:50%;
+    color:#fff;
+}
+.THIS label.selectLabel {
+    position: absolute;
+    right: 30px;
+    top: -7px;
+}
+.THIS .preferredCheckboxWrapper input {
+	display:inline-block;
+}
+.THIS .preferredCheckbox {
+	display:inline-block;
+	margin-right:15px;
+}
+.THIS input.uiInput--checkbox[type=checkbox]:checked {
+	padding:5px 11px 5px 5px;
+}

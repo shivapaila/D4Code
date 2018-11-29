@@ -1,0 +1,29 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" >
+	<!-- I know I spelled commissions wrong, whoops! -->
+   <div class="container">
+      <h2>Select Commissions</h2>
+      <div class="cardWrapper">
+         <div class="cardContent">
+            <div class="row">
+               <div class="col-sm-5">
+                  <lightning:input type="search" label="Find RSA" name="search" />
+               </div>
+               <div class="col-sm-5">
+                  <lightning:input type="text" label="Commission Percent" name="search" />
+               </div>
+               <div class="col-sm-2"></div>
+               <div class="col-sm-12">
+                  <br />
+                  <a class="orangeButton">Add RSA <i class="fa fa-plus"></i></a>
+               </div>
+
+               
+            </div>
+
+            <div class="text-right footerRow">
+               <a class="orangeButton" onclick="{!c.saveCommissions}">Finalize Comissions</a>
+            </div>
+         </div>
+      </div>
+   </div>
+</aura:component>

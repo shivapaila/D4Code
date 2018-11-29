@@ -1,0 +1,245 @@
+.THIS .cartImageWrapper {
+	float:left;
+	height:150px;
+	width:150px;
+	background-position: center;
+    background-repeat: no-repeat;
+	 margin-right:15px;
+	 background-size:contain;
+}
+.THIS.cardWrapper {
+	height:160px;
+	position:relative;
+}
+.THIS.cardStarItemWrapper {
+	height:50px;
+	
+}
+
+.THIS .shippingWrapper {
+	float:right;
+	margin-right:-13px;
+}
+.THIS .shippingIcon {
+	background:#f68c2c;
+	border-radius:50%;
+	color:#fff;
+	width: 25px;
+	height: 25px;
+	display: block;
+	text-align: center;
+	vertical-align: middle;
+	padding-top: 1px;
+}
+.THIS .fa-truck {
+	font-size:12px;
+}
+.THIS .productTitle {
+	margin-bottom:5px;
+}
+.THIS .footerRowWrapper {
+	position: absolute;
+    bottom: 8px;
+    left: 0;
+    width: 100%;
+    display: block;
+}
+.THIS .footerRowWrapper a {
+	font-size:10px;
+	vertical-align:top;
+	color:#999;
+	line-height:19px;
+	margin-right:15px;
+}
+.THIS .footerRowWrapper a i {
+	color:#353534;
+	font-size:18px;
+}
+.THIS .priceWrapper {
+	position:absolute;
+	bottom:5px;
+	left:165px;
+}
+.THIS .priceWrapper h4 {
+	display:inline-block;
+	margin-right:15px;
+}
+.THIS .actionMenu a i {
+	margin-bottom:15px;
+}
+.THIS .actionMenu {
+	width:200px;
+	padding:10px;
+	border-radius:0;
+}
+.THIS .asIsWrapper span {
+	font-size:10px;
+}
+.THIS .actionMenu .slds-checkbox .slds-checkbox--faux {
+	width:18px;
+	height:18px;
+}
+.THIS .cartItemActionsWrapper {
+	float:right;
+}
+.THIS .actionMenu a.discountWrapper .iconWrapper i {
+	margin-bottom:10px;
+}
+.THIS .discountWrapper .iconWrapper {
+	padding-left:3px;
+}
+.THIS .actionMenu .iconWrapper {
+	width:22px;
+	display:inline-block;
+	text-align:left;
+}
+.THIS .slds-modal__footer .greyButton {
+	margin-right:15px;
+}
+.THIS .uiLabel {
+	display:inline-block;
+	margin-top:7px;
+	vertical-align:top;
+}
+.THIS .slds-form-element__label.slds-no-flex {
+	display:none;
+}
+.THIS .slds-form-element.lightningInput {
+	display:inline-block;
+}
+.THIS .flatDiscountAmount {
+	margin-left:-8px;
+}
+.THIS .flatDiscountRow {
+	margin-top:15px;
+}
+.THIS .slds-form-element__control.slds-grow .slds-input {
+	width:175px;
+}
+.THIS .discountStatusWrapper {
+	font-size:10px;
+	color: #f68c2c;
+	position:absolute;
+	bottom:31px;
+	left:165px;
+}
+.THIS .uiPopupTarget .popupTargetContainer, 
+.THIS .uiPopupTarget.popupTargetContainer {
+	box-shadow:0 1px 10px rgba(0, 0, 0, .35);	
+}
+.THIS div.uiPopupTarget {
+	z-index:9;
+}
+.THIS .maxDiscountWrapper {
+	background:#999;
+	color:#fff;
+	padding:8px 12px;
+	margin-bottom:25px;
+	text-align:center;
+}
+.THIS .hideLabel label {
+	display:none;
+}
+.THIS .hideLabel small {
+	margin-bottom:-15px;
+	display:block;
+}
+.THIS .hideLabel .slds-select_container {
+	margin-top:15px;
+}
+.THIS .labelShrink .slds-form-element__label {
+	font-size:13px;
+}
+.THIS .labelShrink {
+	padding-top:5px;
+}
+.THIS .slds-combobox__form-element {
+	border:none;
+}
+.THIS .slds-combobox__input {
+	width:100% !important
+}
+.THIS .slds-has-inline-listbox, 
+.THIS .slds-has-object-switcher {
+	border:none !important;
+}
+.THIS .approverLabel {
+	padding-top:27px;
+	text-align:right;
+}
+.THIS .fppWrapper {
+    right: 46px;
+    position: absolute;
+    bottom: 2px;
+}
+.THIS .quantityWrapper {
+	width:100%;
+	display:block;
+	margin-bottom:15px;
+}
+.THIS .quantityButtonWrapper .input {
+    width: 42px;
+    height: 25px;
+    padding: 3px 10px;
+    font-size: 12px;
+}
+.THIS .quantityButtonWrapper {
+	height:28px;
+	padding:0;
+}
+.THIS .skuAndColorWrapper {
+	padding:4px 0 0 0;
+}
+.THIS .quantityButtonWrapper button {
+    height: 25px;
+    width: 25px;
+    background: #e1e1e1;
+    color: #fff;
+    border: none;
+}
+.THIS .quantityButtonWrapper .quantityNumber {
+	height:40px;
+	width:30px;
+	background:#fff;
+	padding-top:10px;
+	text-align:center;
+}
+.THIS .skuAndColor {
+	font-size:11px;
+	color:#999;
+}
+.THIS .removeFpp {
+	margin-top:20px;
+}
+.THIS .itemTitle {
+	line-height:14px;
+	font-size:11px;
+}
+.THIS.checkoutCartItems {
+	margin-bottom:10px;
+}
+.THIS .qtyWrap {
+	margin-top:-5px;
+	width:245px;
+	display:flex;
+}
+.THIS .deliverytype,
+.THIS .estimatedDelivery,
+.THIS .bestDelivery {
+	line-height:14px;
+}
+.THIS .deliverytype small,
+.THIS .bestDelivery small {
+	color:#353534;
+	font-weight:bold;
+}
+.THIS .homeDelivery{
+    color:#46e570 !important;
+    font-size: 12px !important;
+}
+
+.THIS .modalSizeFix {
+	height: 100px;
+	max-height: 100px;
+	min-height: 100px;
+}

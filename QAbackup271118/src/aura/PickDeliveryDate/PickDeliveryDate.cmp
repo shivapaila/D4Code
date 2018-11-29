@@ -1,0 +1,83 @@
+<aura:component controller="CheckoutController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:attribute name="GuestId" type="string"/>
+    <aura:attribute name="orderId" type="string"/>	
+    <aura:attribute name="orderLineId" type="string" />
+    <aura:attribute name="accountNumber" type="string" />	
+    <aura:attribute name="rdcId" type="string" />		
+    <aura:attribute name="deliveryCalendar" type="Attributable"/>
+    <aura:attribute name="selectedDesiredDeliveryDate" type="String" default=''/>
+    <aura:attribute name="showdatepicker" type="Boolean" default="false"/>
+    <aura:attribute name="buttonClicked" type="Boolean" default="false"/>
+    <aura:attribute name="lineItemMap" type="List"/>
+    <aura:attribute name="isDateSelected" type="Boolean" default="false"/>
+    <aura:attribute name="shipAddr" type="String" default="" />
+    <aura:handler name="init" value="{!this}" action="{!c.Init}"/>
+    <div class="row"> 
+       <ui:scrollerWrapper class="sWrapTest">  
+        <div class="col-sm-12">
+            <div class="shippingMethodWrapper" aura:id="shippingMethodWrapper">
+                <aura:iteration items="{!v.lineItemMap}" indexVar="key" var="item">
+                    
+                    <div class="deliveryMethodWrap">
+                        <aura:if isTrue="{!!v.buttonClicked}">
+                            <aura:if isTrue="{!item.value[0].Delivery_Mode__c != 'TW'}">
+                                <div class="futureDateButtonWrapper float-right">
+                                    <aura:if isTrue="{!!item.value[0].isFutureDatedSale__c}">
+                                        <button class="greyButton smallButton" data-record="{!item.key}" onclick='{!c.updateLineItems}'>Mark as Future Dated Sale</button>
+                                        <aura:set attribute="else">
+                                            <button class="greyButton smallButton" data-record="{!item.key}" onclick='{!c.unMark}'>UnMark as Future Dated Sale</button>
+                                            
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </aura:if>
+                            <aura:if isTrue="{!item.key == 'HD'}">
+                                <h4>Home Delivery</h4> <small class="deliveryDate">{! 'Selected Delivery Date: ' + item.value[0].DeliveryDate__c}</small>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!item.key == 'CPW'}">
+                                <h4>Customer Pickup Warehouse</h4> <small class="deliveryDate">{! 'Selected Delivery Date: ' + item.value[0].DeliveryDate__c}</small>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!item.key == 'CPS'}">
+                                <h4>Customer Pickup Store</h4> <small class="deliveryDate">{! 'Selected Delivery Date: ' + item.value[0].DeliveryDate__c}</small>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!item.key == 'DS'}">
+                                <h4>Direct Ship to Consumer</h4> <small class="deliveryDate">{! 'Selected Delivery Date: ' + item.value[0].DeliveryDate__c}</small>
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!item.key == 'TW'}">
+                                <h4>Take With</h4> <small class="deliveryDate">{! 'Selected Delivery Date: ' + item.value[0].DeliveryDate__c}</small>
+                            </aura:if>
+                            
+                            <div class="deliveryMethodProducts row">
+                                <aura:iteration items="{!item.value}"  var="lineItem">
+                                    <div class="col-sm-6">
+                                        <div class="cardWrapper">
+                                            <div class="cardContent">
+                                                <c:ShoppingCartLineItemsCartLevel lineItem="{!lineItem}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </aura:iteration>
+                            </div>
+                        </aura:if>
+                        <aura:if isTrue="{!and(!item.value[0].isFutureDatedSale__c,item.value[0].Delivery_Mode__c != 'TW')}">
+                            
+                            <c:DeliveryDatePicker GuestId="{!v.GuestId}" accountNumber="{!v.accountNumber}" rdcId="{!v.rdcId}" deliveryMode="{!item.key}" lineItem="{!item.value}" lineItemMap="{!v.lineItemMap}" showdatepicker="{!item.selected}" buttonClicked="{!v.buttonClicked}" shipAddr="{!v.shipAddr}" />
+                            
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!and(!v.buttonClicked,item.value[0].Delivery_Mode__c != 'TW')}">
+                                    Selected Delivery Date: {!$Label.c.FutureDatedSaleDate}
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                    
+                </aura:iteration>
+            </div>
+        </div>
+         </ui:scrollerWrapper>   
+    </div>
+</aura:component>

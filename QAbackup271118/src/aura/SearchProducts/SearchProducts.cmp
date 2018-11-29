@@ -1,0 +1,10 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes"
+    access="global">
+    <aura:registerEvent name="NavigateToWrapperComponentAppEvent" type="c:NavigateToWrapperComponentAppEvent" />
+    
+    <div class="productSearchWrapper float-right">
+        <ui:inputText aura:id="searchInput" placeholder="{!$Label.c.Search_Products}" class="Search" />
+        <ui:button label="Search" press="{!c.searchProds}" />
+    </div>
+    <c:NavigatorCmp />
+</aura:component>

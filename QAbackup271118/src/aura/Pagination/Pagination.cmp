@@ -1,0 +1,56 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="currentPageNumber" type="Integer" required="true" default='0' />
+    <aura:attribute name="maxPageNumber" type="Integer" required="true" default='0' />
+    <aura:attribute name="disableFlag" type="Boolean" default="false"/>
+    <div class="paginationWrapper">
+        <div class="slds-button-group float-right" role="group">
+
+            <aura:if isTrue="{!!(v.maxPageNumber == 1 || v.maxPageNumber == 0)}">
+                <!-- FIRST AND PREVIOUS BUTTONS -->
+                <aura:if isTrue="{!(v.currentPageNumber == 1 || v.currentPageNumber == 0)}">
+                    <button onclick="{!c.firstPage}" class="greyButton smallButton disabled smallMargin" disabled="true">
+                            First
+                        </button>
+                        <button onclick="{!c.prevPage}" class="greyButton smallButton disabled" disabled="true">
+                            Prev
+                        </button>
+                    <aura:set attribute="else">
+
+                        <button onclick="{!c.firstPage}" class="orangeButton smallButton smallMargin">
+                        First
+                    </button>
+                    <button onclick="{!c.prevPage}" class="orangeButton smallButton">
+                        Prev
+                    </button>
+                    </aura:set>
+                </aura:if>
+
+
+                <!-- PAGE NUMBERS -->
+                <div class="pageNumberWrapper">
+                    {!v.currentPageNumber} / {!v.maxPageNumber}
+                </div>
+
+
+                <!-- NEXT LAST BUTTONS -->
+                <aura:if isTrue="{!v.currentPageNumber != v.maxPageNumber}">
+                    <button onclick="{!c.nextPage}" class="orangeButton smallButton smallMargin">
+                        Next
+                    </button>
+                    <button onclick="{!c.lastPage}" class="orangeButton smallButton">
+                        Last
+                    </button>
+                    <aura:set attribute="else">
+                        <button onclick="{!c.nextPage}" class="greyButton smallButton disabled smallMargin" disabled="True">
+                            Next
+                        </button>
+                        <button onclick="{!c.lastPage}" class="greyButton smallButton disabled" disabled="True">
+                            Last
+                        </button>
+                    </aura:set>
+                </aura:if>
+            </aura:if>
+        </div>
+    </div>
+</aura:component>

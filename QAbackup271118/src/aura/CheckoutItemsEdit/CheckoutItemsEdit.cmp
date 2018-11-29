@@ -1,0 +1,109 @@
+<aura:component controller="ShoppingCartDetailCmpCtrl" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="shoppingCartLineItems" type="Shopping_cart_line_item__c[]"/>
+    <aura:attribute name="opp" type="Opportunity" />
+    <aura:attribute name="shippingWayList" type="PairObj[]" />
+    <aura:attribute name="discountReasonList" type="PairObj[]" />
+    <aura:attribute name="marketDiscountCriteria" type="Decimal" />
+    <aura:attribute name="accountStoreInfo" type="String" />
+    <aura:attribute name="isManualPricing" type="Boolean" default="false" />
+    <aura:attribute name="isrenagainForUpdate" type="Boolean"/>
+    <aura:attribute name="manualShoppingCartLineItem" type="Shopping_cart_line_item__c" default="{'sobjectType':'Shopping_cart_line_item__c'}" />
+	<aura:attribute name="inCheckoutPage" type="Boolean" default="false" />
+	<aura:handler name="change" value="{!v.recordId}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.isrenagainForUpdate}" action="{!c.doInit}" />
+    <aura:attribute name="RendershpForUpdate" type="Boolean" default="false" />
+    
+    
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <hr/>                
+				<aura:if isTrue="{!v.inCheckoutPage}">				
+					<section class="slds-clearfix">
+                        <a onclick="{!c.cartLineItemsSection}">
+                            <div class="slds-float--right" style="margin-top:-3px;">
+                                <lightning:Icon class="slds-show" aura:id="CartLineItemsSection" iconName="utility:chevrondown" size="x-small"/>
+                                <lightning:Icon class="slds-hide" aura:id="CartLineItemsSection" iconName="utility:chevronright" size="x-small"/>                      
+                            </div>
+                        
+                            <div>
+                                <h5>{!v.opp.Account.Name +'\'s Cart'}</h5>
+                            </div>
+                        </a>
+                            </section> 
+                        <aura:set attribute="else">
+                            <h5>{!v.opp.Account.Name +'\'s Cart'}</h5>
+                        </aura:set>
+                        
+				</aura:if>				
+                <div class="slds-show" aura:id="CartLineItemsSection">
+                    <aura:iteration items="{!v.shoppingCartLineItems}" var="lineItem"> 
+                         <c:ShoppingCartLineItem lineItemId="{!lineItem.Id}" 
+                                            productSKUId="{!lineItem.Product_SKU__c}" 
+                                            inCheckoutPage="{!v.inCheckoutPage}"
+                                            fppTypes="{!v.fppTypes}"
+                                            accountId="{!v.recordId}"
+                                            shippingWayList="{!v.shippingWayList}"
+                                            discountReasonList="{!v.discountReasonList}" 
+                                            accountStoreInfo="{!v.accountStoreInfo}" 
+                                            marketDiscountCriteria="{!v.marketDiscountCriteria}"
+                                            zipcode='{!v.opp.Cart_ZipCode__c}' 
+                                            BestDate='{!lineItem.BestDate}' 
+                                            msg='{!lineItem.msg}' 
+                                            RendershpForUpdate="{v.RendershpForUpdate}"/>
+                    </aura:iteration>
+				</div>
+				<aura:if isTrue="{!not(v.inCheckoutPage)}">
+					<div class="manualProductAdd">
+						<a class="orangeButton" onclick="{!c.showManualModal}">Manually Add Product</a>
+					</div>
+				</aura:if>
+                <aura:if isTrue="{!and(v.recordId != null, not(v.inCheckoutPage))}">
+                    <c:WishListCmp recordId="{!v.recordId}" />
+                </aura:if>
+            </div>
+        </div>
+        
+        <!-- Manually add product modal -->
+        <aura:if isTrue="{!v.isManualPricing}">
+            <div>
+                <section aura:id="manualCartDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container adjust_container">
+                        <header class="slds-modal__header">
+                            <i class="fa fa-times float-right" onclick="{!c.hideManualModal}" />
+                            <h3>Manually Add Product</h3>
+                        </header>
+                        <div class="slds-modal__content slds-p-around--medium saveCartModal">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    
+                                </div>
+                                <div class="col-sm-6">
+                                    <ui:inputText label="Product SKU" value="{!v.manualShoppingCartLineItem.Product_SKU__c}" />
+                                    <br />
+                                    <br />
+                                    <ui:inputText label="Quantity" value="{!v.manualShoppingCartLineItem.Quantity__c}" />
+                                </div>
+                                <div class="col-sm-3">
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <a class="greyButton" onclick="{!c.hideManualModal}">Cancel</a>
+                            <a class="orangeButton" onclick="{!c.updateLineItem}">Add Product</a>
+                            
+                        </footer>
+                    </div>
+                </section>
+            </div>
+        </aura:if>
+    
+        <div class="slds-backdrop" aura:id="overlay"></div>
+    </div>
+</aura:component>

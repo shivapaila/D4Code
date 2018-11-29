@@ -1,0 +1,37 @@
+<aura:component controller="ManageCustomerCarts" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.Init}"/>
+    <aura:attribute name="recordId" type="String" default="0032F000007rgMuQAI"/>
+    <aura:attribute name="CartLst" type="List[]"/>
+    <aura:attribute name="Message" type="boolean" default="false" description="use for display no record found message"/>
+    
+    <div class="container" style="margin-top:35px;">
+        <i class="far fa-shopping-cart headerIcon float-left"></i> <h3>Guest Carts</h3>
+        <div class="cardWrapper">
+            <div class="cardContent">
+                
+                <aura:if isTrue="{!v.Message}">
+                   <div class="slds-text-color--error">No carts to display</div>
+                   
+                   <aura:set attribute="else">
+                        <div class="row headerRow">
+                            <div class="col-sm-3">Name</div>
+                            <div class="col-sm-3">Cart Status</div>
+                            <div class="col-sm-3">CreatedDate</div>
+                            <div class="col-sm-3">Cart Total</div>
+                        </div>
+
+                        <aura:iteration var="oppObj" items="{!v.CartLst}">
+                            <div class="row caseItemWrapper">
+                                <div class="col-sm-3"><a data-record="{!oppObj.AccountId}" onclick="{!c.goToRecord}">{!oppObj.Name}</a></div>
+                                <div class="col-sm-3">{!oppObj.StageName}</div>
+                                <div class="col-sm-3"><ui:outputDateTime value="{!oppObj.CreatedDate}" format="yyyy-MM-dd"/></div>
+                                <div class="col-sm-3"><ui:outputCurrency value="{!oppObj.Cart_Grand_Total__c}"/></div>
+                            </div>
+                        </aura:iteration>
+
+                   </aura:set>
+                </aura:if>
+            </div>
+        </div>
+    </div>
+</aura:component>

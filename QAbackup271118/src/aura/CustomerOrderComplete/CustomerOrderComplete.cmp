@@ -1,0 +1,21 @@
+<aura:component access="global" implements="flexipage:availableForAllPageTypes">
+
+    <aura:attribute name="SONumber" type="String"/>
+    <aura:attribute name="receiptUrl" type="String"/>
+    
+	<aura:registerEvent name="NavigateToWrapperComponentAppEvent" type="c:NavigateToWrapperComponentAppEvent" />
+  
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+	<aura:handler name="change" value="{!v.receiptUrl}" action="{!c.doInit}" />
+    <div class="container">
+        <h3 style="margin-top:15px;"><i class="far fa-shield-check"></i>&nbsp;{!$Label.c.OrderCompleteThankYou}</h3>   
+        <div class="cardWrapper">  
+            <div class="cardContent">
+                <h4>{!$Label.c.OrderCompleteEmailMsg}</h4>
+                <label class="inlineLabel">{!$Label.c.OrderCompleteSO}:&nbsp;{!v.SONumber}</label><br />
+                <lightning:button aura:id="close-button" class="orangeButton" variant="neutral" label="{!$Label.c.Close}" onclick="{!c.navigateToHome}" /> 
+            </div>   
+        </div> 
+    </div>
+
+</aura:component>

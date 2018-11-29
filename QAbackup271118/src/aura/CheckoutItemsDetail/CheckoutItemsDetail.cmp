@@ -1,0 +1,22 @@
+<aura:component controller="ShoppingCartDetailCmpCtrl" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="shoppingCartLineItems" type="Shopping_cart_line_item__c[]"/>
+    <aura:attribute name="opp" type="Opportunity" />
+    <aura:registerEvent name="NotifyHeaderComponentEvent" type="c:NotifyHeaderComponentEvent"/> 
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    
+    <div class="row">
+        <div class="col-sm-12">
+            <h5>{!v.opp.Account.Name +'\'s Cart'}</h5>
+            <aura:iteration items="{!v.shoppingCartLineItems}" var="lineItem"> 
+                <c:ShoppingCartLineItem lineItemId="{!lineItemId}" 
+                                        productSKUId="{!lineItem.Product_SKU__c}" 
+                                        inCheckoutPage="true"
+                                        fppTypes="{!v.fppTypes}"
+                                        accountId="{!v.recordId}"
+                                        />
+            </aura:iteration>
+        </div>
+    </div>
+</aura:component>

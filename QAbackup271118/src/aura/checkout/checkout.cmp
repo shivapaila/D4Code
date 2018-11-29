@@ -1,0 +1,643 @@
+<aura:component controller="CheckoutController" implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global">
+   <!-- <ltng:require scripts="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" /> -->
+   <!-- DEF-809 fix -->
+   <ltng:require scripts="{!$Resource.ConciergePayment_bigJS + '/big.min.js'}" />
+    <!-- Constants -->
+    <aura:attribute name="OPPORTUNITY_STAGE_PAYMENT" type="String" access="private" default="Payment Process Started"/>   
+    <!-- Validation attributes -->
+    <ltng:require styles="{!$Resource.LightningValidationStylesheet}"/>
+    <aura:attribute name="suggestions" type="Object[]" access="private" description="Suggestions"/>
+    <aura:attribute name="hasSuggestions" type="Boolean" access="private" default="false"/>
+    <aura:attribute name="timeoutIdentifier" type="Integer" access="private"/>
+    <aura:attribute name="ShippingAddressObjectSnapshot" type="sObject" access="private" default="null"/>
+    <aura:attribute name="otherSuggestions" type="Object[]" access="private" description="Suggestions"/>
+    <aura:attribute name="hasOtherSuggestions" type="Boolean" access="private" default="false"/>
+    <aura:attribute name="BillingAddressObjectSnapshot" type="sObject" access="private" default="null"/>
+
+    <aura:attribute name="guestId" type="String" />
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="selectedDesiredDeliveryDay" type="Date" />
+    
+    <aura:attribute name="addresses" type="List" />
+    <aura:attribute name="addresses1" type="List" />
+     
+    <aura:attribute name="lstPhones" type="String[]" />
+    <aura:attribute name="lstEmails" type="String[]" />
+
+    <aura:attribute name="formWrap" type="SObject" />	   
+    <aura:attribute name="showShipAddForm" type="Boolean" default="false" />
+    <aura:attribute name="showBillAddForm" type="Boolean" default="false" />
+    <aura:attribute name="currShipAddr" type="String" default="" />
+    <aura:attribute name="currBillAddr" type="String" />
+    <aura:attribute name="newShipAddr" type="String" default="" />
+    <aura:attribute name="newBillAddr" type="String" default="" />
+    <aura:attribute name="isShipFormError" type="Boolean" default="false" />
+    <aura:attribute name="isBillFormError" type="Boolean" default="false" />
+    <aura:attribute name="isShipPhoneAndEmailError" type="Boolean" default="false" />
+    <aura:attribute name="isBillPhoneAndEmailError" type="Boolean" default="false" />
+
+    <aura:attribute name="isShipPicklistPhone" type="Boolean" default="false" />
+    <aura:attribute name="rSubComponent" type="Boolean" /> 
+    <aura:attribute name="isBillPicklistPhone" type="Boolean" default="false" />
+    <aura:attribute name="isShipManualPhone" type="Boolean" default="false" />
+    <aura:attribute name="isBillManualPhone" type="Boolean" default="false" />
+    
+    <aura:attribute name="pageReference" type="Object"/>
+    
+    <aura:attribute name="shipnewPhone" type="String"/>
+    <aura:attribute name="shipnewEmail" type="String"/>
+    
+    <aura:attribute name="AddnewPhone" type="String"/>
+    <aura:attribute name="AddnewEmail" type="String"/>
+    
+    <aura:attribute name="shipPhone" type="String"/>
+    <aura:attribute name="billPhone" type="String"/>
+
+    <aura:attribute name="shipEmail" type="String"/>
+    <aura:attribute name="billEmail" type="String"/>
+
+    <aura:attribute name="isShipPicklistEmail" type="Boolean" default="false" />
+    <aura:attribute name="isBillPicklistEmail" type="Boolean" default="false" />
+    <aura:attribute name="isShipManualEmail" type="Boolean" default="false" />
+    <aura:attribute name="isBillManualEmail" type="Boolean" default="false" />
+    <aura:attribute name="emailCount" type="Integer" />
+
+    <aura:attribute name="showBillingInfo" type="Boolean" default="true" />
+    <aura:attribute name="orderTotal" type="Double" default="0" />
+    <aura:attribute name="totalPaid" type="Double" default="0" />
+    <aura:attribute name="payments" type="Cart_Payment_Transaction__c[]" />
+    <aura:attribute name="isDeliveryDatesChosen" type="Boolean" default="false" />
+    <aura:attribute name="phCount" type="Integer" />
+    
+    <aura:attribute name="isRenderForUpdate" type="Boolean" default="false" />
+    <aura:attribute name="isrenagainForUpdate" type="Boolean" default="false" />
+    <aura:attribute name="RendercomForUpdate" type="Boolean" default="false" />
+    <aura:attribute name="isDesiredDeliveryDateRequired" type="Boolean" default="false" />
+    <aura:attribute name="showDesiredDeliveryDate" type="Boolean" default="false" />
+
+    <aura:attribute name="showTextOptInModal" type="Boolean" default="false" />
+    <aura:attribute name="textOptInCompleted" type="Boolean" default="false" />
+    
+    <!-- REQ 444 - Holds the all address details and Edit button rendering-->
+    <aura:attribute name="formWrapMap" type="Map" /> 
+    <aura:attribute name="shipAddEditBtn" type="Boolean" default="true"/> 
+    <aura:attribute name="billAddEditBtn" type="Boolean" default="false"/>
+    <aura:attribute name="prevShipAddr" type="String" default="" />
+    
+    <aura:attribute name="shipAddSaveBtn" type="Boolean" default="false"/> 
+    <aura:attribute name="billAddSaveBtn" type="Boolean" default="false"/>
+      
+    <!-- REQ 471 - Customer Order Acceptance -->
+    <aura:attribute name="legalEntityName" type="String" />
+    
+    <!-- REQ 486 - Print Receipt -->
+    <aura:attribute name="receiptUrl" type="String" /> 
+    <aura:attribute name="SONumber" type="String" />
+    <!-- End of REQ 486 - Print Receipt -->
+    
+	<!-- DEF 800 - Cancel suspend sale in Review page -->
+    <aura:attribute name="showSuspendToPosModal" type="Boolean" default="false" />
+    <!-- End of DEF 800 - Cancel suspend sale in Review page -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+  <!--  <aura:handler name="change" value="{!v.guestId}" action="{!c.doInit}" /> -->
+    <aura:handler name="change" value="{!v.rSubComponent}" action="{!c.doInit}" />
+    
+    <!--DEF-958 Desired Delivery Date Rquired for all Shipping types-->
+    <aura:attribute name="showCalendar" type="Boolean" default="true"/>
+    <!--DEF-958 End-->
+    <aura:registerEvent name="NavigateToWrapperComponentAppEvent" type="c:NavigateToWrapperComponentAppEvent" />
+    <aura:registerEvent name="NotifyHeaderComponentEvent" type="c:NotifyHeaderComponentEvent"/>
+    <aura:handler name="DeliveryDateChangeNotifyToCheckoutSummary" event="c:NotifyParentComponentEvent" action="{!c.refreshCheckoutSummary}"/>
+    
+    <aura:handler name="NotifyParentFinishedDesiredDate" event="c:NotifyParentComponentEvent" action="{!c.cancelDesiredDeliveryDateRefresh}" />
+    <aura:handler name="NotifyParentTextOptInDecline" event="c:CloseModalEvent" action="{!c.doTextOptInDecline}" />
+    <aura:handler name="NotifyParentTextOptInComplete" event="c:CloseModalEvent" action="{!c.doTextOptInComplete}" />   
+    <aura:handler name="NotifyParentClosePayment" event="c:CloseModalEvent" action="{!c.closePaymentModal}" />
+    <aura:handler name="NotifyParentFinishedSign" event="c:CloseModalEvent" action="{!c.doPlaceOrderFromPaymentModal}" />
+    <aura:handler name="NotifyParentSuspendSales" event="c:CloseModalEvent" action="{!c.doSuspendSalesFromPaymentModal}" />
+        
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+
+    <aura:if isTrue="{!empty(v.oppId)}" >
+        <lightning:spinner variant="brand" size="large"/>
+    </aura:if>
+
+    <lightning:spinner aura:id="largeSpinner" variant="brand" size="large" class="slds-hide"/>
+
+    <a id="top" name="top"></a>
+
+    <div aura:id="checkoutBody" class="container checkoutWrapper">
+
+        <div class="breadcrumbWrapper">
+            <div class="currentBreadcrumbItem">Review</div>
+        </div>
+        <a class="orangeButton float-right fix-margin" onclick="{!c.openSuspendToPosModal}">Suspend to POS</a>
+        
+        <h3>{!$Label.c.Shipping_Address}</h3>
+
+        <div class="row">
+            <div class="col-sm-7">
+
+                <!--<c:SampleCheckout guestId="{!v.guestId}"/>-->
+
+                <div class="cardWrapper">
+                    <div class="cardContent">
+                        <div class="row" style="margin-bottom: 10px;">
+                            <div class="col-sm-4 text-right">
+                                <label class="inlineLabel">{!$Label.c.Phone}</label>
+                            </div>
+                            <div class="col-sm-8 phonePicklist">
+                                <aura:if isTrue="{!v.isShipPicklistPhone}" >
+                                    <lightning:select aura:id="selectShipPhone" name="selectShipPhone" onchange="{!c.shipPhoneChange}" value="{!v.shipPhone}">
+                                        <aura:iteration items="{!v.lstPhones}" var="phone">
+                                            <option text="{!phone.label}"  value="{!phone.value}"/>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </aura:if>
+                                <aura:if isTrue="{!v.isShipManualPhone}">
+                                   <ui:inputPhone class="slds-input" value="{!v.formWrap.shipPhone}" placeholder="Enter Phone Number" required="true" blur="{!c.ShipPhone}" />
+                                </aura:if>
+                               
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 text-right">
+                                <label class="inlineLabel">Email*</label>
+                            </div>
+                            <div class="col-sm-8 phonePicklist">
+                                <aura:if isTrue="{!v.isShipPicklistEmail}" >
+                                    <lightning:select aura:id="selectShipEmail"  onchange="{!c.shipEmailChange}" value="{!v.shipEmail}">
+                                        <aura:iteration items="{!v.lstEmails}" var="email">
+                                            <option text="{!email.label}"  value="{!email.value}"/>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </aura:if>
+                                <aura:if isTrue="{!v.isShipManualEmail}">                                
+                                    <ui:inputPhone class="slds-input" value="{!v.formWrap.shipEmail}" placeholder="Enter Email " required="true" blur="{!c.ShipEmail}" />
+                                </aura:if>     
+                            </div>
+                        </div>
+                        <!--REQ 444 - Edit Button for update old selected Address-->
+                        <aura:if isTrue="{!v.shipAddEditBtn}">
+                        <lightning:button aura:id="shipEditBtn" class="slds-float_right orangeButton smallButton" label="{!$Label.c.Edit}" onclick="{!c.editSelectedShipAddress}"/>  
+                        </aura:if>
+                             <div class="tabbedIn">
+                            <fieldset class="slds-form-element">
+                                <div class="radioWrapper slds-form-element__control">                                    
+                                    <!-- REQ 444 - END -->                       
+                                    <lightning:radioGroup aura:id="shipGroup" name="Shipping Address" options="{!v.addresses}" value="{!v.currShipAddr}" onchange="{!c.showOrHideShipForm}"/>
+                                     
+                                </div>                                
+                            </fieldset>
+
+                            <aura:if isTrue="{!v.showShipAddForm}">
+                                <div class="formWrapper">
+                                    
+                                  <!-- REQ 444 - Commented FirstName and LastName -->
+                                  <!--  <div class="row">
+                                        <div class="col-sm-4 text-right">
+                                            <label class="inlineLabel">{!$Label.c.First_Name}</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <ui:inputText class="slds-input" value="{!v.formWrap.shipFirstName}" required="true" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4 text-right">
+                                            <label class="inlineLabel">{!$Label.c.Last_Name}</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <ui:inputText class="slds-input" value="{!v.formWrap.shipLastName}" required="true" />
+                                        </div>
+                                    </div>   -->
+
+                                    <div class="row">
+                                        <div class="col-sm-4 text-right">
+                                            <label class="inlineLabel">{!$Label.c.Address_Line_1}</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <div class="search-result-wrapper" onfocusout="{!c.onElementFocusedOut}">
+                                                <ui:inputText class="slds-input" value="{!v.formWrap.shipAddr1}" required="true"
+                                                          aura:id="shippingStreet"
+                                                          updateOn="keyup"
+                                                          keyup="{!c.handleSearchChange}"
+                                                          change="{!c.onAddressChanged}"/>
+                                                <!-- Shipping validation loader -->
+                                                <div aura:id="loader" class="slds-spinner_container spinner-inner invisible">
+                                                    <div class="slds-spinner slds-spinner--small" aria-hidden="false"
+                                                         role="alert">
+                                                        <div class="slds-spinner__dot-a"></div>
+                                                        <div class="slds-spinner__dot-b"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="searchResults">
+                                                    <aura:renderif isTrue="{!v.hasSuggestions}">
+                                                        <ul class="searchResults">
+                                                            <aura:iteration items="{!v.suggestions}" var="suggestion">
+                                                                <li class="resultItem">
+                                                                    <a id="{!globalId + '-suggestion-index-' + suggestion.index}"
+                                                                       tabindex="0"
+                                                                       href="javascript:void(0);"
+                                                                       title="{!suggestion.format}"
+                                                                       onclick="{!c.handleResultSelect}"
+                                                                       onkeyup="{!c.onSuggestionKeyUp}">{!suggestion.suggestion}</a>
+                                                                </li>
+                                                            </aura:iteration>
+                                                        </ul>
+                                                    </aura:renderif>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4 text-right">
+                                            <label class="inlineLabel">{!$Label.c.Address_Line_2}</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <ui:inputText class="slds-input" value="{!v.formWrap.shipAddr2}" required="true"
+                                                          aura:id="shippingStreet2"
+                                                          change="{!c.onAddressChanged}" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4 text-right">
+                                            <label class="inlineLabel">{!$Label.c.City}</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <ui:inputText class="slds-input" value="{!v.formWrap.shipCity}" required="true"
+                                                          aura:id="shippingCity"
+                                                          change="{!c.onAddressChanged}" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4 text-right">
+                                            <label class="inlineLabel">{!$Label.c.State}</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <ui:inputText class="slds-input" value="{!v.formWrap.shipState}" required="true"
+                                                          aura:id="shippingState"
+                                                          change="{!c.onAddressChanged}" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4 text-right">
+                                            <label class="inlineLabel">{!$Label.c.Postal_Code}</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <ui:inputText class="slds-input" value="{!v.formWrap.shipPostalCode}" required="true"
+                                                            aura:id="shippingZip"
+                                                            change="{!c.onAddressChanged}"/>
+                                        </div>
+                                    </div>
+									<!-- REQ 444 - Commented address validation-->
+                                    <!-- Added hidden fields for address validation
+                                    <div class="row">
+                                        <div class="col-sm-4 text-right">
+                                            <label class="inlineLabel">Shipping Address Validation Status</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <ui:inputText class="slds-input" value="{!v.formWrap.Address_Validation_Status__c}"
+                                                          aura:id="shippingValStatus"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4 text-right slds-hide">
+                                            <label class="inlineLabel">Shipping Address Validation Timestamp</label>
+                                        </div>
+                                        <div class="col-sm-8 slds-hide">
+                                            <ui:inputDateTime class="slds-input" value="{!v.formWrap.Address_Validation_Timestamp__c}"/>
+                                        </div>
+                                    </div>  -->
+                                </div>
+                            </aura:if>
+							
+                            <aura:if isTrue="{!v.showShipAddForm}">
+                            <div class="row">
+                                <div class="col-sm-12 text-right">  
+                                    <!-- REQ 444 - Changed button label from "Use this address" to "Edit" -->
+                                   <!-- <a class="orangeButton" onclick="{!c.useThisShippingAddr}">{!$Label.c.Use_this_address}</a>  -->
+                                     <a class="orangeButton" onclick="{!c.useThisShippingAddr}">{!$Label.c.Save}</a>
+                                </div>
+                            </div>
+                           </aura:if>
+                        </div>
+                    </div>
+                </div>
+                
+                <br />
+
+                <h3>{!$Label.c.Billing_Information}</h3>
+                <div class="cardWrapper">
+                    <div class="cardContent">
+                        <fieldset class="slds-form-element">
+                            <aura:if isTrue="{!or(v.currShipAddr!='',v.newShipAddr!='')}">
+                                <div class="radioWrapper slds-form-element__control sameAsShipping">
+                                    <ui:inputCheckbox aura:id="shipCheckBox" label="{!$Label.c.Same_as_shipping_address}" click="{!c.copyShipToBill}" value="true"/>
+                                </div>
+                            </aura:if>
+                        </fieldset>
+                        <aura:if isTrue="{!v.showBillingInfo}">
+                            <div class="row">
+                                <div class="col-sm-4 text-right">
+                                    <label class="inlineLabel">{!$Label.c.Phone}</label>
+                                </div>
+                                <div class="col-sm-8 phonePicklist">
+                                    <aura:if isTrue="{!v.isBillPicklistPhone}">
+                                        <lightning:select name="billingPhones" value="{!v.billPhone}" aura:id="selectBillPhone"  onchange="{!c.billPhoneChange}">
+                                            <aura:iteration items="{!v.lstPhones}" var="phone">
+                                                <option text="{!phone.label}"  value="{!phone.value}"/>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.isBillManualPhone}">
+                                        <ui:inputPhone class="slds-input" value="{!v.formWrap.billPhone}" placeholder="Enter Phone Number" required="true" blur="{!c.BillPhone}" />
+                                    </aura:if>  
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-sm-4 text-right">
+                                    <label class="inlineLabel">Email*</label>
+                                </div>
+                                <div class="col-sm-8 phonePicklist">
+                                    <aura:if isTrue="{!v.isBillPicklistEmail}">
+                                        <lightning:select name="billingEmails" value="{!v.billEmail}" aura:id="selectBillEmail"  onchange="{!c.billEmailChange}">
+                                            <aura:iteration items="{!v.lstEmails}" var="email">
+                                                <option text="{!email.label}"  value="{!email.value}"/>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.isBillManualEmail}">
+                                       <ui:inputPhone class="slds-input" value="{!v.formWrap.billEmail}" placeholder="Enter Email " required="true" blur="{!c.BillEmail}" />
+                                    </aura:if>
+                                    
+                                </div>
+                            </div>
+                            <aura:if isTrue="{!v.billAddEditBtn}">
+                            <lightning:button aura:id="billEditBtn" class="slds-float_right orangeButton smallButton" label="{!$Label.c.Edit}" onclick="{!c.editSelectedBillAddress}"/>
+                               </aura:if>
+                                <div class="tabbedIn">
+                                <fieldset class="slds-form-element">
+                                    <div class="radioWrapper slds-form-element__control">
+                                        <!-- REQ 444 - Edit Button for update old selected Address-->
+                                         
+                                            <aura:if isTrue="{!(v.currBillAddr != '')}">                                                
+                                            </aura:if>
+                                       
+                                        <!-- REQ 444 - END -->                                        
+                                        <lightning:radioGroup aura:id="billGroup" name="Billing Address" options="{!v.addresses1}" value="{!v.currBillAddr}" onchange="{!c.showOrHideBillForm}"/>
+                                    </div>                                
+                                </fieldset>
+                                
+                                <div class="formWrapper">  
+									<aura:if isTrue="{!v.showBillAddForm}">
+                                        <div class="row">
+                                            <div class="col-sm-4 text-right">
+                                                <label class="inlineLabel">{!$Label.c.Address_Line_1}</label>
+                                            </div>
+                                            <div class="col-sm-8">
+                                                <div class="search-result-wrapper" onfocusout="{!c.onOtherElementFocusedOut}">
+                                                    <ui:inputText class="slds-input" value="{!v.formWrap.billAddr1}" required="true"
+                                                                  aura:id="billingStreet"
+                                                                  updateOn="keyup"
+                                                                  keyup="{!c.handleOtherSearchChange}"
+                                                                  change="{!c.onOtherAddressChanged}"/>
+
+                                                    <!-- Billing validation loader -->
+                                                    <div aura:id="otherLoader" class="slds-spinner_container spinner-inner invisible">
+                                                        <div class="slds-spinner slds-spinner--small" aria-hidden="false" role="alert">
+                                                            <div class="slds-spinner__dot-a"></div>
+                                                            <div class="slds-spinner__dot-b"></div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Billing suggestions -->
+                                                    <div class="searchResults">
+                                                        <aura:renderif isTrue="{!v.hasOtherSuggestions}">
+                                                            <ul class="searchResults">
+                                                                <aura:iteration items="{!v.otherSuggestions}" var="suggestion">
+                                                                    <li class="resultItem">
+                                                                        <a id="{!globalId + '-other-suggestion-index-' + suggestion.index}"
+                                                                           tabindex="0"
+                                                                           href="javascript:void(0);"
+                                                                           title="{!suggestion.format}"
+                                                                           onclick="{!c.handleOtherResultSelect}"
+                                                                           onkeyup="{!c.onOtherSuggestionKeyUp}">{!suggestion.suggestion}</a>
+                                                                    </li>
+                                                                </aura:iteration>
+                                                            </ul>
+                                                        </aura:renderif>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-sm-4 text-right">
+                                                <label class="inlineLabel">{!$Label.c.Address_Line_2}</label>
+                                            </div>
+                                            <div class="col-sm-8">
+                                                <ui:inputText class="slds-input" value="{!v.formWrap.billAddr2}" required="true"
+                                                              aura:id="billingStreet2"
+                                                              change="{!c.onAddressChanged}"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-sm-4 text-right">
+                                                <label class="inlineLabel">{!$Label.c.City}</label>
+                                            </div>
+                                            <div class="col-sm-8">
+                                                <ui:inputText class="slds-input" value="{!v.formWrap.billCity}" required="true"
+                                                              aura:id="billingCity"
+                                                              change="{!c.onAddressChanged}" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-sm-4 text-right">
+                                                <label class="inlineLabel">{!$Label.c.State}</label>
+                                            </div>
+                                            <div class="col-sm-8">
+                                                <ui:inputText class="slds-input" value="{!v.formWrap.billState}" required="true"
+                                                              aura:id="billingState"
+                                                              change="{!c.onAddressChanged}" />
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-sm-4 text-right">
+                                                <label class="inlineLabel">{!$Label.c.Postal_Code}</label>
+                                            </div>
+                                            <div class="col-sm-8">
+                                                <ui:inputText class="slds-input" value="{!v.formWrap.billPostalCode}" required="true"
+                                                              aura:id="billingZip"
+                                                              change="{!c.onAddressChanged}" />
+                                            </div>
+                                        </div>
+
+                                    	<div class="row">
+                                            <div class="col-sm-12 text-right">
+                                                <a class="orangeButton" onclick="{!c.useThisBillingAddr}">{!$Label.c.Save}</a>
+                                            </div>
+                                    	</div>    
+                                	</aura:if>
+                                </div>
+                            </div>
+                        </aura:if>
+                    </div>
+                </div>
+                <br />
+                <div>
+                    <h5>Please follow each step to continue to payment</h5>
+                    <div class="buttonWrapper">
+                        <a class="orangeButtonLarge" data-record="deliveryDates" onclick="{!c.openModal}" style="margin-bottom:10px;padding-left: 10px;text-align: left;text-transform: initial;">
+                            <strong>1.</strong> Choose Delivery Date <aura:if isTrue="{!v.isDeliveryDatesChosen}"><lightning:icon iconName="action:approval" title="Delivery date selected" /></aura:if>
+                        </a>
+                        <aura:if isTrue="{!v.isDesiredDeliveryDateRequired}">
+                            <a class="orangeButtonLarge" data-record="deliveryDates" onclick="{!c.openDesiredDeliveryDateModal}" style="margin-bottom:10px;padding-left: 10px;text-align: left;text-transform: initial;">
+                                <strong>2.</strong> Choose Desired Delivery Date 
+                                <aura:if isTrue="{! !empty(v.selectedDesiredDeliveryDay)}">
+                                    <lightning:icon iconName="action:approval" title="Delivery date selected" />&nbsp; {!v.selectedDesiredDeliveryDay}
+                                     <aura:set attribute="else">
+                                        <small>(Please choose desired delivery date.)</small>
+                                    </aura:set>
+                                </aura:if>
+                            </a>
+                            <aura:set attribute="else">
+                                <a class="orangeButtonLarge" data-record="deliveryDates" onclick="return false;" style="margin-bottom:10px;padding-left: 10px;text-align: left;text-transform: initial;">
+                                    <strong>2.</strong> Choose Desired Delivery Date <lightning:icon iconName="action:approval" title="Delivery date selected" />
+                                </a>
+                            </aura:set>
+                        </aura:if>                            
+                        <aura:if isTrue="{!(   v.isDeliveryDatesChosen
+                                                &amp;&amp; !empty(v.selectedDesiredDeliveryDay)
+                                            )}">                                                    
+                            <a class="orangeButtonLarge" data-record="deliveryDates" style="margin-bottom:10px;padding-left: 10px;text-align: left;text-transform: initial;" onclick="{!c.openTextOptInModal}">
+                                <strong>3.</strong> Text Opt-In <aura:if isTrue="{!v.textOptInCompleted}"><lightning:icon iconName="action:approval" title="Text Opt-In Completed" /></aura:if>
+                            </a>
+                            <aura:set attribute="else">
+                                <a class="orangeButtonLarge disabled" data-record="deliveryDates" style="margin-bottom:10px;padding-left: 10px;text-align: left;text-transform: initial;" onclick="return false;">
+                                    <strong>3.</strong> Text Opt-In <aura:if isTrue="{!v.textOptInCompleted}"><lightning:icon iconName="action:approval" title="Text Opt-In Completed" /></aura:if>
+                                </a>                                
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                    <br/>
+                    <div>
+                        <aura:if isTrue="{!(   v.isDeliveryDatesChosen
+                                                &amp;&amp; !empty(v.selectedDesiredDeliveryDay)
+                                                &amp;&amp; v.textOptInCompleted
+                                            )}">
+                            <a class="orangeButton float-right fix-margin" onclick="{!c.openPaymentModal}">
+                                Proceed to Payment
+                            </a>
+                            <aura:set attribute="else">
+                                <a class="greyButton float-right fix-margin disabled" onclick="return false;" disabled="true">
+                                    Proceed to Payment
+                                </a>
+                            </aura:set>
+                        </aura:if> 
+                    </div>                                        
+                </div>
+            </div>
+            <!-- END LEFT COLUMN -->
+
+            <!-- START RIGHT COLUMN -->
+            <div class="col-sm-5">
+                <div class="cardWrapper">
+                    <div class="cardContent">
+                        <aura:if isTrue="{!or(v.guestId,v.isRenderForUpdate)}">
+                            <c:CheckoutOrderSummary recordId="{!v.guestId}" isRenderForUpdate="{!v.isRenderForUpdate}"
+                                                    shoppingCartTotal="{!v.orderTotal}"
+                                                    shipToAddress="{!v.currShipAddr}"/>
+                        </aura:if>
+                        <!-- REQ 443 - Add the ability to edit the cart on the Review Page --> 
+                        <aura:if isTrue="{!v.guestId}">
+                        	<c:CheckoutItemsEdit recordId="{!v.guestId}" inCheckoutPage="true" isrenagainForUpdate="{!v.isrenagainForUpdate}" />
+                        </aura:if>
+						<!-- End of REQ 443 -->
+                        
+ 						<!--<aura:if isTrue="{!v.guestId}">
+                        	<c:CheckoutItemsDetail recordId="{!v.guestId}"/>
+                        </aura:if>-->
+                        
+                        <!--Commissions Details-->
+      					<c:Commissions guestId="{!v.guestId}" RendercomForUpdate="{!v.RendercomForUpdate}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Choose Desired Delivery Date MODAL -->
+       <!--DEF-958 Desired Delivery Date Rquired for all Shipping types-->
+        <aura:if isTrue="{!v.showDesiredDeliveryDate}">
+            <c:DesiredDeliveryDate oppId="{!v.oppId}" selectedDeliveryDate="{!v.selectedDesiredDeliveryDay}" showCalendar="{!v.showCalendar}"/>
+        </aura:if>
+        <!-- DELIVERY DATE MODAL -->
+        <div aura:id="deliveryDates" role="dialog" class="slds-modal slds-fade-in-close">
+
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <i class="fa fa-times float-right" data-record="deliveryDates" onclick="{!c.cancelModal}"></i>
+                    <h3 class="slds-text-heading--medium">Choose Delivery Dates</h3>
+                </div>
+                	<div class="slds-modal__content">
+                    <!--{!v.guestId}
+                    <c:PickDeliveryDate GuestId="{!v.guestId}"/-->
+                    {!v.body}
+                    <!--REQ-451-->
+                </div>
+                    <div class="slds-modal__footer">
+                        <div class="text-left">
+                       <!--   <lightning:input aura:id="deliveryNotes" label="Delivery Notes:" maxlength="3999"/> -->
+                        
+                        <label class="deliveryNotes">Delivery Notes:</label>
+                        <ui:inputTextArea aura:id='deliveryNotes' class="deliveryNoteTextArea"  maxlength="3999"/> 
+                        </div>
+                	</div>
+            
+                <div class="slds-modal__footer">
+                    <div class="text-right">
+                        <a data-record="deliveryDates" class="greyButton" onclick="{!c.cancelModal}">Cancel</a>
+                        <a class="orangeButton" data-record="deliveryDates" onclick="{!c.finishDeliveryDate}">Finish</a>
+                    </div>
+                </div> 
+            </div>
+        </div>
+        <!-- Choose Text Opt-In MODAL -->
+        <aura:if isTrue="{!v.showTextOptInModal}">
+            <c:TextOptIn oppId="{!v.oppId}" recordId="{!v.guestId}" shipPhone="{!v.formWrap.shipPhone}"/>
+        </aura:if>
+        <!-- / DELIVERY DATE MODAL -->
+        <!-- PAYMENT MODAL -->
+        <div aura:id="paymentModal" />
+		<!-- / PAYMENT MODAL -->        
+        
+		<!-- Suspend to POS MODAL -->
+        <aura:if isTrue="{!v.showSuspendToPosModal}">
+            <section role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <h3 class="slds-text-heading--medium">Suspend to POS</h3>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <div class="text-right">
+                            <a class="greyButton" onclick="{!c.closeSuspendToPosModal}">Cancel</a>
+                            <a class="orangeButton" onclick="{!c.doSuspendSales}">Suspend to POS</a>
+                        </div>
+                    </div> 
+                </div>
+            </section>        
+        </aura:if>
+        <!-- / Suspend to POS Modal -->
+		
+
+        <div class="slds-backdrop" aura:id="overlay"></div>
+    </div>
+    
+</aura:component>

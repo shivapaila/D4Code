@@ -1,0 +1,184 @@
+.THIS {
+  padding-bottom:35px;
+}
+.THIS .productCardWrapper {
+	display:inline-block;
+	margin-bottom:20px;
+	vertical-align:top;
+}
+.THIS .productCardWrapper .productCard {
+	background:#fff;
+	height:340px;
+}
+.THIS .productCardDetails {
+	padding:15px 12px;
+}
+.THIS .productImage {
+	width:100%;
+	height:200px;
+	background-size:cover;
+	background-repeat:no-repeat;
+	background-position:center center;
+	border-bottom:1px solid #f2f2f2;
+}
+.THIS .productCardWrapper a:hover h5 {
+	color:#3366cc !important;
+}
+.THIS .productCardWrapper a h5 {
+	transition: color .25s ease-in-out;
+   -moz-transition: color .25s ease-in-out;
+   -webkit-transition: color .25s ease-in-out;
+   line-height:16px;
+   max-height:33px;
+   margin-bottom:4px;
+    width:100%
+}
+.THIS ul.productListWrapper {
+  width:100%;
+}
+.THIS .productImage i {
+  font-size:125px;
+  color:#f2f2f2 !important;
+}
+.THIS .placeholderProductImage {
+  padding-top:31px;
+  width:100%;
+  text-align:center;
+}
+
+
+
+
+
+/* styles for '...' */ 
+.THIS .productCardWrapper a h5 {
+  /* hide text if it more than N lines  */
+  overflow: hidden;
+  /* for set '...' in absolute position */
+  position: relative; 
+  /* use this value to count block height */
+  line-height: 16px;
+  /* max-height = line-height (1.2) * lines max number (3) */
+  max-height: 33px; 
+  /* fix problem when last visible word doesn't adjoin right side  */
+  text-align: justify;  
+  /* place for '...' */
+  margin-right: -1em;
+  padding-right: 1em;
+}
+/* create the ... */
+.THIS .productCardWrapper a h5:before {
+  /* points in the end */
+  content: '...';
+  /* absolute position */
+  position: absolute;
+  /* set position to right bottom corner of block */
+  right: 0;
+  bottom: 0;
+}
+/* hide ... if we have text, which is less than or equal to max lines */
+.THIS .productCardWrapper a h5:after {
+  /* points in the end */
+  content: '';
+  /* absolute position */
+  position: absolute;
+  /* set position to right bottom corner of text */
+  right: 0;
+  /* set width and height */
+  width: 1em;
+  height: 1em;
+  margin-top: 0.2em;
+  /* bg color = bg color under block */
+  background: white;
+}
+
+
+
+.THIS .productCard h4 {
+	margin-bottom:2px;
+	margin-top:5px;
+}
+.THIS .originalPrice, .THIS .salePrice {
+	display:inline-block;
+}
+.THIS .productCardWrapper .productCard .originalPrice {
+	margin-right:10px;
+	color:#353534 !important;
+}
+.THIS.filterRow {
+	margin-top:-30px;
+	margin-bottom:25px;
+}
+.THIS .availableQtyWrapper {
+	color:#999;
+	font-size:12px;
+	position: relative;
+    bottom: 0;
+  float:left;
+  margin-top:5px;
+}
+.THIS .productSwatchImage {
+	display:inline-block;
+	margin-right:5px;
+	border-radius:50%;
+	width:24px;
+	height:24px;
+}
+.THIS .slds-form-element__label {
+	display:none;
+}
+.THIS .filterRow {
+	margin-bottom:15px;
+}
+.THIS .swatchWrapper {
+  max-height:25px;
+  overflow:hidden;
+}
+.THIS .filterRow select {
+  width:100%;
+}
+.THIS .slds-modal__container {
+	max-width:45rem;
+}
+.THIS .slds-modal__header h4 {
+	margin-bottom:0;
+}
+
+
+
+.THIS .modalFix {
+  overflow:visible !important;
+}
+.THIS .modalFix .cAddCustomer {
+  z-index:9999;
+}
+.THIS .modalFix .cAddCustomer .slds-fade-in-open {
+  z-index:9999;
+}
+.THIS .modalFix .cAddCustomer .slds-fade-in-open .slds-modal__container {
+  margin-top:0 !important;
+}
+
+
+.THIS .productCardDetails .smallButton.float-right {
+  position:absolute;
+  right:21px;
+  bottom:6px;
+}
+
+@media screen and (max-width: 992px) {
+  .THIS .slds-modal{
+    position: fixed !important;
+        overflow-x: hidden;
+        
+        
+       
+}
+    
+        
+    
+.THIS .slds-backdrop{
+    position: fixed !important;
+        overflow-x: hidden;
+}
+}

@@ -1,0 +1,12 @@
+.THIS .row {
+	margin:0;
+}
+.THIS .headerRow {
+	font-weight:600;
+}
+.THIS .row div {
+	padding: 15px 0;
+}
+.THIS .caseItemWrapper {
+	border-top:1px solid #e1e1e1;
+}

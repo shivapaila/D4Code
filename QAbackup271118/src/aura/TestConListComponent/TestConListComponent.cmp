@@ -1,0 +1,20 @@
+<aura:component controller="SFDCTestClass" implements="force:appHostable,lightning:isUrlAddressable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable">
+    <!--lightning:isUrlAddressable,-->
+    <aura:handler name="init" action="{!c.myAction}" value="{!this}" />
+    <aura:handler name="change" value="{!v.pageReference}" action="{!c.reInit}" />
+    
+    <aura:attribute name="contacts" type="Contact[]" />
+    <lightning:button label = "Presstorefresh" onclick = "{!c.refreshview}"/>
+    <ul>
+      
+<aura:iteration items="{!v.contacts}" var="contact">
+	<li class="minli"> <h3>{!contact.Name}</h3>
+    <h3>{!contact.Phone}</h3>
+        <h3>{!contact.Email}</h3>
+        <h3>{!contact.LastViewedDate}</h3>
+    
+    </li>
+</aura:iteration>
+	</ul> 
+    
+</aura:component>

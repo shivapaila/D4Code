@@ -1,0 +1,39 @@
+<aura:component controller="Manage_AppointmentsAndTasksController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.Init}"/> 
+    <aura:handler name="change" value="{!v.pageNumber}" action="{!c.renderPage}" />
+    <!-- <ltng:require styles="{! $Resource.SLDSv2 + '/assets/styles/salesforce-lightning-design-system.css'}"/> -->
+    <aura:attribute name="allTasks" type="List[]"/>
+    <aura:attribute name="currentList" type="List[]"/>
+    <aura:attribute type="Integer"      name="pageNumber"       default="1" />
+    <aura:attribute type="Integer"      name="maxPage"          default="1" />
+    <aura:attribute name="statusOpts" type='List'/>
+    <aura:attribute name="typeOpts" type='List'/>
+    <aura:attribute name="Message" type="boolean" default="false" description="use for display no record found message"/>
+
+    <!-- DEF-0151 - to load the custom New Task component -->
+    <aura:handler name="ConciergeDestroyNewTask" action="{!c.closeComponent}" event="c:ConciergeDestroyNewTask"/>
+
+    <div class="container" >
+        
+        
+        <h2 class="pageTitle">My Open Tasks</h2>
+        <ui:button class="newTaskButton  orangeButton smallButton" aura:id='newtask' label='New Task +' press='{!c.createTask}'/>
+        <div class="cardWrapper">
+            
+            <div class="cardContent" >
+                <c:ViewAllTaskTableCmp allTasksLst="{!v.allTasks}" currentList="{!v.currentList}" allTasks="{!v.allTasksObj}" statusOpts="{!v.statusOpts}" typeOpts="{!v.typeOpts}" pageNumber="{!v.pageNumber}" maxPage="{!v.maxPage}" Message="{!v.Message}"/>
+            </div>
+            <div class="paginationWrapper">
+                <c:Pagination currentPageNumber="{!v.pageNumber}" maxPageNumber="{!v.maxPage}" />
+            </div>
+        </div>
+        <br /><br /><br />
+        <div class="container2">
+            <c:ViewAllCompletedTask />
+        </div>
+        <ui:button aura:id='back' label='BACK' press='{!c.back}' class="greyButton smallButton"/> 
+        <!-- DEF-0151 - custom new component -->
+            {!v.body}
+    </div>
+    
+</aura:component>

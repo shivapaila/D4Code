@@ -1,0 +1,64 @@
+<aura:component controller="SendEmailController"
+                implements="force:hasRecordId,force:appHostable,flexipage:availableForRecordHome,lightning:actionOverride,forceCommunity:availableForAllPageTypes,force:lightningQuickActionwithoutHeader" access="global">
+   <!--Part 1 [for attribute declare]-->  
+   <aura:attribute name="email" type="string"/>
+   <aura:attribute name="subject" type="string"/>
+   <aura:attribute name="bodytext" type="string"/>
+   <aura:attribute name="recordId" type="Id" />
+   <aura:attribute name="mailStatus" type="boolean" default="false"/> 
+    
+   <!---Part 2 [header part] -->  
+   <div class="slds-page-header" role="banner" id="banner">
+      <h1 class="slds-page-header__title slds-m-right--small slds-align-middle slds-truncate" title="Email Component">
+         Email to Others
+      </h1>
+   </div>
+  <!---Part 3 [message display part] --> 
+   <aura:if isTrue="{!v.mailStatus}">
+      <div role="alertdialog" tabindex="-1" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal--prompt">
+         <div class="slds-modal__container">
+            <div class="slds-modal__header slds-theme--error slds-theme--alert-texture">
+               <h2 class="slds-text-heading--medium" id="prompt-heading-id">Mail Status</h2>
+            </div>
+            <div class="slds-modal__content slds-p-around--medium">
+               <div>
+                  <p>Email Sent successfully to {!v.email}</p>
+               </div>
+            </div>
+            <div class="slds-modal__footer slds-theme--default">
+               <button class="slds-button slds-button--brand" onclick="{!c.closeMessage}">Close</button>
+            </div>
+         </div>
+      </div>
+      <div class="slds-backdrop slds-backdrop--open"></div>
+   </aura:if>
+   
+   <!---Part 4 [mail fourm part]-->   
+   <div class="slds-m-around--medium" id="mainDiv">
+      <div class="slds-container--medium">
+         <div class="slds-form--stacked">
+            <div class="slds-form-element">
+               <label class="slds-form-element__label" for="CC">Email</label>
+               <div class="slds-form-element__control">
+                  <ui:inputEmail class="slds-input" aura:id="email"  value="{!v.email}" required="true" placeholder="enter@email.com"/>
+               </div>
+            </div>
+            <div class="slds-form-element">
+               <label class="slds-form-element__label" for="CC">Subject</label>
+               <div class="slds-form-element__control">
+                  <ui:inputText class="slds-input" aura:id="subject"  value="{!v.subject}" placeholder="Subject"/>
+               </div>
+            </div>
+            <div class="slds-form-element">
+               <label class="slds-form-element__label" for="textareaSample2">Mail Body</label>
+               <div class="slds-form-element__control">
+                  <lightning:inputRichText aura:id="body" value="{!v.bodytext}" />
+               </div>
+            </div>
+            <div class="slds-form-element">    
+               <button class="slds-button slds-button--brand" onclick="{!c.sendMail}">Send</button>
+            </div>
+         </div>
+      </div>
+   </div>
+</aura:component>

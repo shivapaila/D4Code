@@ -1,0 +1,13 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride,force:lightningQuickAction" access="global" controller="NewCaseLineFromCaseController">
+	<aura:attribute name="recordId" type="Id" />
+	<aura:attribute name="initializationData" type="Attributable" />
+	<aura:attribute name="isLoading" type="Boolean" default="false"/>
+
+	<aura:if isTrue="{!v.isLoading}">
+		<lightning:spinner aura:id="spinner" alternativeText="loading..."/>
+	</aura:if>
+
+	<div class="slds-card slds-align_absolute-center slds-form">
+    	<lightning:button variant="base" label="New Case Line Item" onclick="{!c.launchNewCaseLineScreen}" />
+    </div>
+</aura:component>

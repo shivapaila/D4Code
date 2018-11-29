@@ -1,0 +1,264 @@
+<aura:component controller="CreateCaseCtrl" implements="force:lightningQuickActionWithoutHeader,force:hasRecordId" access="global" >
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute type="String" name="fileString" default=''/>
+    <aura:attribute type="String" name="fileName" default="notExist"/>
+    <aura:attribute name="caseIs" type="Case" default="{'sobjectType':'Case'}"/>
+    
+    <aura:attribute name="salesOrderObj" type="SalesOrder__x" default="{ 'sobjectType': 'SalesOrder__x' }"/>
+    <aura:attribute name="contactname" type="SalesOrder__x" default="{ 'sobjectType': 'SalesOrder__x' }"/>
+    <aura:attribute name="addressObj" type="Address__c" default="{ 'sobjectType': 'Address__c' }"/>
+    <aura:attribute name="casetype" type="Case" default="{ 'sobjectType': 'Case' }"/>
+    <aura:attribute name="casesubtype" type="Case" default="{ 'sobjectType': 'Case' }"/>
+    <aura:attribute name="orderId" type="ID"/>
+    <aura:attribute name="options" type="List"/>
+    <aura:attribute name="mydata" type="Object"/>
+    <aura:attribute name="selectedRows" type="List" />
+    <aura:handler name="init" value="{!this}" action="{!c.myAction}" />
+    <aura:attribute name="contactnameId" type="String"/>
+    <aura:attribute name="contactnameIds" type="id"/>
+    <aura:attribute name="lineItem" type="List"/>
+    <aura:attribute name="Sales_Order_id" type="id"/>
+    <aura:attribute name="selectedvals" type="List" />
+    <aura:attribute name="isLoading" type="Boolean" default="false"/>
+    <aura:attribute name="isError2" type="Boolean" default="false"/>
+    <aura:attribute name="isError3" type="Boolean" default="false"/>
+    <aura:if isTrue="{!v.isLoading}">
+        <lightning:spinner aura:id="spinner" alternativeText="loading..."/>
+    </aura:if>
+    <header class="slds-modal__header">
+            <p class="slds-text-heading--medium">Create Case</p>
+    </header>
+    <div class="demo-only"  style="max-width: 90rem">
+        <h3 class="slds-section-title--divider">Case Details</h3>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-1">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label" for="input-unique-id">
+                        <abbr class="slds-required" title="required">*</abbr>Subject</label>
+                    <div class="slds-form-element__control">
+                        <force:inputField value="{!v.caseIs.Subject}"  aura:id="Subject"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-1">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label" for="input-unique-id">
+                        <abbr class="slds-required" title="required">*</abbr>Description</label>
+                    <div class="slds-form-element__control">
+                        <force:inputField value="{!v.caseIs.Description}"  aura:id="Description"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-m-top--medium"></div>
+        <h3 class="slds-section-title--divider">Additional Details</h3>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label">Case Origin </label>
+                    <div class="slds-form-element__control">
+                        <force:inputField value="{!v.caseIs.Origin}"  aura:id="Origin"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label">Sales Order </label>
+                    <div class="slds-form-element__control">
+                        <force:outputField value="{!v.salesOrderObj.ExternalId}" aura:id="Sales_Order_id" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label">Refusal and Return Reason</label>
+                    <div class="slds-form-element__control">
+                        <force:inputField value="{!v.caseIs.Refusal_Reason__c}"/>
+                    </div>
+                </div>
+            </div> 
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label" for="input-unique-id">
+                        <abbr class="slds-required" title="required">*</abbr>Status</label>
+                    <div class="slds-form-element__control">
+                        <force:inputField value="{!v.caseIs.Status}" aura:id="Status"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <lightning:recordEditForm recordId=""
+                                  objectApiName="Case" > 
+            <abbr class="slds-required" title="required">*</abbr>
+            <lightning:inputField fieldName="Type" aura:id="Type"/>
+            <abbr class="slds-required" title="required">*</abbr>
+            <lightning:inputField fieldName="Sub_Type__c" aura:id="Sub-Type"/>
+        </lightning:recordEditForm>
+        <div class="slds-grid slds-gutters">
+            
+        </div>
+        
+        <div class="slds-m-top--medium"></div>
+        <h3 class="slds-section-title--divider">Customer Information</h3>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label">Market - Account#</label>
+                    <div class="slds-form-element__control">
+                        <force:inputField value="{!v.caseIs.Market__c}"  aura:id="Market_Account#"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label"> Contact Name </label>
+                    <div class="slds-form-element__control">
+                        <lightning:formattedText value="{!v.contactnameId}"/>
+                    </div>
+                </div>
+            </div>
+        </div>        
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label">Address</label>
+                    <div class="slds-form-element__control">
+                        <force:inputField value="{!v.caseIs.Address__c}"  aura:id="addressid"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label"> Web Email</label>
+                    <div class="slds-form-element__control">
+                        <force:inputField value="{!v.caseIs.SuppliedEmail}" aura:id="leadEMail"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label"> Web Name </label>
+                    <div class="slds-form-element__control">
+                        <force:inputField value="{!v.caseIs.SuppliedName}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label"> Web Company </label>
+                    <div class="slds-form-element__control">
+                        <force:inputField value="{!v.caseIs.SuppliedCompany}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label"> Web Phone </label>
+                    <div class="slds-form-element__control">
+                        <force:inputField value="{!v.caseIs.SuppliedPhone}" aura:id="inputCmp"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slds-m-top--medium"></div>
+        <h3 class="slds-section-title--divider">Resolution Information</h3>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-1">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label">Type of Resolution</label>
+                    <div class="slds-form-element__control">
+                        <force:inputField value="{!v.caseIs.Type_of_Resolution__c}"  aura:id="Type_of_Resolution"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-1">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label">Resolution Notes</label>
+                    <div class="slds-form-element__control">
+                        <force:inputField value="{!v.caseIs.Resolution_Notes__c}"  aura:id="Resolution_Notes"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slds-m-top--large"></div>
+        <div> 
+            <div class="slds-page-header" style="cursor: pointer;" onclick="{!c.sectionOne}">
+                <section class="slds-clearfix">
+                    <div class="slds-float--left ">
+                        <lightning:icon class="slds-show" aura:id="articleOne" iconName="utility:chevrondown" size="x-small" alternativeText="Indicates chevrondown"/>
+                        <lightning:icon class="slds-hide" aura:id="articleOne" iconName="utility:chevronup" size="x-small" alternativeText="Indicates chevronup"/>
+                    </div>
+                    <div class="slds-m-left--medium">Select Line Item</div>
+                </section>
+            </div>
+            <div class="slds-hide slds-p-around--medium" aura:id="articleOne">
+                <lightning:datatable columns="{!v.options}" 
+                                     data="{!v.mydata}" 
+                                     keyField="id" 
+                                     selectedRows="{!v.selectedRows}"
+                                     onrowselection="{!c.getSelectedVal}" 
+                                     aura:id="quoteField"
+                                     />
+            </div>
+        </div>
+    <!--    <div id="error" class="alert alert-danger slds-theme_alert-texture slds-theme_warning slds-align_absolute-center" aria-hidden="true" role="alert">
+            
+        </div>
+	-->
+        <div></div><div></div>
+        <!-- save button  row -->
+   <!--     <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label">  </label>
+                    <div class="slds-form-element__control">
+                        <button class="slds-button slds-button_brand" onclick="{!c.dosave}">save</button>
+                    </div>
+                </div>
+            </div>
+        </div>  
+	-->  
+        <!--   <div aura:id="lightning"/>   -->
+        <!-- save button  Row end--> 
+        <aura:if isTrue="{!v.isError2}">
+            <section class="slds-popover slds-popover_error slds-nubbin_bottom-left" role="dialog" aria-labelledby="dialog-heading-id-2" aria-describedby="dialog-body-id-3" style="position: absolute; bottom: 56px; left: 50%; margin-left: 62px; transform: translateX(-50%);">
+                <header class="slds-popover__header">
+                    <div class="slds-media slds-media_center slds-has-flexi-truncate ">
+                        <div class="slds-media__body">
+                            <h4 class="slds-truncate slds-text-heading_small" id="ErrorBody" title="Resolve Errors">Enter all the mandatory Fields</h4>
+                        </div>
+                    </div>
+                </header>
+            </section>
+        </aura:if>
+        <aura:if isTrue="{!v.isError3}">
+            <section class="slds-popover slds-popover_error slds-nubbin_bottom-left" role="dialog" aria-labelledby="dialog-heading-id-2" aria-describedby="dialog-body-id-3" style="position: absolute; bottom: 56px; left: 50%; margin-left: 62px; transform: translateX(-50%);">
+                <header class="slds-popover__header">
+                    <div class="slds-media slds-media_center slds-has-flexi-truncate ">
+                        <div class="slds-media__body">
+                            <h4 class="slds-truncate slds-text-heading_small" id="ErrorBody" title="Resolve Errors">Review all Errors</h4>
+                        </div>
+                    </div>
+                </header>
+            </section>
+        </aura:if>
+        <div style="height: 180px;">
+            <div class="slds-docked-form-footer">
+                <button type="button" class="slds-button slds-button_brand" onclick="{!c.dosave}">Save</button>
+                <button type="button" class="slds-button slds-button_neutral" onclick="{!c.doCancel}">Cancel</button>
+            </div>
+        </div>
+    </div>
+</aura:component>

@@ -1,0 +1,16 @@
+<apex:page showHeader="false" sidebar="false" standardcontroller="SalesOrder__x">
+    <apex:includeLightning />
+
+    <div id="lightning" />
+
+    <script>
+    	var orderID = "{!SalesOrder__x.id}";
+        $Lightning.use("c:SalesorderLineItemRelatedListApp", function() {
+          $Lightning.createComponent("c:SalesorderItemRelatedList",{recordId : orderID},
+          "lightning",
+          function(cmp) {}
+          );
+        });
+    </script>
+    
+</apex:page>

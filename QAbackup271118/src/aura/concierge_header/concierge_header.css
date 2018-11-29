@@ -1,0 +1,55 @@
+.THIS.cConcierge_template {
+    padding:0;
+}
+
+.THIS {
+	border-bottom:3px solid #e8e8e8;
+	padding:17px;
+    margin-bottom:15px;
+    margin-top:-7px; /* for some reason the header is repeating twice and it needs this to fix margin issues */
+}
+.THIS .logo {
+	height:45px;
+	float:left;
+}
+.THIS .search {
+	max-width:300px;
+	margin-top:4px;
+}
+.THIS .cartWrapper {
+	font-size:24px;
+	margin-top:4px;
+}
+.THIS .cartWrapper a {
+	color:#999;
+}
+.THIS .cartNumber {
+	position: absolute;
+    background: #f68c2c;
+    color: #fff;
+    padding: 2px 4px;
+    border-radius: 50%;
+    font-size: 9px;
+    top: 2px;
+    right: 19px;
+    width:18px;
+    text-align:center;
+    overflow:hidden;
+}
+.THIS .pageTitle {
+	text-align:left;
+	display:inline-block;
+	margin:0;
+	padding:0;
+}
+.THIS .slds-modal__header {
+	text-align:left;
+}
+.THIS .homeText {
+	display:inline-block;
+	margin-left:15px;
+	color:#999;
+	font-size:22px;
+    float: left;
+    margin-top: 6px;
+}

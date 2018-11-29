@@ -1,0 +1,42 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride,flexipage:availableForAllPageTypes" controller="ConciergeRecordDetailAfterCreateCtrl">
+	<ltng:require styles="{!$Resource.conciergeStyles}" />
+    <ltng:require styles="https://fonts.googleapis.com/css?family=Open+Sans" />
+    <ltng:require styles="{!$Resource.fontawesome + '/css/fontawesome-all.css'}" />
+    <ltng:require styles="{!$Resource.bootstrap + '/bootstrap/css/bootstrap.min.css'}" />
+    <!--<ltng:require scripts="{!$Resource.bootstrap + '/bootstrap/js/bootstrap.min.js'}"  /> -->
+
+    <!-- AURA EVENTS -->
+    <aura:registerEvent name="NavigateToWrapperComponentAppEvent" type="c:NavigateToWrapperComponentAppEvent" />
+    <!-- /AURA EVENTS -->    
+	
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="isConciergeUser" type="Boolean" />
+    <lightning:workspaceAPI aura:id="workspace"/>
+	<c:concierge_header />
+		<br />
+		<div class="container">
+			<ui:scrollerWrapper>
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="cardWrapper">
+							<div class="cardContent">
+								<a href="" onclick="{!c.editRecord}" class="orangeButton" style="float:right;">
+									<i class="far fa-pencil"></i> EDIT
+								</a>
+								<a href="" onclick="{!c.deleteRecord}" class="orangeButton" style="float:right; margin-right:20px;">
+									<i class="far fa-trash-alt"></i> DELETE
+								</a>
+								<a href="" onclick="{!c.navigateToHome}" class="orangeButton" style="float:right; margin-right:20px;">
+									<i class="far fa-home"></i> HOME
+								</a>
+								<force:recordView recordId="{!v.recordId}" type="FULL"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</ui:scrollerWrapper>
+		</div>
+	<!-- CUSTOM LIGHTNING NAVIGATION -->
+	<c:NavigatorCmp />
+	<!-- / CUSTOM LIGHTNING NAVIGATION -->		
+</aura:component>

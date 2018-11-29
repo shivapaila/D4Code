@@ -1,0 +1,68 @@
+<aura:component controller="SignatureController" >
+	<aura:attribute name="recordId" type="id" />
+    <aura:attribute name="message" type="String" />
+     <aura:attribute name="error" type="String" />
+   <aura:attribute name="newPersonAccount" type="Account" default="{ 'sobjectType': 'Account'}" />
+    <c:ToastErrorHandler aura:id="toastErrorHandler" /> 
+	<!--<aura:attribute name="newContact" type="Contact" default="{ 'sobjectType': 'Contact'}" />-->
+    <aura:registerEvent name="NotifyParentSignatureModal" type="c:SignatureModalEvent"/>
+    <aura:registerEvent name="NotifyParentCloseModal" type="c:CloseModalEvent"/>
+
+    <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="Modalbox" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <div class="slds-modal__header">
+                
+                <a href="" class="float-right" onclick="{!c.closeModal}"><i class="fa fa-times"></i></a>
+                <h2 id="header43">Please Sign to Continue</h2>
+            </div>
+            <div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap">
+                <div class="main text-center"> 
+                    <h4>Guest Information and Signature</h4>
+                    <div >
+                        <!-- messaging --> 
+                        <div class="{v.messageType}"><ui:outputText value="{!v.message}" /></div>
+                        <div><ui:outputText value="{!v.error}" /></div>
+                        <div class="row">
+                            <!-- FORM -->
+                            <!--  <lightning:input aura:id="firstname" label="First Name"
+                                         class="col-sm-6"
+                                         name="firstname"
+                                         value="{!v.newPersonAccount.FirstName}"
+                                         placeholder="First Name"
+                                         required="true"/> 
+                        <lightning:input aura:id="lastname" label="Last Name"
+                                         class="col-sm-6"
+                                         name="lastname"
+                                         value="{!v.newPersonAccount.LastName}"
+                                         placeholder="Last Name"
+                                         required="true"/>
+                        <lightning:input aura:id="email" label="Email" type="email"
+                                         class="col-sm-6"
+                                         name="email"
+                                         value="{!v.newPersonAccount.PersonEmail}"
+                                         placeholder="Email" /> 
+                        <lightning:input aura:id="email2" label="Phone" type="Phone"
+                                         class="col-sm-6"
+                                         name="Phone"
+                                         value="{!v.newPersonAccount.Phone }"
+                                         placeholder="Phone" /> -->
+                        </div>
+                    </div>
+                    <BGSIGCAP:SignatureCapture aura:id="GuestInfoSig" recordId="{!v.recordId}" 
+                                               startMsg="Click the button to get started"
+                                               enterMsg="With my signature below, I provide consent to have my account history looked-up."
+                                               completeMsg="Here is the signature you entered"
+                                               saveAttachment="false"       
+                                               width="50%"
+                                               height="200px"/>
+                </div>
+                
+            </div>
+            <div class="slds-modal__footer">
+                <lightning:button variant="neutral" label="Cancel" onclick="{!c.cancelDialog}" />
+                <lightning:button variant="brand" label="Submit" onclick="{!c.lookupContact}"  />
+            </div>
+            
+        </div>
+    </div>
+</aura:component>

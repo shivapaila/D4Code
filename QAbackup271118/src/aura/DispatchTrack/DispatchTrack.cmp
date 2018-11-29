@@ -1,0 +1,11 @@
+<aura:component controller="DispatchTrackCtrl" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="dispatchTrackUrl" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:if isTrue="{!$Label.c.ShowDispatchTestUrl}">
+        <iframe height="500" id="iframeResult" width="100%" src="{!v.dispatchTrackUrl}"></iframe>
+    	<aura:set attribute="else">    
+    		<iframe height="500" id="iframeResult" width="100%" src="{!v.dispatchTrackUrl}"></iframe>
+        </aura:set>
+    </aura:if>
+</aura:component>

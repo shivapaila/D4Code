@@ -1,0 +1,49 @@
+<aura:component controller="ProductReviewAndRatingCmpCtrl">
+	<aura:attribute name="productDetailId" type="String"/>
+    <aura:attribute name="onlyRating" type="Boolean" default="false"/>
+ 	<aura:attribute name="starSize" type="String" default="Middle"/> <!--Middle, Large, Small-->
+   
+    <aura:attribute name="productRating" type="Double"/>
+    <aura:attribute name="productReviewsSize" type="Integer"/>
+
+	<aura:attribute name="productReviews" type="ProductReviewWrapper[]"/>
+
+    <!-- initialization -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <!-- expand/contract -->
+    <aura:attribute name="reviewLinkText" type="String" default="More +" />
+    <aura:attribute name="end" type="Integer" default="1" />    
+
+    <!-- helper components -->
+	<c:ToastErrorHandler aura:id="toastErrorHandler" /> 
+	<aura:if isTrue="{!v.onlyRating}">
+
+        <div class="reviewsWrapper">
+            <!-- STAR RATING -->
+            <c:Stars ratingClass="{! 'starRating ' + v.starSize}" rating="{!v.productRating}" />
+    	</div>
+        
+        <aura:set attribute="else">
+            <div class="reviewsWrapper row">
+                <div class="col-sm-12">
+                    
+                    <h4 class="sectionHeader">Reviews <small>({!v.productReviewsSize})</small></h4>
+                    
+                    <aura:iteration items="{!v.productReviews}" var="productReview" end="{!v.end}">
+                        <div class="singleReviewWrapper">      
+                            <!-- STAR RATING -->
+                            <c:Stars ratingClass="{! 'starRating ' + v.starSize}" rating="{!productReview.Rating}" />
+                            <div>{!productReview.ReviewText}</div>
+                            <div class="reviewUserName">{!productReview.UserNickname}</div>
+                        </div>
+                    </aura:iteration>
+                    <aura:if isTrue="{!greaterthan(v.productReviewsSize,1)}">
+                        <a href="javascript:void(0);" onclick="{!c.expandReviews}">{!v.reviewLinkText}</a>
+                    </aura:if>
+                </div>
+            </div>
+        </aura:set>
+        
+    </aura:if>
+</aura:component>

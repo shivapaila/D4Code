@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="Event to delete note" >
+    <aura:attribute name="indexVar" type="Integer" description="index of note to delete from list" />
+    <aura:attribute name="noteId" type="String" description="id of note to delete from list" />
+</aura:event>

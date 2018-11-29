@@ -1,0 +1,29 @@
+<aura:component controller="SalesOrderListfromCase" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                												access="global">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.initSO}"/>          												
+	<ltng:require styles="{!$Resource.SLDS212 + '/assets/icons/standard-sprite/svg/symbols.svg#user'}"/>
+    <aura:attribute name="salesOrders" type="List"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="selectedValue" type="String" />
+
+    <!--####<lightning:icon iconName="standard:user" size="large" alternativeText="Test"/>#####-->
+    <lightning:flexipageRegionInfo width="{!v.width}"/>
+    
+    <div class="modalbox">
+        <div class="slds-box slds-size--1-of-1">
+            
+            <lightning:select name="mySelect" aura:id="mySelect" required="true" value="{!v.selectedValue}" messageWhenValueMissing="Choose a Sales Order" label="Select Sales Order">
+                <option value="">-- None --</option>
+                <aura:iteration items="{!v.salesOrders}" var="SO">
+                    <!--<option text="{!SO.label}" value="{!SO.value}" selected="{!SO.selected}"/>-->
+                    <option value="{!SO.externId}" text="{!v.externId}" selected="{!SO.selected}">{!SO.Salesorder} : {!SO.salesType}</option>
+                 </aura:iteration>
+            </lightning:select>
+            
+                <ui:button class="form-control" aura:id="button" label="Submit" press="{!c.updateSalesOrder}"/>
+            
+        </div>
+        
+    </div>
+</aura:component>

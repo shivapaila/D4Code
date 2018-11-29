@@ -1,0 +1,141 @@
+<aura:component controller="PaymentController" access="global" implements="flexipage:availableForAllPageTypes">
+
+	<!-- Attribute Definitions -->
+    <aura:attribute name="guestId" type="String" access="PUBLIC" />
+    <aura:attribute name="opportunityId" type="String" access="PUBLIC" />
+    <aura:attribute name="targetAmount" type="Double" access="PUBLIC" /> 
+    <aura:attribute name="legalEntityName" type="String" access="PUBLIC" />
+
+    <aura:attribute name="selectedPaymentOptions" type="List" access="PRIVATE" />
+	<aura:attribute name="paymentMethods" type="PaymentMethodWrapper[]" access="PRIVATE" />
+	<aura:attribute name="payTerminalOptions" type="List" access="PRIVATE" />
+	<aura:attribute name="totalAmount" type="Double" access="PRIVATE" />
+	<!-- DEF-0874 fix -->
+	<aura:attribute name="paidAmt" type="Double" access="PRIVATE" />
+
+	<aura:attribute name="processedPaymentAmount" type="Double" access="PRIVATE" default="0.00" />
+	<aura:attribute name="showPayment" type="Boolean" access="PRIVATE" default="false"/>
+	<aura:attribute name="showCustomerOrderAcceptance" type="Boolean" access="PRIVATE" default="false"/>
+	<aura:attribute name="isExecuting" type="Boolean" access="PRIVATE" default="false"/>
+	<aura:attribute name="isSuspendToPOSConfirmed" type="Boolean" access="PRIVATE" default="false"/>
+
+    <!-- Event Handlers -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="NotifyParentPmtAdded" event="c:PaymentChangeEvent" action="{!c.handlePaymentProcessed}"/>
+    <aura:handler name="NotifyParentCloseAcceptance" event="c:CloseModalEvent" action="{!c.cancelAcceptance}" />
+    <!-- Registered Events -->
+    <aura:registerEvent name="NotifyParentSuspendSales" type="c:CloseModalEvent" />
+    <aura:registerEvent name="NotifyParentClosePayment" type="c:CloseModalEvent" />
+	<aura:registerEvent name="NotifyHeaderComponentEvent" type="c:NotifyHeaderComponentEvent"/>
+    <!-- Error Handler -->
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+
+	<aura:if isTrue="{!v.isExecuting}">
+		<lightning:spinner aura:id="spinner" alternativeText="processing..."/>
+	</aura:if>    
+
+    <aura:if isTrue="{!(v.showPayment)}">
+	    <div>
+	        <section aura:id="paymentDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+	            <div class="slds-modal__container">
+
+	                <header class="slds-modal__header">
+	                	<!-- you are not allowed to close the payment window -->
+	                	<aura:if isTrue="{!v.isSuspendToPOSConfirmed}">
+							<aura:set attribute="else">
+								<aura:if isTrue="{! equals(v.processedPaymentAmount, 0)}">
+									<i class="fa fa-times float-right" onclick="{!c.cancelDialog}"></i>
+								</aura:if>
+							</aura:set>
+						</aura:if>
+	                    <h2 class="slds-text-heading--medium">Payment Information</h2>
+	                </header>
+
+	                
+		                <div class="slds-modal__content slds-p-around--medium">
+							<ui:scrollerWrapper>
+								<!-- Suspend to POS button -->
+								<div class="row slds-m-bottom_medium">
+									<div class="col-sm-12">
+										<h4 class="totalDue">Total Due: <ui:outputNumber  value="{!v.targetAmount}" format="0.00"/></h4>
+										<div class="float-right">
+											<aura:if isTrue="{!v.isSuspendToPOSConfirmed}">
+												<a class="greyButton disabled" onclick="return false;">
+													Suspend to POS
+												</a>
+												<div class="confirm" style="margin-top:20px;">
+													<div class="confirmText">
+														Are you sure?
+													</div>
+													<div class="confirmButtons">
+														<a class="orangeButton marginRight smallButton" onclick="{!c.doSuspendToPOS}">Yes</a>
+														<a class="greyButton smallButton" onclick="{!c.cancelSuspendToPOS}" >No</a>
+													</div>
+												</div>
+												<aura:set attribute="else">
+													<aura:if isTrue="{! equals(v.processedPaymentAmount, 0)}">
+														<a class="orangeButton" onclick="{!c.confirmSuspendToPOS}">
+															Suspend to POS
+														</a>
+														<aura:set attribute="else">
+															<a class="greyButton" onclick="return false;">
+																Suspend to POS
+															</a>
+														</aura:set>
+													</aura:if>
+												</aura:set>
+											</aura:if>
+										</div>
+									</div>
+								</div>
+
+								
+								<!-- PAYMENT METHODS -->
+								<div class="row slds-m-bottom_medium">
+									<div class="col-sm-12">
+										<!-- DEF-0874 - adding paidAmt attribute -->
+										<c:MultiPaymentMethods guestId="{!v.guestId}"
+																currSelectedPaymentOptions="{!v.selectedPaymentOptions}"
+																paymentMethods="{!v.paymentMethods}"
+																payTerminalOptions="{!v.payTerminalOptions}" 
+																totalAmount="{!v.totalAmount}"
+																targetAmount="{!v.targetAmount}" 
+																paidAmt="{!v.paidAmt}"/>
+									</div>
+								</div>
+								
+								
+
+								
+							</ui:scrollerWrapper>
+		                </div>
+		            
+
+	                <footer class="slds-modal__footer">
+						<!-- PLACE ORDER BUTTON -->
+						<div class="row">
+								<div class="col-sm-12">
+									<div class="float-right">
+										<aura:if isTrue="{! equals(v.targetAmount, v.processedPaymentAmount)}">
+											<a class="orangeButton" onclick="{!c.doCustomerOrderAcceptance}">
+													Place Order
+											</a>
+											<aura:set attribute="else">
+												<a class="greyButton disabled" onclick="return false;">
+														Place Order
+												</a>
+											</aura:set>
+										</aura:if>
+									</div>
+								</div>
+							</div>
+	                </footer>
+	            </div>
+	        </section>
+	    </div>
+	</aura:if>
+	<aura:if isTrue="{!(v.showCustomerOrderAcceptance)}">
+        <c:CustomerOrderAcceptance guestId="{!v.guestId}" entityName="{!v.legalEntityName}"/>		
+	</aura:if>    
+	
+</aura:component>

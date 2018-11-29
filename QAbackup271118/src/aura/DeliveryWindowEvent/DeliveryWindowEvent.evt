@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="This is a component event that is used to broadcast a delivery date (null if not available) for a specific delivery mode from the DeliveryWindowLookup component to the parent components that consume/invoke the DeliveryWindowLookup component." >
+	<aura:attribute name="deliveryMode" type="String"/>
+    <aura:attribute name="deliveryDate" type="String"/>
+</aura:event>

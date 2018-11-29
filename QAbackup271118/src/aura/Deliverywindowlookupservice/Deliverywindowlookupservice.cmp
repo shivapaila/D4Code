@@ -1,0 +1,230 @@
+<aura:component controller="DeliveryWindowLookupserviceController">
+    <aura:attribute name="orderId" type="string"/>	
+    <aura:attribute name="orderLineId" type="string" />
+    <aura:attribute name="accountNumber" type="string" />	
+    <aura:attribute name="rdcId" type="string" />
+    <aura:attribute name="orderNumber" type="string" />
+    <aura:attribute name="profitCenter" type="Integer" />	
+    <aura:attribute name="deliveryCalendar" type="Attributable"/>
+    <aura:attribute name="lineItemDeliveryDate" type="Date"/>
+    <aura:attribute name="selectedDesiredDeliveryDate" type="Date"/>
+    <aura:attribute name="isLoading" type="Boolean" default="false"/>
+    <aura:attribute name="futureDate" type="string" default="2049-12-01"/>
+    <aura:attribute name="selectedMonth" type="Attributable"/>
+    <aura:attribute name="selectedDeliveryDate" type="Date"/>
+    <aura:attribute name="popupDate" type="Date"/>
+    <aura:attribute name="isConciergeApp" type="Boolean" default="false"/>
+    <aura:attribute name="deliveryMode" type="String"/>
+    <aura:attribute name="shipToAddr" type="String"/>
+    <!--aura:attribute name="userProfileid" type="String" default="00E6A000000U63YUAS"/-->
+    <aura:attribute name="calendarData" type="string" />
+    <aura:attribute name="displayedSe" type="string" />
+    <aura:attribute name="PopuprResponse" type="object" />
+    <aura:attribute name="displayedSection1" type="Boolean" default="false"/>
+    <aura:attribute name="displayedSection2" type="Boolean" default="false"/>
+    <aura:attribute name="error" type="Boolean" default="false"/>
+    <aura:attribute name="dwProcessingStartDate" 
+                    type="Integer" 
+                    access="PRIVATE" 
+                    description="Delivery window request should be no earlier than the processing start date"/>    
+    <aura:attribute name="dwEarliestMonthStartDate" 
+                    type="Date" 
+                    access="PRIVATE" 
+                    description="Earliest Month Start date of the delivery window"/>
+    <aura:attribute name="dwCurrentMonthStartDate" 
+                    type="Date" 
+                    access="PRIVATE" 
+                    description="Current Month Start date of the delivery window"/>
+    <ltng:require scripts="{!join(',', $Resource.moment_2_20_1_min, $Resource.moment_timezone)}" afterScriptsLoaded="{!c.init}" />
+    
+    <aura:registerEvent name="deliveryWindowEvent" type="c:DeliveryWindowEvent"/>	
+    
+    <div class="slds-p-around_medium">
+        <aura:if isTrue="{!v.isLoading}">
+            <lightning:spinner aura:id="spinner" alternativeText="loading..."/>
+        </aura:if>
+        
+        <aura:if isTrue="{!not(empty(v.deliveryCalendar))}">
+            <div class="slds-grid slds-gutters"> 
+                <div class="slds-col slds-size_1-of-2">
+                    <div class="slds-form-element">
+                        <div class="slds-size--1-of-3 slds-p-horizontal_xx-medium" onclick="{!c.currentMonth}"><a>Current Month</a></div>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                    <div class="slds-form-element">
+                        <div class="slds-size--1-of-3 slds-p-horizontal_xx-medium" style="float:right;" onclick="{!c.futureMonth}"><a>Future Month</a></div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-text-align_center">
+                <!-- <aura:if isTrue="{!or( not(v.selectedMonth.isFirst), notequals(v.dwEarliestMonthStartDate, v.dwCurrentMonthStartDate) ) }"> -->
+                <lightning:buttonIcon iconName="utility:chevronleft" variant="bare" alternativeText="previous"
+                                      iconClass="dark" onclick="{!c.previousMonth}" class="orangeButton slds-float_left"/>
+                <!-- </aura:if> -->
+                {!v.selectedMonth.name}
+                
+                <lightning:buttonIcon iconName="utility:chevronright" variant="bare" alternativeText="next"
+                                      iconClass="dark" onclick="{!c.nextMonth}" class="orangeButton slds-float_right"/>
+                
+            </div>
+            <div class="slds-scrollable--x">
+                <table class="slds-table slds-table--bordered slds-table_col-bordered slds-table--cell-buffer slds-no-row-hover">
+                    <thead>
+                        <tr class="slds-text-title--caps">								    	
+                            <aura:iteration var="weekDayName" items="{!v.deliveryCalendar.weekDayNames}">	
+                                <th scope="col" class="slds-text-align_center">
+                                    <div class="slds-truncate" title="{!$weekDayName}">{!weekDayName}</div>
+                                </th>	
+                            </aura:iteration>								    	     
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration var="week" items="{!v.selectedMonth.weeks}">	
+                            <tr>
+                                <aura:iteration var="day" items="{!week}">
+                                    <td class="slds-text-align_center">
+                                        <aura:if isTrue="{!day.dateIsInCurrentMonth}">
+                                            <aura:if isTrue="{!day.availableForDelivery}">
+                                                <!--REQ-451-->
+                                              <!--   <aura:if isTrue="{!v.lineItemDeliveryDate==day.d}">
+                                                <a ><span class="slds-badge Blue" onmouseenter="{!c.openPop}" onmouseout="{!c.closePop}" onclick="{!c.returnDeliveryDate}" data-date="{!day.d}">{!day.dateStringForDisplay}</span></a>
+                                                </aura:if> -->
+                                                
+                                                <aura:if isTrue="{!day.BackColor != 'DarkGray'}">
+                                                    <aura:if isTrue="{!day.ServiceLevel == 'Threshold Delivery'}">
+                                                        <div class="tech-avail" style="clear:both;float:right;">
+                                                            <aura:if isTrue="{!day.BackColor == 'Red with Green'}">
+                                                                <a ><span class="slds-badge red" onmouseenter="{!c.openPop}" onmouseout="{!c.closePop}" onclick="{!c.displaySection1}" data-date="{!day.d}">{!day.dateStringForDisplay}</span></a>
+                                                            </aura:if>
+                                                            <aura:if isTrue="{!day.BackColor == 'White with Green'}">
+                                                                <a><span class="slds-badge White" onmouseenter="{!c.openPop}" onmouseout="{!c.closePop}" onclick="{!c.returnDeliveryDate}" data-date="{!day.d}">{!day.dateStringForDisplay}</span></a>
+                                                            </aura:if>
+                                                            </div>
+                                                            <aura:if isTrue="{!day.BackColor == 'LightGray'}">
+                                                                <a><span class="slds-badge LightGray" onmouseenter="{!c.openPop}" onmouseout="{!c.closePop}" onclick="{!c.displaySection1}" data-date="{!day.d}">{!day.dateStringForDisplay}</span></a>
+                                                            </aura:if>
+                                                             <aura:if isTrue="{!day.BackColor == 'Blue'}">
+                                                                <a><span class="slds-badge Blue" onmouseenter="{!c.openPop}" onmouseout="{!c.closePop}" onclick="{!c.returnDeliveryDate}" data-date="{!day.d}">{!day.dateStringForDisplay}</span></a>
+                                                            </aura:if>	
+                                                             
+                                                        <aura:set attribute="else"> 											
+                                                  			<aura:if isTrue="{!day.BackColor == 'White'}">
+                                                                <a><span class="slds-badge White" onmouseenter="{!c.openPop}" onmouseout="{!c.closePop}" onclick="{!c.returnDeliveryDate}" data-date="{!day.d}">{!day.dateStringForDisplay}</span></a>
+                                                            </aura:if>
+                                                            <aura:if isTrue="{!day.BackColor == 'LightGray'}">
+                                                                <a><span class="slds-badge LightGray" onmouseenter="{!c.openPop}" onmouseout="{!c.closePop}" onclick="{!c.returnDeliveryDate}" data-date="{!day.d}">{!day.dateStringForDisplay}</span></a>
+                                                            </aura:if>
+                                                             <aura:if isTrue="{!day.BackColor == 'Blue'}">
+                                                                <a><span class="slds-badge Blue" onmouseenter="{!c.openPop}" onmouseout="{!c.closePop}" onclick="{!c.returnDeliveryDate}" data-date="{!day.d}">{!day.dateStringForDisplay}</span></a>
+                                                            </aura:if>	
+                                                       </aura:set> 
+                                                    </aura:if>
+                                                    
+                                                    <aura:set attribute="else">														
+                                                         <a><span class="slds-badge gray" onmouseenter="{!c.openPop}" onmouseout="{!c.closePop}"  data-date="{!day.d}">{!day.dateStringForDisplay}</span></a>
+                                                    </aura:set>
+                                                    
+                                                </aura:if>
+                                                
+                                                <aura:set attribute="else">														
+                                                    {!day.dateStringForDisplay}		
+                                                </aura:set>			
+                                            </aura:if>
+                                        </aura:if>												
+                                    </td>
+                                </aura:iteration>		
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div><br/><br/>
+            
+            <div id="error" class="alert alert-danger slds-theme_alert-texture slds-theme_warning slds-align_absolute-center" aria-hidden="true" role="error" closable="true">
+            </div><br/>
+            
+            <!--aura:if isTrue="{!v.error}">
+        
+            <ui:message title="Error" severity="error" closable="true">
+            Only Managers with override authority can schedule this date
+            </ui:message>
+        
+    		</aura:if-->  
+            
+            <div class = "slds-text-align_left">
+                <div><span class="" style="padding-top:10px;"></span><b style="float:left;">Colors representation on calendar:- </b></div><br/>
+                <div><span class="" style="float:left;"><b>Blue:</b></span><p>&nbsp;&nbsp;&nbsp;Current scheduled date</p></div><br/>
+                <div><span class="" style="float:left;"><b>Dark Gray:</b></span><p>&nbsp;&nbsp;&nbsp;Unavailable for delivery</p></div><br/>
+                <div><span class="" style="float:left;"><b>White:</b></span><p>&nbsp;&nbsp;&nbsp;Reschedule without manager approval and unavailable for threshold delivery</p></div><br/>
+                <div class="">
+                	<div><span class="" style="float:left;"><b>White with Green:</b></span><p>&nbsp;&nbsp;&nbsp;Reschedule without manager approval and available for threshold delivery</p></div><br/>
+                </div>    
+                <div><span class="" style="float:left;"><b>Light Gray:</b></span><p>&nbsp;&nbsp;&nbsp;Reschedule with manager approval and unavailable for threshold delivery</p></div><br/>
+                <div class="">
+                	<div><span class="" style="float:left;"><b>Red with Green:</b></span><p>&nbsp;&nbsp;&nbsp;Reschedule with manager approval and available for threshold delivery</p></div><br/>
+                </div>
+            </div>
+        </aura:if>
+    </div>
+    
+    <!--Added for Manager approval-->
+    
+    <aura:if isTrue="{!v.displayedSection2}">
+        <section  aura:id="modal" class="slds-fade-in-open container" role="dialog"  style="position:fixed;" closable="true">
+        <div class="slds-modal__header">
+            <h4 id="header43" class="slds-text-heading--medium">
+                Are you sure you want to continue?
+          	</h4><br/><br/>
+        </div>
+   
+        <div class="slds-align_absolute-center slds-modal__footer">
+          	<lightning:button label="Yes" variant="brand" onclick="{!c.confirmUserProfile}"/>
+            <lightning:button label="No" variant="neutral" onclick="{!c.closeSec}"/>
+        </div>
+       
+        </section>
+    </aura:if> 
+    
+    <section class="slds-popover slds-box slds-hide slds-border_right" role="dialog" id="help" style="position:fixed;" aura:id="pop">
+        <table aura:id="SalesorderID" class="slds-table slds-table--bordered  slds-align_absolute-left">  
+            <div class="slds-popover__body">
+                <header class="slds-popover__header slds-text-heading_small"><h3 id="dialog-heading-id-1" ><b>Delivery Capacity Info</b></h3></header>
+                <p > 
+                    
+                    <!-- displaying the line item details based on salesorder -->
+                    <tbody>
+                        <aura:iteration var="week" items="{!v.selectedMonth.weeks}">  
+                            <aura:iteration var="day" items="{!week}">
+                                <aura:if isTrue="{!(day.d == v.popupDate)}">
+                                    <b>Date: </b><ui:outputText value="{!day.DeliverDate}"/><br/>
+                                    <b>Resource Group: </b><ui:outputText value="{!day.ResourceGroup}"/><br/>
+                                    <b>Resource Group Type: </b><ui:outputText value="{!day.ResourceGroupType}"/><br/>
+                                    <b>Allowable Overage: </b><ui:outputText value="{!day.AllowableOverage}"/><br/>
+                                    <b>Capacity: </b><ui:outputText value="{!day.Capacity}"/><br/>
+                                    <b>Allowable Promised Capacity: </b><ui:outputText value="{!day.AllowbalePromisedCapacity}"/><br/>
+                                    <b>Promised: </b><ui:outputText value="{!day.Promised}"/><br/>
+                                    <b>PromisedActual: </b><ui:outputText value="{!day.PromisedActual}"/><br/>
+                                    <b>PromisedAllowable: </b><ui:outputText value="{!day.PromisedAllowable}"/><br/>
+                                    <b>Confirmed: </b><ui:outputText value="{!day.Confirmed}"/><br/>
+                                    <b>ConfirmedActual: </b><ui:outputText value="{!day.ConfirmedActual}"/><br/>
+                                    <b>ServiceLevel: </b><ui:outputText value="{!day.ServiceLevel}"/><br/>
+                                <aura:if isTrue="{!day.BzNameDescription}">		
+	                                	<br/><b></b><ui:outputText value="{!day.BzNameDescription}"/>  <ui:outputText value="{!day.BzNameValue}"/><br/>		
+	                                    <b>Bubble Zone Capacity: </b><ui:outputText value="{!day.BzOtherCapacity}"/><br/>		
+	                                    <b>BZ Promised Capacity: </b><ui:outputText value="{!day.BzOtherPromisedCapacity}"/><br/>		
+	                                    <b>BZ Available Capacity: </b><ui:outputText value="{!day.BzOtherAvailableCapacity}"/><br/>		
+	                            </aura:if>		
+	                            <aura:if isTrue="{!day.NddCapacity}">		
+	                                    <b>NDD Capacity: </b><ui:outputText value="{!day.NddCapacity}"/><br/>		
+	                            </aura:if>       
+                                </aura:if>
+                            </aura:iteration>
+                        </aura:iteration>
+                    </tbody>
+                </p>
+            </div>
+        </table> 
+    </section> 
+    
+    
+</aura:component>

@@ -1,0 +1,14 @@
+.THIS {
+	
+}
+.THIS .guestTypeWrapper {
+	width:290px;
+	float:right;
+}
+.THIS .guestTypeWrapper .uiInput {
+	display:inline-block;
+	width:155px;
+}
+.THIS .guestTypeWrapper .orangeButton {
+	display:block;
+}

@@ -1,0 +1,4 @@
+<apex:page >
+<c:RefreshConsoleTab >
+</c:RefreshConsoleTab>
+</apex:page>

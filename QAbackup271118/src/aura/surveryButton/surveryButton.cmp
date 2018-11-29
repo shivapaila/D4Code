@@ -1,0 +1,29 @@
+<aura:component implements="flexipage:availableForAllPageTypes" access="global" >
+    <aura:attribute name="showModal" type="Boolean" default="false" />
+    <lightning:spinner variant="brand" size="medium" aura:id="Id_spinner" class="slds-hide" />
+    <div class="container text-center">
+	    <a class="orangeButton" onclick="{!c.openModal}">Feedback</a>
+	</div> 
+    
+    <aura:if isTrue="{!v.showModal}">
+        <div >
+            <lightning:spinner aura:id="mySpinner" alternativeText="Processing.." title="Processing.." variant="medium" size="large" class="slds-hide"/>
+            <section aura:id="createDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container adjust_container">
+                    <header class="slds-modal__header">
+                        <i class="fa fa-times float-right" onclick="{!c.closeModal}" />
+                        <h2 class="pageTitle">Concierge Feedback</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around--medium scrollWrapper ">
+                        <!--Please go to find custom label SurveryId and update the survery Id of Survery__c object to redirect to the related Surevery-->
+                        <iframe height="440" id="iframeResult" width="100%" src="{!'/apex/takesurvey?id='+$Label.c.SurveryId}" ></iframe>
+                 
+                    </div>     
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral" label="Close Survey" onclick="{!c.closeModal}" />
+                    </footer>           
+                </div>
+            </section>
+        </div>
+    </aura:if>
+</aura:component>

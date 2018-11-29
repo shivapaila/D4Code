@@ -1,0 +1,84 @@
+.THIS .customerSearch {
+	width:40% !important;
+    margin:15px 0;
+    float:left;
+}
+.THIS .customerSearchWrapper {
+    margin-bottom: 7px;
+    text-align: center;
+    width:100%;
+    height:70px;
+}
+.THIS .customerSearchWrapper .orangeButton {
+    float:left;
+    margin-top:15px;
+}
+.THIS .lastContacted .slds-form-element__label {
+    display:inline-block;
+    margin-top: 25px;
+}
+.THIS .lastContacted .slds-form-element__control {
+    display:inline-block;
+    margin-top:15px;
+}
+.THIS .lastContacted .slds-form-element__control select {
+    min-width:135px;
+}
+.THIS .paginationWrapper {
+    float:right;
+    margin-top:5px;
+}
+.THIS .slds-text-color--error {
+	font-weight:bold;
+}
+.THIS a:hover .cardWrapper {
+	background:#e8e8e8;
+}
+.THIS .pageTitle {
+	margin-top:-3px;
+}
+.THIS .selectCustomer {
+	width:100px;
+	float:right;
+}
+.THIS .cartCustomerSelect {
+    border-bottom: 1px solid #e1e1e1;
+    padding: 20px 0;
+    margin:0;
+}
+.THIS .accountName {
+	padding-top: 3px;
+    width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.THIS .hasCart {
+    float:right;
+    background:#f68c2c;
+    padding: 3px 3px 2px 6px;
+    width: 28px;
+    height: 28px;
+    border-radius:50%;
+    margin-top:-5px;
+}
+.THIS .hasCart i {
+    color:#fff;
+}
+.THIS .cardContent {
+    padding:15px 10px 15px 20px;
+}
+.THIS .gray {
+    color:#999 !important;
+    font-size:12px;
+}
+.THIS .gray i {
+    color:#999;
+}
+.THIS .placeholderLine {
+    height:17px;
+    min-width:1px;
+}
+.THIS .lastContacted {
+    float:right;
+}

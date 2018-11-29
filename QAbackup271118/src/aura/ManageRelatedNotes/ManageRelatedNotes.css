@@ -1,0 +1,31 @@
+.THIS {
+	margin-top:35px;
+}
+.THIS .slds-input {
+	width:100%;
+}
+.THIS .noteHeader {
+	margin-bottom:0;
+}
+.THIS .deleteNote, .THIS .editNote {
+	font-size:16px;
+	background:#f68c2c;
+	color:#fff;
+	padding:3px 8px;
+	cursor:pointer;
+	margin-top:8px;
+    position: relative; 
+}
+.THIS .deleteNote {
+    position: relative; 
+    left: 10px;
+}
+.THIS .slds-textarea {
+	width:100%;
+}
+.THIS .lineBreak {
+	margin-top:15px;
+}
+.THIS .createNoteHeader {
+	margin-bottom:10px;
+}

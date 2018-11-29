@@ -1,0 +1,19 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global" >
+	<aura:attribute name="receiptUrl" type="String" />
+    <aura:attribute name="SONumber" type="String" />
+    
+    <aura:attribute name="pageReference" type="Object"/>
+    <aura:attribute name="renderSubComponent" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/> 
+        <aura:handler name="change" value="{!v.pageReference}" action="{!c.init}" />
+    <ui:scrollerWrapper>
+        
+        <div>
+            <c:concierge_header />
+            <aura:if isTrue="{!v.renderSubComponent}">
+                <c:CustomerOrderComplete receiptUrl="{!v.receiptUrl}" SONumber="{!v.SONumber}"/>
+            </aura:if>
+            <c:NavigatorCmp />
+        </div>
+    </ui:scrollerWrapper>
+</aura:component>

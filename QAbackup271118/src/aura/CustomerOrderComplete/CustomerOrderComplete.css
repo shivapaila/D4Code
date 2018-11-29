@@ -1,0 +1,26 @@
+.THIS .container {
+    padding: 2% 2%;  
+    max-width: 70rem;
+}
+
+.THIS .slds-modal__container {  
+    padding-top: 2%;
+    max-width: 70rem;
+}
+
+.THIS .scrollWrapper {
+    -webkit-overflow-scrolling: touch;
+      overflow-y: scroll;
+      height:600px !important;
+}
+
+.THIS .scrollWrapper iframe {
+    height:600px !important;
+    overflow-y:scroll;
+    border:none;
+}
+
+.THIS .slds-modal__header .pageTitle {
+    display:inline-block;
+    margin-top:10px;
+}

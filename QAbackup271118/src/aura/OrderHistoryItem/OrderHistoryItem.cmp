@@ -1,0 +1,17 @@
+<aura:component >
+    <aura:attribute name="order" type="SalesOrder__x" />
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    <div>
+        <div class="row orderHistoryItemWrapper" onclick="{!c.showOrder}">
+            <div class="col-sm-3"><a href="">{!v.order.phhSalesOrder__c}</a></div>
+            <div class="col-sm-3">{!v.order.phhSaleType__c}</div>
+            <div class="col-sm-3">
+                <lightning:formattedNumber value="{!v.order.phhPurchaseValue__c}" style="currency" currencyCode="USD" />
+            </div>
+            <div class="col-sm-3">
+                <lightning:formattedDateTime value="{!v.order.phhSalesOrderDate__c}" />
+            </div>
+
+        </div>
+    </div>
+</aura:component>

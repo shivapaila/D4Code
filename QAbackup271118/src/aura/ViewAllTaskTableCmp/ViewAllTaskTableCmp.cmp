@@ -1,0 +1,167 @@
+<aura:component controller="Manage_AppointmentsAndTasksController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.Init}"/>
+     <aura:attribute name="allTasksLst" type="List[]"/>
+    <aura:attribute name="currentList" type="Object[]"/>
+    <aura:attribute name="AllTasks" type="task[]"/> 
+    <aura:attribute name="statusOpts" type='List'/>
+    <aura:attribute name="typeOpts" type='List'/>
+    <aura:attribute type="Integer"      name="pageNumber"       default="1" />
+    <aura:attribute type="Integer"      name="maxPage"          default="1" />
+    <aura:attribute name="showCheckLink" type="Boolean" default="true"/>
+    <aura:attribute type="String"       name="sortField" />
+    <aura:attribute type="Boolean"		name="sortAsc" />
+    <aura:attribute name="showEdit" type="Boolean" default="true"/>
+    <aura:attribute name="Message" type="boolean" default="false" description="use for display no record found message"/>
+    
+    <aura:registerEvent name="NavigateToWrapperComponentAppEvent" type="c:NavigateToWrapperComponentAppEvent" />
+	    
+    <div id="Appointment-table"> 
+        <table class="table">
+            <thead>
+                <tr class="slds-text-title--caps">
+                    <th scope="col">
+                        <div onclick="{!c.sortBySub}"
+                             class="slds-truncate"
+                             title="Subject">
+                            Subject
+                            <aura:if isTrue="{!v.sortField=='Subject'}">
+                                <span>
+                                    <aura:if isTrue="{!v.sortAsc}">
+                                        &#8593;
+                                        <aura:set attribute="else">
+                                            &#8595;
+                                        </aura:set>
+                                    </aura:if>
+                                </span>
+                            </aura:if>
+                        </div>
+                    </th>
+                    <th scope="col">
+                        <div onclick="{!c.sortByActivityDate}"
+                             class="slds-truncate"
+                             title="ActivityDate">
+                            ActivityDate
+                            <aura:if isTrue="{!v.sortField=='ActivityDate'}">
+                                <span>
+                                    <aura:if isTrue="{!v.sortAsc}">
+                                        &#8593;
+                                        <aura:set attribute="else">
+                                            &#8595;
+                                        </aura:set>
+                                    </aura:if>
+                                </span>
+                            </aura:if>
+                        </div>
+                    </th>
+                    <th scope="col">
+                        <div onclick="{!c.sortByType}"
+                             class="slds-truncate"
+                             title="Type">
+                            Type
+                            <aura:if isTrue="{!v.sortField=='Type'}">
+                                <span>
+                                    <aura:if isTrue="{!v.sortAsc}">
+                                        &#8593;
+                                        <aura:set attribute="else">
+                                            &#8595;
+                                        </aura:set>
+                                    </aura:if>
+                                </span>
+                            </aura:if>
+                        </div>
+                    </th>
+
+                    <th scope="col">
+                    </th>
+                    <th scope="col" style="min-width:0; padding:0; margin:0;">
+                    </th>
+                    <th scope="col" style="min-width:0; padding:0; margin:0;">
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.currentList}" var="tasks" indexVar="i">
+                    <aura:if isTrue="{!tasks.isEdit}">
+                        <tr>
+                            <td>
+                                <input id="{!'sub'+i}" type="text" name="Sub" value="{!tasks.taskObj.Subject}" class="uiInput--default"/>
+                            </td>
+                            <!--td>
+                                            <Select id="{!'statusOptions'+i}" >
+                                                <Option text="" label="Select a Status:" disabled="true"  />
+                                                <aura:iteration items="{!v.statusOpts}" var="opts" indexVar="index">
+                                                    <aura:if isTrue="{!tasks.taskObj.Status == opts}">
+                                                        <Option text="{!opts}" label="{!opts}" selected='selected'/>
+                                                        <aura:set attribute="else">
+                                                            <Option text="{!opts}" label="{!opts}" />
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </aura:iteration>
+                                            </Select>
+                                        </td-->
+                            <td>
+                                
+                                <input id="{!'date'+i}" type="date" value="{!tasks.taskObj.ActivityDate}" class="uiInput--datetime uiInput--default" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" />
+                            </td>
+                            <td>
+                                <Select id="{!'typeOptions'+i}" class="uiInput--select">
+                                    <Option text="" label="Select a Type:" disabled="true"  />
+                                    <aura:iteration items="{!v.typeOpts}" var="opts" indexVar="index">
+                                        <aura:if isTrue="{!tasks.taskObj.Type == opts}">
+                                            <Option text="{!opts}" label="{!opts}" selected='selected'/>
+                                            <aura:set attribute="else">
+                                                <Option text="{!opts}" label="{!opts}" />
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:iteration>
+                                </Select>
+                            </td>
+                            <td class="saveCancel" colspan="3">
+                                <a id="{!i}" data-record="{!tasks.taskObj.Id}"  onclick="{!c.submitTask}">
+                                    <i class="fa fa-save"></i> Save
+                                </a>
+                                <a id="{!i}" onclick="{!c.cancelEdit}">
+                                    <i class="fa fa-times"></i> Cancel
+                                </a>
+                            </td>
+                        </tr>
+                        
+                        <aura:set attribute="else">
+                            <tr>
+                                <td><a data-record="{!tasks.taskObj.Id}" onclick="{!c.openDetails}">{!tasks.taskObj.Subject}</a></td>
+                                <!--td>{!tasks.taskObj.Status}</td-->
+                                
+                                <td>{!tasks.taskObj.ActivityDate}</td>
+                                <td>{!tasks.taskObj.Type}</td>
+                                <td>
+                                    <aura:if isTrue="{!v.showEdit}">
+                                        
+                                        <a class="tableIcon" id="{!i}" data-record="{!i}" onclick="{!c.editClick}">
+                                            <i class="far fa-pencil"></i>
+                                        </a>
+                                    </aura:if>
+                                </td>
+                                <td>
+                                    <a id="{!i}" class="tableIcon" data-record="{!tasks.taskObj.Id}" onclick="{!c.deleteClick}"><i class="far fa-trash-alt"></i></a>
+                                </td>
+                                <aura:if isTrue="{!v.showCheckLink}">
+                                    <td>
+                                        <a id="{!i}" class="tableIcon" data-record="{!tasks.taskObj.Id}" onclick="{!c.setComplete}"><i class="far fa-check"></i></a>
+                                    </td>
+                                </aura:if>
+                            </tr>
+                        </aura:set>
+                    </aura:if>
+                </aura:iteration>
+                <aura:if isTrue="{!v.Message}">
+                    <div class="cardWrapper">
+                        <div class="cardContent">
+                            <div class="slds-text-color--error">There are no Tasks today</div>
+                        </div>
+                    </div>
+                </aura:if>
+            </tbody>
+        </table>
+    </div>
+</aura:component>

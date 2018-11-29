@@ -1,0 +1,212 @@
+<aura:component controller="AddressUpdateController"
+                implements="flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride">
+
+
+    <aura:attribute name="AddressObj" type="Address__c" default="{ 'sobjectType': 'Address__c'}"/>
+    <aura:attribute name="recordId" type="Id"/> 
+    <aura:attribute name="stateValues" type="Object"/>
+    <aura:attribute name="AddTypeValues" type="Object"/>
+    <lightning:workspaceAPI aura:id="workspace"/>
+ 
+
+    <c:PickListValues sObjectName="Address__c" fieldName="StatePL__c" picklistValues="{!v.stateValues}"/>
+    <c:PickListValues sObjectName="Address__c" fieldName="Address_Type__c" picklistValues="{!v.AddTypeValues}"/>  
+
+    <!-- hadlerMethod declaration -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <!--/ hadlerMethod declaration -->
+
+    <!-- EDQ Validation attributes Start -->
+    <ltng:require styles="{!$Resource.LightningValidationStylesheet}"/>
+    <aura:attribute name="suggestions" type="Object[]" access="private" description="Suggestions"/>
+    <aura:attribute name="hasSuggestions" type="Boolean" access="private" default="false"/>
+    <aura:attribute name="timeoutIdentifier" type="Integer" access="private"/>
+    <aura:attribute name="AddressObjectSnapshot" type="sObject" access="private" default="null"/>
+    <!-- EDQ Validation attributes End -->
+
+   
+                                                
+    <div>
+        <section aura:id="modalIdForUpdateAddress" role="dialog" tabindex="-1" aria-labelledby="header41"
+                 class="slds-modal slds-fade-in-open">
+
+            <div class="slds-modal__container">
+                <!-- header -->
+                <div class="slds-modal__header">
+                    <h2 id="header43" class="slds-text-heading--medium">
+                        Update Address
+                    </h2>
+                </div>
+                <!--/ header -->
+                <!-- modal body -->
+                <form class="col">
+                    <div class="slds-form slds-grid slds-wrap slds-modal__content">
+ 
+                        <div class="slds-col--padded slds-size--1-of-2">
+
+                            <!--EDQ div wrapper-->
+                            <div class="slds-form-element search-result-wrapper" onfocusout="{!c.onElementFocusedOut}">
+                                   <span onkeydown="{!c.handleSuggestionNavigation}">
+                                        <lightning:input aura:id="address1"
+                                                         label="Address Line 1"   
+                                                         type="Text"
+                                                         required="true"
+                                                         value="{!v.AddressObj.Address_Line_1__c}"
+                                                         onchange="{!c.handleSearchChange}"/>
+                                   </span>
+                                <!--EDQ Address validation loader -->
+                                <div aura:id="loader" class="slds-spinner_container spinner-inner invisible">
+                                    <div class="slds-spinner slds-spinner--small" aria-hidden="false"
+                                         role="alert">
+                                        <div class="slds-spinner__dot-a"></div>
+                                        <div class="slds-spinner__dot-b"></div>
+                                    </div>
+                                </div>
+
+                                <!-- EDQ Address validation search results dropdown -->
+                                <div class="searchResults">
+                                    <aura:renderif isTrue="{!v.hasSuggestions}">
+                                        <ul class="searchResults">
+                                            <aura:iteration items="{!v.suggestions}" var="suggestion">
+                                                <li class="resultItem">
+                                                    <a id="{!globalId + '-suggestion-index-' + suggestion.index}"
+                                                       tabindex="0"
+                                                       href="javascript:void(0);"
+                                                       title="{!suggestion.format}"
+                                                       onclick="{!c.handleResultSelect}"
+                                                       onkeyup="{!c.onSuggestionKeyUp}">{!suggestion.suggestion}</a>
+                                                </li>
+                                            </aura:iteration>
+                                        </ul>
+                                    </aura:renderif>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+
+                                <lightning:input aura:id="Preferred" type="checkbox"
+
+                                                 name="Preferred" label="Preferred"
+                                                 checked="{!v.AddressObj.Preferred__c}"/>
+
+                            </div>
+                        </div>
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:input aura:id="address2"
+                                                 label="Address Line 2"
+                                                 type="Text"
+                                                 value="{!v.AddressObj.Address_Line_2__c}"
+                                                 onchange="{!c.onAddressChanged}"/>
+                            </div>
+                        </div>
+
+                        <lightning:select aura:id="addresstype" label="Address Type"
+                                          class="slds-size--1-of-2 slds-p-horizontal_x-small"
+                                          value="{!v.AddressObj.Address_Type__c}"
+                                          name="AddressType">
+                            <option value="">{!v.AddressObj.Address_Type__c}</option>
+                            <aura:iteration items="{!v.AddTypeValues}" var="item">
+                                <option value="{!item}">{!item}</option>
+                            </aura:iteration>
+                        </lightning:select>
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:input aura:id="addressformstatus"
+                                                 label="Address Validation Status"
+                                                 type="text"
+                                                 value="{!v.AddressObj.Address_Validation_Status__c}"/>
+                            </div>
+                        </div>
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:input aura:id="city"
+                                                 label="City"
+                                                 type="Text"
+                                                 value="{!v.AddressObj.City__c}"
+                                                 onchange="{!c.onAddressChanged}"/>
+                            </div>
+                        </div>
+
+                        <lightning:select aura:id="state" label="State"
+                                          class="slds-size--1-of-2 slds-p-horizontal_x-small"
+                                          value="{!v.AddressObj.StatePL__c}"
+                                          name="state">
+                            <option value="">{!v.AddressObj.StatePL__c}</option>
+                            <aura:iteration items="{!v.stateValues}" var="item">
+                                <option value="{!item}">{!item}</option>
+                            </aura:iteration>
+                        </lightning:select>
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:input aura:id="zip"
+                                                 label="Zip Code"
+                                                 type="Number"
+                                                 value="{!v.AddressObj.Zip_Code__c}"
+                                                 onchange="{!c.onAddressChanged}"/>
+                            </div>
+                        </div>
+
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:input aura:id="country"
+                                                 label="Country"
+                                                 type="Text"
+                                                 value="{!v.AddressObj.Country__c}"
+                                                 onchange="{!c.onAddressChanged}"/>
+                            </div>
+                        </div>
+
+
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:input aura:id="status"
+                                                 label="Address Validation Timestamp"
+                                                 type="text"
+                                                 value="{!v.AddressObj.Address_Validation_Timestamp__c}"/>
+                            </div>
+                        </div>
+                        <div class="slds-col--padded slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <lightning:inputLocation label="Geolocation"
+                                                         aura:id="Geolocation"
+                                                         latitude="{!v.AddressObj.Geocode__Latitude__s}"
+                                                         longitude="{!v.AddressObj.Geocode__Longitude__s}"
+                                                         required="true"/>
+
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                </form>
+                <!--/ modal body -->
+
+                <!-- modal footer -->
+                <div class="slds-modal__footer">
+                    <!-- Button -->
+                    <lightning:button aura:id="cancelId"
+                                      label="Cancel"
+                                      variant="brand"
+                                      onclick="{!c.doCancel}"/>
+                    <lightning:button aura:id="saveId"
+                                      label="Save"
+                                      variant="neutral"
+                                      onclick="{!c.doSave}"/>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div aura:id="backdropIdForEditAddress" class="slds-backdrop slds-backdrop--open"/>
+</aura:component>

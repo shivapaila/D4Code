@@ -1,0 +1,46 @@
+<aura:component extends="c:ProductPriceBase">
+    <aura:attribute name="productDetailId" type="String"/>
+    <aura:attribute name="productPrice" type="ProductPriceWrapper"/>
+    <aura:attribute name="ecommPrice" type="ProductEcommWrapper"/>
+    <aura:attribute name="icon" type="String" default="fa-plus" />
+    <aura:attribute name="priceExpanded" type="Boolean" default="false" />
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    <div class="row">
+        <div class="col-sm-4">
+            <small>In-Store Original</small><br/>
+             <h3 class="{!v.productPrice.SalePrice!=null ? 'originalPrice strikeThrough':'originalPrice'}">${!v.productPrice.OriginalPrice}</h3>
+        </div>
+        <div class="col-sm-4">
+            <aura:if isTrue="{!v.productPrice.SalePrice!=null}">
+                
+                    <small>Sale Price</small><br/>
+                    <h3 class="salePrice">${!v.productPrice.SalePrice}</h3>
+                  
+            </aura:if>
+        </div>  
+        <div class="col-sm-4">
+            <div>
+                <button class="expandPricesButton" onclick="{!c.openClose}">
+                    <i class="{! 'fal ' + v.icon}"></i>
+                </button>
+            </div>
+        </div>
+        <aura:if isTrue="{!v.priceExpanded}">
+            <div class="col-sm-12">
+                <small>eCommerce Price</small><br/>
+                <aura:if isTrue="{!v.ecommPrice!=null}">
+                    <!-- DEF-0766 -->
+                    <aura:if isTrue="{!v.ecommPrice.product.salePrice != null}">
+                        <h3>${!v.ecommPrice.product.salePrice}</h3>
+                        <aura:set attribute="else">
+                            <h3>${!v.ecommPrice.product.regularPrice}</h3>
+                        </aura:set>
+                    </aura:if>
+                    <aura:set attribute="else">
+                        <h3>No sales price found.</h3>
+                    </aura:set>
+                </aura:if>
+            </div>
+        </aura:if>
+    </div>
+</aura:component>

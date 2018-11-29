@@ -1,0 +1,12 @@
+.THIS .cShoppingCartLineItem .cartImageWrapper {
+   width:123px !important;
+   height:123px !important;
+   background-size:contain;
+} 
+.THIS .checkout {
+   font-size:12px !important;
+}
+.THIS h4.checkout {
+   color:#999 !important;
+   font-weight:normal !important;
+}

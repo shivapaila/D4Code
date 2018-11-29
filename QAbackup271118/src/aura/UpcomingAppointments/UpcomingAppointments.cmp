@@ -1,0 +1,99 @@
+<aura:component controller="UpcomingAppointmentsAndTasksController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.Init}"/> 
+    <!-- <ltng:require styles="{! $Resource.SLDSv2 + '/assets/styles/salesforce-lightning-design-system.css'}"/> -->
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="AllEvents" type="Object[]"/>  
+    <aura:attribute name="showEdit" type="Boolean" default="true"/>
+    <aura:attribute name="Message" type="boolean" default="false" description="use for display no record found message"/>
+
+    <!-- DEF-0151 - to load the custom New Task component -->
+    <aura:handler name="ConciergeDestroyNewTask" action="{!c.closeComponent}" event="c:ConciergeDestroyNewTask"/>
+
+    <div>
+        <div class="container" style = "height:100%" >
+            
+            <ui:button class="float-right newAppointmentButton orangeButton smallButton" aura:id='newappointment' label='New Appointment +' press="{!c.createEvent}"/>
+            
+            <i class="far fa-calendar-alt headerIcon float-left"></i> <h3 class="tableTitle">Upcoming Appointments</h3>
+            
+            <div id="Appointment-table"> 
+                <div class="cardWrapper">
+                    <div class="cardContent">
+                        <table class="table">
+                            <tbody>
+                                <aura:iteration items="{!v.AllEvents}" var="evt" indexVar="i">
+                                    <aura:if isTrue="{!evt.isEdit}">
+                                        <tr>
+                                            <td class="subjectColumn">
+                                                <ui:inputText value="{!evt.eventSub}" />
+                                            </td>
+                                            <td class="customerColumn">
+                                                <ui:inputText value="{!evt.eventWhatName}" disabled="true"/>
+                                            </td>
+                                            <!--input id="party" type="datetime-local" name="partydate" value="2017-06-01T08:30"/-->
+                                            <aura:if isTrue="{!!evt.allDayEvent}">
+                                                <td class="dateTime">
+                                                    <label class="startLabel"><small>Start</small></label>
+                                                    <ui:inputDateTime aura:id="startDate"  value="{!evt.eventstartDate}" displayDatePicker="true"  format="h:mm a" updateOn="change"/>
+                                                    <label><small>End</small></label>
+                                                    <ui:inputDateTime aura:id="endDate" value="{!evt.eventendDate}" displayDatePicker="true"  format="h:mm a" updateOn="change"/>
+                                                </td>
+                                                <aura:set attribute="else">
+                                                    <td class="dateTime">
+                                                        <label class="startLabel"><small>Start</small></label>
+                                                        <ui:inputDate aura:id="startDate"  value="{!evt.eventstartDate}" displayDatePicker="true"   updateOn="change"/>
+                                                        <label><small>End</small></label>
+                                                        <ui:inputDate aura:id="endDate"  value="{!evt.eventendDate}" displayDatePicker="true"   updateOn="change"/>
+                                                        
+                                                    </td>  
+                                                </aura:set>
+                                            </aura:if>
+                                            <td class="saveCancel">
+                                                <a id="{!i}" data-record="" onclick="{!c.submitEvent}" class="marginRight">
+                                                    <i class="fa fa-save"></i> Save
+                                                </a>
+                                                <a id="{!i}" data-record="" onclick="{!c.cancelEdit}">
+                                                    <i class="fa fa-times"></i> Cancel
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <aura:set attribute="else">
+                                            <tr>
+                                                <td><a data-record="{!evt.eventId}" onclick="{!c.openAppointmentDetail}">{!evt.eventSub}</a></td>
+                                                
+                                                <td><a data-record="{!evt.eventWhatId}" onclick="{!c.openCustomerDetail}">{!evt.eventWhatName}</a></td>
+                                                <td  class="dateTime">
+                                                    <ui:outputDate value="{!evt.eventstartDate}" format="YYYY-MM-DD hh:mm:a"/>&nbsp;-&nbsp;<ui:outputDate value="{!evt.eventendDate}" format="YYYY-MM-DD hh:mm:a"/>
+                                                    <!--time datetime="2009-11-13T20:00Z"/-->
+                                                </td>
+                                                <td>
+                                                    <aura:if isTrue="{!evt.notesAvailable}">
+                                                        <a class="tableIcon" id="{!evt.eventId}" data-record="{!evt.eventId}" onclick="{!c.openAppointmentDetail}">
+                                                            <i class="far fa-comment-alt"></i>
+                                                        </a>
+                                                    </aura:if>
+                                                </td>
+                                                <td>
+                                                    <aura:if isTrue="{!v.showEdit}">
+                                                        <a class="tableIcon" id="{!i}" data-record="{!evt.eventObj.Id}" onclick="{!c.editClick}">
+                                                            <i class="far fa-pencil"></i>
+                                                        </a>
+                                                    </aura:if>
+                                                </td>
+                                            </tr>
+                                        </aura:set>
+                                    </aura:if>
+                                </aura:iteration>
+                                <aura:if isTrue="{!v.Message}">
+                                    <div class="slds-text-color--error">This Guest has no upcoming Appointments</div>
+                                </aura:if>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- DEF-0151 - custom new component -->
+            {!v.body}
+        </div>
+    </div>
+</aura:component>

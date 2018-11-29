@@ -1,0 +1,9 @@
+<aura:interface description="Constants defined for Shopping Cart page">
+	<aura:attribute name="CART_ACTION_UPDATE_QUANTITY" type="String" default="UPDATE_QUANTITY" />
+    <aura:attribute name="CART_ACTION_UPDATE_FPP_SKU" type="String" default="UPDATE_FPP_SKU" />
+    <aura:attribute name="CART_ACTION_APPLY_DISCOUNT" type="String" default="APPLY_DISCOUNT" />
+    <aura:attribute name="CART_ACTION_UPDATE_DELIVERY_MODE" type="String" default="UPDATE_DELIVERY_MODE" />
+    <aura:attribute name="CART_ACTION_DELETE_ITEM" type="String" default="DELETE_ITEM" />
+    <aura:attribute name="CART_ACTION_MARK_ITEM_AS_IS" type="String" default="MARK_ITEM_AS_IS" />
+	<aura:attribute name="CART_ACTION_UPDATE_ADDRESS" type="String" default="UPDATE_ADDRESS" />    
+</aura:interface>

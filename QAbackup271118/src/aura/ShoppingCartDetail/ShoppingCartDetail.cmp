@@ -1,0 +1,350 @@
+<aura:component 
+    implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,c:ShoppingCartConstants"
+    controller="ShoppingCartDetailCmpCtrl"
+    access="global" extensible="true">
+    <aura:registerEvent name="NavigateToWrapperComponentAppEvent" type="c:NavigateToWrapperComponentAppEvent" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <!--<aura:handler name="change" value="{!v.recordId}" action="{!c.doInit}" />-->
+    
+   <aura:handler name="change" value="{!v.SubComponent}" action="{!c.doInit}"/>
+    
+    <aura:attribute name="shoppingCartLineItems" type="list[]" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="pageReference" type="Object"/>
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="selectedToDiscountItem" type="Shopping_cart_line_item__c" />
+    <aura:attribute name="selectedItemProductDetail" type="ProductWrapper" />
+    <aura:attribute name="showDiscountModal" type="Boolean" default="false" />
+    <aura:attribute name="shoppingCartEstimatedTax" type="Decimal" />
+    <aura:attribute name="shoppingCartTotal" type="Decimal" />
+    <aura:attribute name="shoppingCartTotalBeforeTax" type="Decimal" />
+    <aura:attribute name="shoppingCartDeliveryFee" type="Decimal" />    
+    <aura:attribute name="shoppingCartRecycleFee" type="Decimal" />    
+    <aura:attribute name="shoppingCartWarrantyFee" type="Decimal" />
+    <aura:attribute name="shoppingCartWarrantyItemFee" type="ShoppingCartResponseWrapper.PairValueObj[]" />
+   	
+    <aura:attribute name="shoppingCartNextDayCharge" type="Decimal" />    
+    <aura:attribute name="cartStateList" type="PairObj[]" />
+    <aura:attribute name="shippingWayList" type="PairObj[]" />
+    <aura:attribute name="discountReasonList" type="PairObj[]" />
+    <aura:attribute name="opp" type="Opportunity" />
+    <aura:attribute name="acc" type="Account" />
+    <aura:attribute name="addr" type="Address__c" default="{'sobjectType':'Address__c', 'Address_Line_1__c':'', 'Address_Line_2__c':''}"/>
+    <aura:attribute name="addrId" type="String" />
+    <aura:attribute name="isFormError" type="Boolean" default="false" />
+    <aura:attribute name="marketDiscountCriteria" type="Decimal" />
+    <aura:attribute name="accountStoreInfo" type="String" />
+    <aura:attribute name="showTsAndCs" type="Boolean" default="false" />
+    <aura:attribute name="showSaveCartModal" type="Boolean" default="false" />
+    <aura:attribute name="showFinancingModal" type="Boolean" default="false" />
+    <aura:attribute name="showAddressModal" type="Boolean" default="false" />
+    <aura:attribute name="isShowPosModal" type="Boolean" default="false" />
+    <aura:attribute name="isManualPricing" type="Boolean" default="false" />
+    <aura:attribute name="canViewCheckout" type="Boolean" default="false" />
+    <aura:attribute name="SubComponent" type="Boolean" />
+    <aura:attribute name="canViewCheckoutPOS" type="Boolean" default="false" />
+    <aura:attribute name="manualShoppingCartLineItem" type="Shopping_cart_line_item__c" default="{'sobjectType':'Shopping_cart_line_item__c'}"
+    />
+    <aura:attribute name="formWrap" type="SObject" default="{'shipEmail':''}"/>
+
+    <aura:attribute name="fppTypes" type="WarrantyItemWrapper[]" />
+
+    <!-- Req 433 - Suspend to POS - Feedback change-->
+    <!-- to avoid multiple spinners issue
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>-->
+    <aura:attribute name="spinner" type="Boolean" default="false"/>
+    <!-- to avoid multiple spinners issue -->
+    <aura:attribute name="allEventsList" type="String[]" default="['getCartStateList', 'getCartStateList', 'getShippingWayList', 'getDiscountReasonList', 'getMarketDiscountCriteria', 'getAccountStoreInfo', 'getFppTypes', 'getCanViewCheckout', 'getShoppingCartLineItems']" />
+    <aura:attribute name="listofEventsCompleted" type="List" />
+    <!-- End of Req 433 - Suspend to POS - Feedback change-->
+    
+    <aura:handler name="change" value="{!v.opp}" action="{!c.handleOpportunityChange}"/>
+    <aura:handler name="NotifyParentCloseModal" event="c:CloseModalEvent" action="{!c.hideFinancing}" />
+    <aura:handler name="NotifyParentCloseTsAndCs" event="c:CloseModalEvent" action="{!c.cancelTsAndCs}" />
+	<aura:handler name="NotifyParentFinishedSign" event="c:CloseModalEvent" action="{!c.proceedToCheckout}" />
+    <aura:handler name="NotifyParentAddressInfoCloseModal" event="c:CloseModalEvent" action="{!c.closeAddressInfoModal}" />
+    <aura:handler name="NotifyParentOpenDiscountModal" event="c:NotifyParentComponentEvent" action="{!c.openDiscountModal}"/>
+    <aura:handler name="NotifyParentCloseDiscountModal" event="c:CloseModalEvent" action="{!c.closeDiscountModal}"/>
+    <aura:handler name="shoppingCartLineItemEvent" event="c:ShoppingCartLineItemEvent" action="{!c.refreshShoppingCart}"/>
+    <aura:handler name="change" value="{!v.listofEventsCompleted}" action="{!c.checkSpinner}"/>
+    <aura:handler name="ThresholdUpdateEvent" event="c:ThresholdUpdateEvent" action="{!c.doInit}"/>
+		
+  	<aura:registerEvent name="NotifyHeaderComponentEvent" type="c:NotifyHeaderComponentEvent"/>
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+	
+    <!--loading spinner start... style=Brand Medium (blue dots)-->
+    <aura:if isTrue="{!v.spinner}">
+	    <div aura:id="spinnerId" class="slds-spinner_container">
+           <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+             <span class="slds-assistive-text">Loading</span>
+             <div class="slds-spinner__dot-a"></div>
+             <div class="slds-spinner__dot-b"></div>
+           </div>
+        </div>
+    </aura:if>
+    <!-- Loading spinner end-->  
+    
+    <div class="container">
+
+        <div class="breadcrumbWrapper">
+            <div class="currentBreadcrumbItem">Guest's Cart</div>
+            <aura:if isTrue="{!v.canViewCheckoutPOS}">
+                <a class="orangeButton float-right fix-margin" onclick="{!c.openPosModal}">Suspend to POS</a>
+            </aura:if>
+        </div>
+        
+        <div class="row">
+
+            <div class="col-sm-8 cartMainColumn">
+                <i class="far fa-shopping-cart headerIcon float-left"></i>
+                <h3>{!v.opp.Account.Name +'\'s Shopping Cart'}</h3>
+				<div class="shpCartLineItems">
+                    <aura:iteration items="{!v.shoppingCartLineItems}" var="lineItem">
+                        <!-- DEF-0780 - ATC call -->
+                        <c:ShoppingCartLineItem lineItemId="{!lineItem.item.Id}" 
+                                                productSKUId="{!lineItem.item.Product_SKU__c}" 
+                                                shippingWayList="{!v.shippingWayList}"
+                                                discountReasonList="{!v.discountReasonList}" 
+                                                accountStoreInfo="{!v.accountStoreInfo}" 
+                                                marketDiscountCriteria="{!v.marketDiscountCriteria}"
+                                                fppTypes="{!v.fppTypes}" 
+                                                opp="{!v.opp}"
+                                                accountId="{!v.recordId}" 
+                                                zipcode='{!v.opp.Cart_ZipCode__c}' 
+                                                msg='{!lineItem.msg}'/>
+                                                
+                    </aura:iteration>
+                </div>
+
+                <div class="manualProductAdd">
+                    <a class="orangeButton" onclick="{!c.showManualModal}">Manually Add Product</a>
+                </div>
+                <aura:if isTrue="{!v.recordId != null}">
+                    <c:WishListCmp recordId="{!v.recordId}" />
+                </aura:if>
+
+                <!--
+                <div class="wishlistWrapper">
+                    <h3>{!v.customerName +'\'s Wishlist'}</h3>
+                    <aura:iteration items="{!v.shoppingCartLineItems}" var="lineItem">   
+                        <c:WishlistLineItem lineItem="{!lineItem}"/>
+                    </aura:iteration>
+                </div>
+            -->
+
+
+
+            </div>
+
+
+            <div class="col-sm-4">
+
+                <!--DEF-0770 Display subtotal when the cart is displayed-->
+                <!--<h4 class="subtotal">Subtotal</h4>-->
+                <p>
+                    <h4>
+                        Subtotal
+                        <div class="float-right">
+                            <ui:outputCurrency value="{!v.shoppingCartTotalBeforeTax}" />
+                        </div>
+                    </h4>
+                </p>
+                <p>Delivery fee:
+                    <div class="float-right">
+                        <ui:outputCurrency value="{!v.shoppingCartDeliveryFee}" />
+                    </div>
+                </p>
+                <aura:if isTrue="{!v.shoppingCartNextDayCharge>0}">
+                    <p>Next Day Charge:
+                        <div class="float-right">
+                            <ui:outputCurrency value="{!v.shoppingCartNextDayCharge}" />
+                        </div>
+                    </p>
+                </aura:if>
+                <p>Estimated tax:
+                    <div class="float-right">
+                        <ui:outputCurrency value="{!v.shoppingCartEstimatedTax}" />
+                    </div>
+                </p>
+               <!-- <aura:if isTrue="{!v.shoppingCartWarrantyFee>0}">
+                 <p>Furniture Protection Plan:
+                    <div class="float-right">
+                        <ui:outputCurrency value="{!v.shoppingCartWarrantyFee}" />
+                    </div>
+                </p>
+                </aura:if>   -->
+                <aura:if isTrue="{!v.shoppingCartWarrantyItemFee.length>0}">
+                    <aura:iteration items="{!v.shoppingCartWarrantyItemFee}" var="warrantyItem">
+                        <p>{!warrantyItem.key}
+                            <div class="float-right">
+                                <ui:outputCurrency value="{!warrantyItem.value}" />
+                            </div>
+                        </p>
+                    </aura:iteration>
+                    
+                    
+                </aura:if>
+                
+				<aura:if isTrue="{!v.shoppingCartRecycleFee>0}">
+                <p>Recycle fee:
+                    <div class="float-right">
+                        <ui:outputCurrency value="{!v.shoppingCartRecycleFee}" />
+                    </div>
+                </p>
+                </aura:if>
+                <div class="cartTotalWrapper">
+                    <h3 class="cartTotal float-right">
+                        <ui:outputCurrency value="{!v.shoppingCartTotal}" />
+                    </h3>
+                </div>
+
+
+                <div class="cartButtons">
+                    <aura:if isTrue="{!$Label.c.Show_Financing_Button == 'true'}" >
+						<a class="lightGreyButtonLarge" onclick="{!c.showFinancing}">{!$Label.c.SelectFinancingPrice}</a>
+                    </aura:if>
+                    <aura:if isTrue="{!v.canViewCheckout}">
+                    <a class="orangeButtonLarge" onclick="{!c.showTsAndCs}">{!$Label.c.ProceedToReview}</a>
+                    </aura:if>
+                </div>
+                <!--
+                <div class="recentlyViewedItems">
+                    <h4>Recently Viewed Items</h4>
+                </div-->
+                <aura:if isTrue="{!not(v.spinner)}">
+                    <div class="postalCodeWrapper">
+                        <h5>Guest's Address</h5>
+                        <!--ADD ALL ADDRESS FIELDS HERE -->
+                        <ui:inputText aura:id="zipCodeInCart" value="{!v.opp.Cart_ZipCode__c}" placeholder="Guest's Postal Code" />
+
+                        <div class="stateDropdownWrapper">
+                            <lightning:select aura:id="stateOptionInCart" name="selectedState" class="">
+                                <aura:iteration items="{!v.cartStateList}" var="cartState">
+                                    <option value="{!cartState.value}" selected="{!cartState.value==v.opp.Cart_State__c}">{!cartState.label}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </div>
+                        <a class="orangeButton float-right" onclick="{!c.updateAddressInfo}">Save</a>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+   		<!-- discount modal -->
+        <aura:if isTrue="{!v.showDiscountModal}">
+            
+            <c:ShoppingCartDiscountModal shoppingCartLineItems="{!v.shoppingCartLineItems}" 
+                                                 lineItem="{!v.selectedToDiscountItem}"
+                                                 accountStoreInfo="{!v.accountStoreInfo}"
+                                                 productDetail="{!v.selectedItemProductDetail}"
+                                                 discountReasonList="{!v.discountReasonList}"
+                                                 opp="{!v.opp}"/>
+        </aura:if>
+        <!-- save cart modal -->
+        <aura:if isTrue="{!v.showSaveCartModal}">
+            <div>
+                <section aura:id="saveCartDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container adjust_container">
+                        <header class="slds-modal__header">
+                            <i class="fa fa-times float-right" onclick="{!c.hideCartModal}" />
+                            <h3>{!v.opp.Account.Name}'s Cart is Saved</h3>
+                        </header>
+                        <div class="slds-modal__content slds-p-around--medium  text-center saveCartModal">
+                            <a class="orangeButton" onclick="{!c.goToProducts}">Continue Shopping</a>
+                            <a class="orangeButton" onclick="{!c.goHome}">Go Home</a>
+                            <a class="greyButton" onclick="{!c.hideCartModal}">Stay on Cart</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </aura:if>
+        <!-- financing modal -->
+        <aura:if isTrue="{!v.showFinancingModal}">
+            <c:FinancingModal cartTotal="{!v.shoppingCartTotalBeforeTax}" />
+        </aura:if>
+        <!-- addressInfo modal -->
+        <aura:if isTrue="{!v.showAddressModal}">
+            <c:AddressInfoModal opp="{!v.opp}" cartStateList="{!v.cartStateList}" />
+        </aura:if>
+
+        <!-- Manually add product modal -->
+        <aura:if isTrue="{!v.isManualPricing}">
+            <div>
+                <section aura:id="manualCartDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container adjust_container">
+                        <header class="slds-modal__header">
+                            <i class="fa fa-times float-right" onclick="{!c.hideManualModal}" />
+                            <h3>Manually Add Product</h3>
+                        </header>
+                        <div class="slds-modal__content slds-p-around--medium saveCartModal">
+                            <!--   <a class="orangeButton" onclick="{!c.goToProducts}" >Continue Shopping</a>
+                            <a class="orangeButton" onclick="{!c.goHome}" >Go Home</a>-->
+                            <div class="row">
+                                <div class="col-sm-3">
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <ui:inputText label="Product SKU" value="{!v.manualShoppingCartLineItem.Product_SKU__c}" />
+                                    <br />
+                                    <!--ui:inputText label="List Price" value="{!v.manualShoppingCartLineItem.List_Price__c}" /-->
+                                    <br />
+                                    <ui:inputText label="Quantity" value="{!v.manualShoppingCartLineItem.Quantity__c}" />
+                                </div>
+                                <div class="col-sm-3">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <a class="greyButton" onclick="{!c.hideManualModal}">Cancel</a>
+                            <a class="orangeButton" onclick="{!c.updateLineItem}">Add Product</a>
+
+                        </footer>
+                    </div>
+                </section>
+            </div>
+        </aura:if>
+        
+        <!-- T's and C's modal -->
+        <aura:if isTrue="{!v.showTsAndCs}">
+            <c:TsAndCs guestId="{!v.recordId}" />
+        </aura:if>
+        
+        <!-- Suspend to POS modal -->
+        <aura:if isTrue="{!v.isShowPosModal}">
+            <div>
+                <section aura:id="suspendToPosDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container adjust_container" style="display: flex">
+                        <header class="slds-modal__header">
+                            <i class="fa fa-times float-right" onclick="{!c.closePosModal}" />
+                            <h3>Suspend to POS</h3>
+                        </header>
+                        <div class="slds-modal__content slds-p-around--medium saveCartModal">
+                            <div class="row">
+                                <div class="col-sm-3">
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <ui:inputText label="Email*" aura:id="posEmail" value="{!v.acc.PersonEmail}"/>
+                                    <ui:inputText label="Phone*" aura:id="posPhone" value="{!v.acc.Phone}"/>
+                                    <c:AddressForm aura:id="addrComp" addr="{!v.addr}"/>
+                                </div>
+                                <div class="col-sm-3">
+                                </div>
+                            </div>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <a class="greyButton" onclick="{!c.closePosModal}">Cancel</a>
+                            <a class="orangeButton" onclick="{!c.suspendToPos}">Suspend to POS</a>
+                        </footer>
+                    </div>
+                </section>
+            </div>
+        </aura:if>
+        
+        <div class="slds-backdrop" aura:id="overlay"></div>
+    </div>
+
+</aura:component>

@@ -1,0 +1,21 @@
+.THIS .productCategory {
+    display: inline-block;
+    text-align: center;
+    margin-bottom: 30px;
+    vertical-align: top;
+}
+.THIS .productCategory img {
+	width:100%;
+	transition: opacity .25s ease-in-out;
+   -moz-transition: opacity .25s ease-in-out;
+   -webkit-transition: opacity .25s ease-in-out;
+}
+.THIS .productCategory a:hover img {
+	opacity:.8;
+}
+.THIS .categoryImage {
+	margin-bottom:10px;
+}
+.THIS .productCategoryWrapper a:hover h4 {
+	color:#3366cc !important;
+}

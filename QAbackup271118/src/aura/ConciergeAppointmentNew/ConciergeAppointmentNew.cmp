@@ -1,0 +1,267 @@
+<aura:component implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable,flexipage:availableForRecordHome,forceCommunity:availableForAllPageTypes,force:appHostable,force:hasRecordId,force:lightningQuickAction" access="global" controller="ConciergeTaskNewController">
+    <lightning:navigation aura:id="navService" />
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="customerId" type="Id" />
+	<aura:attribute name="newEvent" type="Event" access="global" default="{'sobjectType' : 'Event'}"/>
+	<aura:attribute name="uiAllDayEvent" type="Boolean" />
+	<aura:attribute name="uiStartDateTime" type="DateTime" />
+	<aura:attribute name="uiEndDateTime" type="DateTime" />
+	<aura:attribute name="uiStartDate" type="Date" />
+	<aura:attribute name="uiEndDate" type="Date" />
+	<aura:attribute name="showError" type="Boolean" />
+	<aura:attribute name="errorTitle" type="String" />
+	<aura:attribute name="errorMsg" type="String" />
+    <!-- Navigation fix -->
+	<aura:registerEvent name="appEvent" type="c:NavigateToWrapperComponentAppEvent"/>
+	<c:NavigatorCmp />
+    
+	<aura:registerEvent name="ConciergeDestroyNewTask" type="c:ConciergeDestroyNewTask" />
+	<div aura:id="recordEditModal" role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="image-modal" style="height:100%" class="slds-modal slds-fade-in-open slds-scrollable_y">
+
+		<div class="slds-modal__container">
+			
+				<header class="slds-modal__header">
+					<i class="fa fa-times float-right" onclick="{!c.close}" />
+					<h3>Create Appointment</h3>
+				</header>
+
+				<div>
+					<div class="slds-modal__content slds-p-around--medium ">
+						<ui:scrollerWrapper>
+							<aura:if isTrue="{!v.showError}">
+								<div class="errorMessage">
+									<h4>{!v.errorMsg}</h4>
+								</div>
+							</aura:if>
+
+							<h4 class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container">
+								Appointment Details
+							</h4>
+
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>Subject</span>
+													<span class="required">*</span>
+												</label>
+												<!--<force:inputField value="{!v.newEvent.Subject}" />-->
+												<ui:inputText value="{!v.newEvent.Subject}" />
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<!--
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>Assigned To</span>
+												</label>
+												<force:inputField aura:id="eventOwnerId" value="{!v.newEvent.OwnerId}" />
+												-->
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>All-Day Event</span>
+												</label>
+												<ui:inputCheckbox aura:id="uiAllDayEvent" value="{!v.uiAllDayEvent}" />
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>Location</span>
+												</label>
+												<force:inputField aura:id="eventLocation" value="{!v.newEvent.Location}" />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>Start</span>
+													<span class="required">*</span>
+												</label>
+												<aura:if isTrue="{!!v.uiAllDayEvent}">
+													<ui:inputDateTime aura:id="uiStartDateTime" value="{!v.uiStartDateTime}" displayDatePicker="true" />
+												</aura:if>
+												<aura:if isTrue="{!v.uiAllDayEvent}">
+													<ui:inputDate aura:id="uiStartDate" value="{!v.uiStartDate}" displayDatePicker="true" />
+												</aura:if>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>End</span>
+													<span class="required">*</span>
+												</label>
+												<aura:if isTrue="{!!v.uiAllDayEvent}">
+													<ui:inputDateTime aura:id="uiEndDateTime" value="{!v.uiEndDateTime}" displayDatePicker="true" />
+												</aura:if>
+												<aura:if isTrue="{!v.uiAllDayEvent}">
+													<ui:inputDate aura:id="uiEndDate" value="{!v.uiEndDate}" displayDatePicker="true" />
+												</aura:if>
+											</div>
+										</div>
+									</div>
+								</div>
+
+							</div>
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<!--
+													<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+														<span>Type</span>
+																<span class="required">*</span>
+													</label>
+													<force:inputField aura:id="eventType" value="{!v.newEvent.Type}"/>
+													-->
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>Appointment Status</span>
+													<span class="required">*</span>
+												</label>
+												<force:inputField aura:id="eventAppointmentStatus" value="{!v.newEvent.Appointment_Status__c}" />
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>Description</span>
+												</label>
+												<force:inputField aura:id="eventDescription" value="{!v.newEvent.Description}" />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+												<div class="slds-form-element__control">
+														<aura:if isTrue="{!v.customerId == null}">
+															<div class="uiInput uiInputText uiInput--default uiInput--input">
+																<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+																		<span>Related To</span>
+																</label>
+																<force:inputField aura:id="eventRelatedTo" value="{!v.newEvent.WhatId}" />
+															</div>
+															<aura:set attribute="else">
+																<div class="uiInput uiInputText uiInput--default uiInput--input">
+																		<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+																			<span>Related To</span>
+																		</label>
+																		<force:outputField aura:id="eventRelatedTo" value="{!v.newEvent.WhatId}" />
+																</div>
+															</aura:set>
+														</aura:if>
+												</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--
+							<div class="slds-grid full forcePageBlockSectionRow">
+									<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+										<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+											<div class="slds-form-element__control">
+												<div class="uiInput uiInputText uiInput&REPLACEHYPHEN&default uiInput&REPLACEHYPHEN&input">
+													<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+														<span>Account</span>
+													</label>
+													<force:inputField aura:id="taskAccount" value="{!v.newEvent.Account__c}"/>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+										<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+											<div class="slds-form-element__control">
+												<div class="uiInput uiInputText uiInput&REPLACEHYPHEN&default uiInput&REPLACEHYPHEN&input">
+											</div>
+											</div>
+										</div>
+									</div>
+							</div>
+						-->
+							<!--
+							<h3 class="slds-section__title slds-theme&REPLACEHYPHEN&shade primaryPaletteBorder test-id__section-header-container">
+									System Information
+								</h3>
+								<div class="slds-grid full forcePageBlockSectionRow">
+									<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+										<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+											<div class="slds-form-element__control">
+												<div class="uiInput uiInputText uiInput&REPLACEHYPHEN&default uiInput&REPLACEHYPHEN&input">
+													<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+														<span>Name</span>
+													</label>
+													<force:inputField aura:id="eventWhoId" value="{!v.newEvent.WhoId}"/>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+										<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+											<div class="slds-form-element__control">
+												<div class="uiInput uiInputText uiInput&REPLACEHYPHEN&default uiInput&REPLACEHYPHEN&input">
+											</div>
+											</div>
+										</div>
+									</div>
+							</div>
+							-->
+						</ui:scrollerWrapper>
+					</div>
+
+					<footer class="slds-modal__footer">
+                        <button class="greyButton" onclick="{!c.close}">Cancel</button>
+						<button class="slds-button slds-button--neutral slds-button--brand" onclick="{!c.addEvent}">Save</button>
+					</footer>
+				</div>
+			
+		</div>
+
+	</div>
+
+</aura:component>

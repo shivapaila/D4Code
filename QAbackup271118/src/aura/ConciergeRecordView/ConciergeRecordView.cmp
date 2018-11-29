@@ -1,0 +1,54 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" controller="ManageObjects" access="global">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <!--aura:dependency resource="markup://force:editRecord" type="EVENT" /-->
+<!--aura:handler event="force:refreshView" action="{!c.doInit}" /-->
+   <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="ObjName" type="String"/>
+    <aura:attribute name="showEditrecordModal" type="Boolean" default="false"/>
+    <!--aura:handler event="force:showToast" action="{!c.viewRefreshed}" /-->
+    <aura:handler name="onSaveSuccess" event="force:recordSaveSuccess" action="{!c.viewRefreshed}"/>
+    
+    <!-- AURA EVENTS -->
+    <aura:registerEvent name="NavigateToWrapperComponentAppEvent" type="c:NavigateToWrapperComponentAppEvent" />
+    <!-- /AURA EVENTS -->
+
+    <div class="container">
+    	<div class="row">
+		    <div class="col-sm-12">
+			    <div class="cardWrapper">
+			    	<div class="cardContent">
+					    <a href="" onclick="{!c.editRecord}" class="orangeButton" style="float:right;">
+							<i class="far fa-pencil"></i> EDIT
+						</a>
+						<a href="" onclick="{!c.deleteRecord}" class="orangeButton" style="float:right; margin-right:20px;">
+							<i class="far fa-trash-alt"></i> DELETE
+						</a>
+						<a href="" onclick="{!c.navigateToHome}" class="orangeButton" style="float:right; margin-right:20px;">
+							<i class="far fa-home"></i> HOME
+						</a>
+					    <force:recordView recordId="{!v.recordId}" type="FULL"/>
+					</div>
+				</div>
+			</div>
+		</div>
+        <aura:if isTrue="{!v.showEditrecordModal}">
+            <section aura:id="recordEditModal" role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="image-modal" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <i class="fa fa-times float-right" onclick="{!c.removecss}" />
+                    </header>
+                    <div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap">
+                        <ui:scrollerWrapper>
+                            <force:recordEdit aura:id="edit" recordId="{!v.recordId}"/>
+                        </ui:scrollerWrapper>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="greyButton" onclick="{!c.removecss}">Cancel</button>
+                        <button class="slds-button slds-button--neutral slds-button--brand" onclick="{!c.updateRecord}">Save</button>
+                    </footer>
+                </div>
+            </section>
+           
+        </aura:if>
+	</div>
+</aura:component>

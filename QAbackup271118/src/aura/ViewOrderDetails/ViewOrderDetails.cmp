@@ -1,0 +1,22 @@
+<aura:component controller="ViewCustomerOrdersController" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="order" type="SalesOrder__x" />
+
+    <aura:attribute name="orderItems" type="SalesOrderItem__x[]" />
+
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    <div class="modalContentWrapper">
+        <ui:scrollerWrapper>
+            <div class="row itemRow">
+                <div class="col-sm-2"><strong></strong></div>
+                <div class="col-sm-6"><strong>Name &amp; Description</strong></div>
+                <div class="col-sm-2"><strong>Price</strong></div>
+                <div class="col-sm-2"><strong>Qty</strong></div>
+            </div>
+            <aura:iteration aura:id="itemList" var="orderItem" items="{!v.orderItems}">
+                <c:OrderDetailItem productSKUId="{!orderItem.phdItemSKU__c}" orderItem="{!orderItem}"/>
+               
+            </aura:iteration>
+        </ui:scrollerWrapper>
+    </div>
+</aura:component>

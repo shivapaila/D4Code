@@ -1,0 +1,6 @@
+.THIS .dateTime-inputTime.form-element.form-element__control {
+    display: none;
+} 
+.THIS button.slds-float_right, .THIS button.slds-float_left {
+    margin-top:21px;
+}

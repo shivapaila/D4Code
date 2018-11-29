@@ -1,0 +1,98 @@
+.THIS .wishlistRow {
+	margin-bottom:10px;
+}
+.THIS .wishlistRow h5 {
+	margin-bottom:0;
+}
+.THIS .wishlistRow small {
+	margin-bottom:10px;
+}
+.THIS .wishlistItem {
+	background-size:cover;
+	width:100%;
+	background-position: top center;
+	background-repeat:no-repeat;
+}
+.THIS .productCardWrapper {
+	display:inline-block;
+	margin-bottom:20px;
+	vertical-align:top;
+}
+.THIS .productCardWrapper .productCard {
+	background:#fff;
+	height:340px;
+}
+.THIS .productCardDetails {
+	padding:15px 12px;
+}
+.THIS .productImage {
+	width:100%;
+	height:200px;
+	background-size:cover;
+	background-repeat:no-repeat;
+	background-position:center center;
+	border-bottom:1px solid #f2f2f2;
+}
+.THIS .productCardWrapper a:hover h5 {
+	color:#3366cc !important;
+}
+.THIS .productCardWrapper a h5 {
+	transition: color .25s ease-in-out;
+   -moz-transition: color .25s ease-in-out;
+   -webkit-transition: color .25s ease-in-out;
+   line-height:16px;
+   max-height:33px;
+   margin-bottom:4px;
+    width:100%
+}
+
+
+
+/* styles for '...' */ 
+.THIS .productCardWrapper a h5 {
+  /* hide text if it more than N lines  */
+  overflow: hidden;
+  /* for set '...' in absolute position */
+  position: relative; 
+  /* use this value to count block height */
+  line-height: 16px;
+  /* max-height = line-height (1.2) * lines max number (3) */
+  max-height: 33px; 
+  /* fix problem when last visible word doesn't adjoin right side  */
+  text-align: justify;  
+  /* place for '...' */
+  margin-right: -1em;
+  padding-right: 1em;
+}
+/* create the ... */
+.THIS .productCardWrapper a h5:before {
+  /* points in the end */
+  content: '...';
+  /* absolute position */
+  position: absolute;
+  /* set position to right bottom corner of block */
+  right: 0;
+  bottom: 0;
+}
+/* hide ... if we have text, which is less than or equal to max lines */
+.THIS .productCardWrapper a h5:after {
+  /* points in the end */
+  content: '';
+  /* absolute position */
+  position: absolute;
+  /* set position to right bottom corner of text */
+  right: 0;
+  /* set width and height */
+  width: 1em;
+  height: 1em;
+  margin-top: 0.2em;
+  /* bg color = bg color under block */
+  background: white;
+}
+
+
+
+.THIS .productCard h4 {
+	margin-bottom:2px;
+	margin-top:5px;
+}

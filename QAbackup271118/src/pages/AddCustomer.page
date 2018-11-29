@@ -1,0 +1,17 @@
+<apex:page standardController="Account">
+    <apex:includeLightning />
+
+    <div id="lightning" />
+
+    <script>
+        $Lightning.use("c:AddCustomerApp", function() {
+          $Lightning.createComponent("c:AddCustomer",
+          { inSvcConsole : true, 
+            recordId: '{!$CurrentPage.parameters.id}' ? '{!$CurrentPage.parameters.id}' : null
+          },
+          "lightning",
+          function(cmp) {}
+          );
+        });
+    </script>
+</apex:page>

@@ -1,0 +1,71 @@
+<aura:component >
+    <aura:registerEvent name="NotifyParentCloseModal" type="c:CloseModalEvent"/>
+    <aura:attribute name="cartTotal" type="Decimal" />
+    <aura:attribute name="options" type="Object[]" default="[{'months': 12, 'percent': null}, {'months': 24, 'percent': null}, {'months': 48, 'percent': null}, {'months': 72, 'percent': null}]" />
+    <div>
+        <section aura:id="createDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container adjust_container">
+                <header class="slds-modal__header">
+                    <i class="fa fa-times float-right" onclick="{!c.cancelDialog}"></i>
+                    <h3>Calculate Financing Options</h3>
+                </header>
+                <div class="slds-modal__content slds-p-around--medium">
+
+                    <div class="row totalWrapper">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-6">
+                            <div class="totalRow text-center">Total without financing = <strong>${!v.cartTotal}</strong></div>
+                        </div>
+                        <div class="col-sm-3"></div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <strong>Financing Length</strong>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <strong>Percent Discount</strong>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <strong>Monthly Payments</strong>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row financingTable">
+                        <aura:iteration var="opt" items="{!v.options}" >
+                            <div class="col-sm-4 paddingTopFix">
+                                <span>{!opt.months} MONTHS FINANCING</span>
+                            </div>
+                            <div class="col-sm-4 percentDiscount">
+                                <span>
+                                    <lightning:input min="0" max="100" type="number" value="{!opt.percent}"/>
+                                    <div class="percentOff">% OFF</div>
+                                </span>
+                            </div>
+                            <div class="col-sm-4 paddingTopFix">
+                                <aura:if isTrue="{!opt.percent}">
+                                    <span>
+                                        $<ui:outputNumber value="{!sub(v.cartTotal, mult(v.cartTotal,mult(opt.percent,.01)))}" format=".00"/> /
+                                        $<ui:outputNumber value="{!div(sub(v.cartTotal, mult(v.cartTotal,mult(opt.percent,.01))), opt.months)}" format=".00"/> 
+                                        Month
+                                    </span>
+                                    <aura:set attribute="else">
+                                        <small class="lightText">Projected Monthy Payment</small>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                        </aura:iteration>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="Ok" onclick="{!c.cancelDialog}" />
+                </footer>                
+            </div>
+        </section>
+    </div>	
+</aura:component>

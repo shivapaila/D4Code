@@ -1,0 +1,118 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes" controller="CommissionsCtrl" access="global">
+    <!-- required parameter -->
+    <aura:attribute name="guestId" type="String" access="PUBLIC"/>
+    <!-- / required parameter -->
+    <!-- optional attribute to track, if the commission section should be collapsed or expanded? -->
+    <aura:attribute name="isCollapsed" type="Boolean" default="true" access="PUBLIC"/>
+    <aura:attribute name="RendercomForUpdate" type="Boolean"/>
+    <!-- private attributes -->
+    <aura:attribute name="currentRSA" type="User" />
+    <aura:attribute name="commissionSplits" type="Object[]" default="[]" />
+    <!-- / private attributes -->
+    <aura:handler name="init" value="this" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.guestId}" action="{!c.doInit}" />
+     <aura:handler name="change" value="{!v.RendercomForUpdate}" action="{!c.doInit}" />
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+
+    <!-- CONTAINER -->
+    <div class="container">
+        <div class="row">		
+            <div class="col-sm-12">				
+				<section class="slds-clearfix">
+                    <a onclick="{!c.handleCommissionSection}">
+                        <div class="slds-float--right" style="margin-top:-3px;">
+                            
+                                <lightning:Icon iconName="{!if(v.isCollapsed,'utility:chevronright','utility:chevrondown')}" 
+                                                size="x-small"/>
+                                                        
+                        </div>
+                        <div>
+                            <h5>Sales Person</h5>
+                        </div>
+                    </a>
+				</section>
+            </div>
+        </div>
+		<!-- SECTION -->
+        <aura:if isTrue="{!not(v.isCollapsed)}">
+    		<div>
+                <div class="row currentSplits">
+                    <div class="col-sm-8">
+                        <label>RSA</label>
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Percentage</label>
+                    </div>
+                </div>
+    			<aura:iteration items="{!v.commissionSplits}" var="s" indexVar="index">
+                    <div class="row currentSplits">
+        				<div class="col-sm-8">
+                            <aura:if isTrue="{!empty(s.user)}">
+                                <c:LookupComponent aura:id="lookupUserfield"
+                                    objectName="User" 
+                                    fieldSet="['Name','Id']"   
+                                    whereCondition="{!' AND Id != \'' + v.currentRSA.user.Id+'\' AND AcctNo_ShipTo_ProfitCtr__c LIKE \'' + v.currentRSA.acctNo + '-' + v.currentRSA.shipTo + '%' + '\''}"
+                                    placeholder="Search RSAs" 
+                                    comparisonField="['Name']" 
+                                    primaryDisplayField="Name"
+                                    alternateDisplayField="['Name']" 
+                                    minimumCharacter="2" 
+                                    lightningIconName="standard:user" 
+                                    uniqueLookupIdentifier="testUser"
+                                    value="{!s.user}" 
+                                    readOnly="false" 
+                                    required="true"
+                                    requiredErrorMessage="" />
+                                <aura:set attribute="else">                                
+        					       <lightning:formattedText value="{!s.user.Name}" />
+                                </aura:set>
+                            </aura:if>
+        				</div>
+        				<div class="col-sm-4">
+                            <aura:if isTrue="{!equals(v.currentRSA.user.Id, s.user.Id)}">
+                                <!-- <ui:outputNumber value="{!s.percentage}" format="#" /> -->
+                                {!s.percentage}%                              
+                                <aura:set attribute="else">
+                                    <!-- <ui:inputNumber value="{!s.percentage}" class="inputPercent" format="#" /> -->
+                                    <div class="hideLabel">
+                                        <lightning:input aura:id="field"
+                                                    type="number" 
+                                                    name="splitPercentage"
+                                                    label="" 
+                                                    value="{!s.percentage}" 
+                                                    formatter="percent-fixed" 
+                                                    step="1"
+                                                    min="0"
+                                                    max="100"/>
+                                    </div>
+                                </aura:set>
+                            </aura:if>
+        				</div>
+                    </div>
+    			</aura:iteration>
+                <div class="row">
+                    <div class="col-sm-12 text-right">
+                        <div class="text-right footerRow">
+                            <a class="orangeButton" onclick="{!c.save}">
+                                Save
+                            </a>
+                            &nbsp;&nbsp;
+                            <aura:if isTrue="{!(v.commissionSplits.length &gt; 3)}">
+                                <a class="greyButton disabled" onclick="return false;">
+                                    <small style="font-size: 120%;">+</small>                    
+                                </a>                                
+                                <aura:set attribute="else">
+                                    <a class="orangeButton"  onclick="{!c.addCommissionEntry}">
+                                        <small style="font-size: 120%;">+</small>                    
+                                    </a>
+                                </aura:set>
+                            </aura:if>
+                        </div>                        
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+        <!-- SECTION -->
+    </div>
+    <!-- / CONTAINER --> 
+</aura:component>

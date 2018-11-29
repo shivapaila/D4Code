@@ -1,0 +1,45 @@
+<aura:component controller="WishListController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+  
+    <aura:handler name="init" value="{!this}" action="{!c.getWishLst}"/>
+    <aura:attribute type="WishListWrapper[]" name="wishLst"/>
+    <aura:attribute type="Boolean" name="isWishlistEmpty"/>
+    <aura:attribute type="Boolean" name="hasError"/>
+	<aura:attribute name="recordId" type="String"/>
+
+    <!-- AURA EVENTS -->
+    <aura:registerEvent name="NavigateToWrapperComponentAppEvent" type="c:NavigateToWrapperComponentAppEvent" />
+    <!-- /AURA EVENTS -->     
+    
+    <br />
+    <div class="container">
+        <i class="far fa-heart headerIcon float-left"></i> <h3> Ashley eCommerce Wishlist</h3>
+
+        <aura:if isTrue="{!v.isWishlistEmpty}">
+            <div class="cardWrapper">
+                <div class="cardContent">
+                    <div class="slds-text-color--error">This Guest currently has no wishlist</div> 
+                </div>
+            </div>
+            <aura:set attribute="else">
+                <ul class="row productListWrapper">
+                    <aura:iteration var="prod" items="{!v.wishLst}" >
+                            <li class="col-sm-4 productCardWrapper">
+                                <a data-record="{!prod.sku}" onclick="{!c.goToProduct}">
+                                    <div class="productCard">
+                                        <div class="productImage" style="{! 'background-image:url(' + prod.eCommLargeImage + ');'}"></div>
+                                        <div class="productCardDetails">
+
+                                            <h5>{!prod.productName} ({!prod.quantity})</h5>
+                                            <small>{!prod.sku}</small>
+                                            
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                    </aura:iteration>
+                </ul>
+            </aura:set>
+        </aura:if>
+           
+    </div>
+</aura:component>

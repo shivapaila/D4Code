@@ -1,0 +1,11 @@
+<apex:page sidebar="false" tabStyle="Contact" showHeader="true" controller="EDQ.DataQualityController">
+    <apex:form > 
+        <c:DataQuality DataQualityClient="{!DataQualityClient}" 
+                       ValidateSingleResultAction="{!DataQualityClient.RefineSelectedMatch}"
+                       ContinueValidationAction="{!DataQualityClient.Next}" 
+                       RerenderIds="dataQualityComponentOuterWrapper,experianForm" />
+        
+        <c:DataQualityTriggerAsync ExecuteValidationAction="{!Execute}" />
+           
+     </apex:form>
+</apex:page>

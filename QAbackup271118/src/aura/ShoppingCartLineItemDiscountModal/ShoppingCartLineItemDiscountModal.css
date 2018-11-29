@@ -1,0 +1,30 @@
+.THIS .hideLabel label {
+    display:none;
+}
+.THIS .discountModal {
+    margin-top:35px;
+}  
+.THIS .labelShrink .slds-form-element label {
+    display:none;
+}
+.THIS .row .slds-input {
+    color:#999 !important;
+}
+.THIS .totalPrice {
+    color:#60c460 !important;
+}
+.THIS .discountTableHeader small {
+    color:#353534; 
+    font-weight:bold;
+}
+.THIS .slds-combobox_container .slds-combobox__input {
+    width:100%;
+    border:none;
+}
+.THIS .slds-form-element__control .slds-combobox_container {
+    border:2px solid #e1e1e1;
+    border-radius:0;
+}
+.THIS .cLookupComponent label {
+    display:none;
+}

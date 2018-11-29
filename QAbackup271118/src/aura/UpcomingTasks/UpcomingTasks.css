@@ -1,0 +1,32 @@
+.THIS #Task-table .uiInput--datetime {
+	width:100%;
+	min-height:37px;
+	height:37px;
+}
+.THIS #Task-table input {
+	width:100%;
+	font-size:12px;
+}
+.THIS .dateTime {
+	max-width:225px;
+}
+.THIS .saveCancel a {
+	display:inline-block;
+	cursor:pointer;
+}
+.THIS .saveCancel a:last-child{
+	float:right;
+}
+.THIS .saveCancel a.marginRight {
+	margin-right:20px;
+}
+.THIS .saveCancel {
+	min-width:165px;
+	padding-top:19px;
+}
+.THIS {
+	margin-top:35px;
+}
+.THIS .newTaskButton {
+	margin-top:-3px;
+}

@@ -1,0 +1,49 @@
+<aura:component controller="Case_SalesOrderDetails_Controller" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global">
+	<aura:attribute name="recordId" type="Id" /> <!-- It will holds the Case Id -->
+    <aura:attribute name="salesOrder" type="SalesOrder__x" /> <!-- It holds the Sales Order Record -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />           
+    <div class="slds customBackground">
+        <br/>        
+        <div class="slds-align--absolute-center">
+            <b><p class="slds-text-heading--label">Sales Order Details</p></b>
+        </div>
+        <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+            <div class="slds-form-element">
+                <label class="slds-form-element__label">Sale Order Number</label>
+                <div class="slds-form-element__control">
+                    <b><ui:outputText value="{!v.salesOrder.phhSalesOrder__c}"/></b> 
+                </div>
+            </div>
+            <br/>
+            <div class="slds-form-element">
+                <label class="slds-form-element__label">Sale Type</label>
+                <div class="slds-form-element__control">
+                    <b><ui:outputText value="{!v.salesOrder.phhSaleType__c}"/></b> 
+                </div>
+            </div>
+            <br/>
+            <div>
+                <label class="slds-form-element__label">Contact Status</label>
+                <div class="slds-form-element__control">
+                    <b><ui:outputText value="{!v.salesOrder.phhContactStatus__c}"/></b> 
+                </div>
+            </div>
+            <br/>
+            <div>
+                <label class="slds-form-element__label">Number of Items</label>
+                <div class="slds-form-element__control">
+                    <b><ui:outputText value="{!v.salesOrder.phhItemCount__c}"/></b> 
+                </div>
+            </div>
+            <br/>
+            <div>
+                <label class="slds-form-element__label">Order Total</label>
+                <div class="slds-form-element__control">
+                    <b><ui:outputText value="{!v.salesOrder.phhPurchaseValue__c}"/></b> 
+                </div> 
+            </div>
+            <br/>
+
+        </div>
+    </div>
+</aura:component>

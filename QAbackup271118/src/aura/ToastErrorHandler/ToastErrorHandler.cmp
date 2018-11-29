@@ -1,0 +1,8 @@
+<aura:component >
+    <!-- Reference: https://salesforce.stackexchange.com/questions/176979/best-practice-for-catching-and-displaying-action-errors-in-lightning-components -->
+    <aura:method name="handleResponse" action="{!c.handleResponse}">
+        <aura:attribute name="response" type="Object" />
+        <aura:attribute name="successHandler" type="Object" />
+        <aura:attribute name="errorHandler" type="Object" />
+    </aura:method>
+</aura:component>

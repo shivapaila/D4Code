@@ -1,0 +1,63 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="TechSchedulingController">
+    <aura:attribute name="recordId" type="String" access="global" />
+    <aura:attribute name="casesAre" type="case[]" />
+    <aura:attribute name="SiblingsExist" type="boolean" default="false" />
+    <aura:attribute name="noPliExist" type="boolean" default="false" />
+
+    <aura:handler name="init" value="this" action="{!c.doInit}" />
+
+    <aura:if isTrue="{!v.noPliExist}">
+        <!-- prompt to show no PLI associated to this case -->
+        <div class="demo-only" style="height: 24rem;">
+            <section role="alertdialog" tabindex="-1" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal_prompt" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header slds-theme_error slds-theme_alert-texture">
+                        <button onclick="{!c.moveTotab}" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                            X
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 class="slds-text-body_small" id="prompt-heading-id">Technician Scheduling</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="prompt-message-wrapper">
+                        <div class="slds-text-body_small" id="prompt-heading-id">You don't have any PLI's attached to this case, are you sure you want to Schedule a Technician?</div>
+                    </div>
+                    <footer class="slds-modal__footer slds-theme_default">
+                        <button class="slds-button slds-button_brand" onclick="{!c.validateTechSchedule}">Yes</button>
+                        <button class="slds-button slds-button_brand" onclick="{!c.GobackToRecord}">No</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+        <!-- end of no PLI prompt-->
+    </aura:if>
+
+    <aura:if isTrue="{!v.SiblingsExist}">
+        <!-- prompt to show related childs-->
+        <div class="demo-only" style="height: 24rem;">
+            <section role="alertdialog" tabindex="-1" aria-labelledby="prompt-heading-id" aria-describedby="prompt-message-wrapper" class="slds-modal slds-fade-in-open slds-modal_prompt" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header slds-theme_error slds-theme_alert-texture">
+                        <button onclick="{!c.moveTotab}" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                            X
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 class="slds-text-body_small" id="prompt-heading-id">Technician Scheduling</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="prompt-message-wrapper">
+                        <div class="slds-text-body_small" id="prompt-heading-id">This Person Account already has at least one technician scheduled. Are you sure you want to schedule another technician?</div>
+                        <aura:iteration items="{!v.casesAre}" var="item">
+                            <ui:outputURL target="_blank" value="{!item.Id}" label = "{!item.CaseNumber}"> </ui:outputURL> <br/>
+                        </aura:iteration>
+                    </div>
+                    <footer class="slds-modal__footer slds-theme_default">
+                        <button class="slds-button slds-button_brand" onclick="{!c.moveTotab}">Schedule Another Technician</button>
+                        <button class="slds-button slds-button_brand" onclick="{!c.GobackToRecord}">Cancel</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+        <!-- end of prompt-->
+    </aura:if>
+</aura:component>

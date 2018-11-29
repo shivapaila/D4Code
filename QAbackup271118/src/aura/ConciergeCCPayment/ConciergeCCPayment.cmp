@@ -1,0 +1,87 @@
+<aura:component  implements="flexipage:availableForAllPageTypes" controller="ConciergeCCPaymentController" access="global" extends="c:PaymentBase">
+ 
+    <aura:attribute name="guestId" type="String" />
+    <aura:attribute name="pm" type="PaymentMethodWrapper"/> 
+    <aura:attribute name="targetAmount" type="Double" /> 
+    <aura:attribute name="totalAmount" type="Double" default="0" />
+    <aura:attribute name="payOptions" type="List" />
+    <aura:attribute name="payTerminalOptions" type="List" />
+    <aura:attribute name="indexNum" type="Integer" />
+    <aura:attribute name="showPaymentSection" type="Boolean" default="true" />
+    <aura:attribute name="showVoidConfirmation" type="Boolean" default="false" />
+    <!-- DEF-0874 fix -->
+    <aura:attribute name="paidAmt" type="Double" default="0"/>
+    <aura:registerEvent name="addAnotherPaymentEvent" type="c:AddAnotherPayment" />
+    <aura:registerEvent name="updateAmount" type="c:AmountAppliedEvent" />
+    <aura:registerEvent name="NotifyParentPmtAdded" type="c:PaymentChangeEvent" />
+    <lightning:spinner aura:id="largeSpinner" variant="brand" size="small" class="slds-hide"/>
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!this}" action="{!c.doInit}"/>
+
+    
+    <div class="singlePaymentMethod">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="paymentMethodLabel">{!v.pm.paymentTrans.Payment_Type__c}</div>
+            </div>
+            <aura:if isTrue="{!v.showPaymentSection}">
+                <div class="col-sm-8">
+                    <aura:if isTrue="{!and(v.pm.paymentTrans.Transaction_Number__c != null,v.pm.paymentTrans.Transaction_Number__c != '')}">
+                        <small class="paymentInputLabel">Authorization Number</small>
+                        <ui:outputText aura:id="auth_no" value="{!v.pm.paymentTrans.Transaction_Number__c}"/>
+                        <div style="margin-bottom:15px;">
+                            <a onclick="{!c.showVoidConfirmation}" class="orangeButton smallButton" style="background:red !important;"><i class="fas fa-trash-alt"></i> Delete</a>  
+                        </div>    
+                        
+                        <small class="paymentInputLabel">Acct Number:</small>
+                        <ui:outputText  value="{!v.pm.paymentTrans.Account_Number__c}"/>
+                        <small class="paymentInputLabel">Payment Type:</small>
+                        <ui:outputText  value="{!v.pm.paymentTrans.Payment_Type__c}"/>
+                        <small class="paymentInputLabel">Check/Document Number:</small>
+                        <ui:outputText  value="{!v.pm.paymentTrans.Check_DocumentNumber__c}"/>
+                        <small class="paymentInputLabel">Authorization Number:</small>
+                        <ui:outputText value="{!v.pm.paymentTrans.AuthorizationNumber__c}" />
+                        <small class="paymentInputLabel">Reference Number:</small>
+                        <ui:outputText  value="{!v.pm.paymentTrans.ReferenceNumber__c}"/>
+                        <small class="paymentInputLabel">Terms Code Number:</small>
+                        <ui:outputText  value="{!v.pm.paymentTrans.TermsCode__c}"/>
+                        <small class="paymentInputLabel">Amount:</small>
+                        <ui:outputNumber  value="{!v.pm.paymentTrans.Payment_Amount__c}" format="#,###,##0.00"/>
+                        <div class="addNewButtonWrapper text-right">
+                            <a class="orangeButton" data-record="{!idx}" onclick="{!c.addCardPayment}"> Add Another Card +<i class="fa far-plus"></i></a>
+                        </div> 
+                    </aura:if>
+                    <aura:if isTrue="{!or(v.pm.paymentTrans.Transaction_Number__c == null, v.pm.paymentTrans.Transaction_Number__c == '')}">
+                        <small class="paymentInputLabel">Card Type</small>
+                        <ui:inputSelect aura:id="cardType" label="cardType" options="{!v.payOptions}" value="{!v.pm.paymentTrans.TenderCode__c}"/>
+                        <small class="paymentInputLabel">Terminal</small>
+                        <ui:inputSelect aura:id="terminal" label="Terminal" options="{!v.payTerminalOptions}" value="{!v.pm.paymentTerminalSelected}"/>
+                        <lightning:input type="checkbox" label="Apply Total Balance to Card" name="{!'applybalance-' + idx}" onchange="{!c.ApplyAmount}" aura:id="auraApplyBalance"/>
+                        <small class="paymentInputLabel">Amount</small>
+                        <ui:inputNumber aura:id="amt" class="slds-input"  value="{!v.pm.paymentTrans.Payment_Amount__c}" change="{!c.checkAmount}"  format="#,###,##0.00"/>
+                        
+                            <div class="addNewButtonWrapper text-right">
+                                <a class="orangeButton" data-record="{!idx}" onclick="{!c.processPayment}">Submit to Payment Terminal <i class="fa far-plus"></i></a>
+                            </div>
+                            <div class="addNewButtonWrapper text-right">                                    <a class="orangeButton" data-record="{!idx}" onclick="{!c.addCardPayment}"> Add Another Card +<i class="fa far-plus"></i></a>
+                            </div>
+                                                
+                    </aura:if>                        
+                </div>
+            </aura:if>
+            <!-- Void payment -->
+            <aura:if isTrue="{!v.showVoidConfirmation}">
+                <div class="col-sm-8">
+                    <div>
+                        Are you sure you want to cancel this transaction?
+                    </div>
+                    <div style="margin-top:15px;">
+                        <lightning:button label="Cancel" onclick="{!c.Cancel}" class="greyButton"/> &nbsp;
+                        <lightning:button label="Yes" onclick="{!c.proceedtoVoid}" class="orangeButton"/>
+                    </div>
+                </div>
+            </aura:if>            
+        </div>
+    </div>
+</aura:component>

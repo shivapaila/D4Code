@@ -1,0 +1,16 @@
+.THIS.slds-popover {
+   	min-height: 100px;
+    top:45%;
+    left:65px;
+    width:550px;
+    z-index:1000;
+    border-right: 1px solid #000000;
+	border-left: 1px solid #000000;
+    border-top: 1px solid #000000;
+    border-bottom:1px solid #000000;
+}
+
+.THIS.slds-spinner_container {  
+  z-index: 10000;
+  position: fixed;   
+}

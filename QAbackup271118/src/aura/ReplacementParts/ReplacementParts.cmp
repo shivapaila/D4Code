@@ -1,0 +1,397 @@
+<aura:component controller="ProductLineItemFromOrderHelper" implements="lightning:actionOverride,force:hasRecordId,force:hasSObjectName" access="global" >
+    
+    <aura:attribute name="record" type="Object" />
+    <aura:attribute name="componentRecord" type="Object" />
+    <aura:attribute name="componentRecordName" type="ProductLineItem__c" default="{ 'sobjectType': 'ProductLineItem__c' }"/>
+    <aura:attribute name="recordError" type="String" />
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="isSerialNumValid" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.myAction}" />
+    
+    <force:recordData 
+                      aura:id="recordLoader" 
+                      recordId="{!v.recordId}" 
+                      layoutType="FULL" 
+                      mode="EDIT"
+                      targetRecord="{!v.record}"
+                      targetFields="{!v.componentRecord}"
+                      targetError="{!v.recordError}" />
+    <div id="error" class="alert alert-danger slds-theme_alert-texture slds-theme_warning slds-align_absolute-center" aria-hidden="true" role="alert">
+        
+    </div>
+    
+    <div class="slds-page-header">
+        <div class="slds-media">
+            <div class="slds-media__figure">
+                <lightning:icon iconName="custom:custom67" />
+            </div>
+            <div class="slds-media__body">
+                <p class="slds-text-body_small slds-line-height_reset"></p>
+                <h1 class="slds-page-header__title slds-truncate slds-align-middle" 
+                    title="{!v.componentRecord.Name}">{!v.componentRecord.Name}</h1>
+            </div>
+            <lightning:buttonGroup>            
+                <lightning:button label="Save" onclick="{!c.onSave}" />
+                <lightning:button label="Cancel" onclick="{!c.onCancel}" />
+            </lightning:buttonGroup>
+        </div>
+    </div>
+    
+    <aura:if isTrue="{!not(empty(v.recordError))}">
+        <ui:message title="Error" severity="error">
+            {!v.recordError}
+        </ui:message>
+    </aura:if>
+    <div class="demo-only"  style="max-width: 90rem">
+        
+        
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label">ProductLineItem Name</label>
+                    <div class="slds-form-element__control">
+                        <lightning:formattedText value ="{!v.componentRecord.Name}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         aura:id ="itemSerialNumber"  
+                                         name="Item Serial Number" 
+                                         label="Item Serial Number"
+                                         type="text"
+                                         value="{!v.componentRecord.Item_Serial_Number__c}"
+                                         messageWhenBadInput="Invalid Serial Number"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input name="description" type="text" label = "Item Description"
+                                         value="{!v.componentRecord.Item_Description__c}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Item Number" 
+                                         label="Item Number"
+                                         type="text"
+                                         value="{!v.componentRecord.Item_Number__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="case" 
+                                         type="Master-Detail(Case)"
+                                         label="Case"
+                                         value="{!v.componentRecord.Case__c}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Item SKU" 
+                                         label="Item SKU"
+                                         type="text"
+                                         value="{!v.componentRecord.Item_SKU__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="quantity" 
+                                         label="Quantity"
+                                         type="Master-Detail(Case)"
+                                         value="{!v.componentRecord.Quantity__c}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="SKU Description" 
+                                         label="SKU Description"
+                                         type="text"
+                                         value="{!v.componentRecord.SKU_Description__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="warranty date" 
+                                         label="Warranty Date"
+                                         type="text"
+                                         value="{!v.componentRecord.warranty_date__c}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Record Source" 
+                                         label="Record Source"
+                                         type="text"
+                                         value="{!v.componentRecord.Record_Source__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Customer Number" 
+                                         label="Customer Number"
+                                         type="text"
+                                         value="{!v.componentRecord.Customer_Number__c}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Delivery Date" 
+                                         label="Delivery Date"
+                                         type="text"
+                                         value="{!v.componentRecord.Delivery_Date__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Sales Order Number" 
+                                         label="Sales Order Number"
+                                         type="text"
+                                         value="{!v.componentRecord.Sales_Order_Number__c}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label">Ashley Direct Link ID</label>
+                    <lightning:helptext iconName="utility:info" content="This ID is a Salesforce generated number that tracks the case line item details when linking out to Ashley Direct" />
+                    <div class="slds-form-element__control">
+                        <lightning:formattedText value="{!v.componentRecord.Ashley_Direct_Link_ID__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-m-top--medium"></div>
+        <h3 class="slds-section-title--divider">Part Info</h3>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         aura:id ="POnumber"
+                                         name="Part Order Number" 
+                                         label="Part Order Number"
+                                         type="text"
+                                         value="{!v.componentRecord.Part_Order_Number__c}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Part Order Shipping Date" 
+                                         label="Part Order Shipping Date"
+                                         type="date"
+                                         value="{!v.componentRecord.Part_Order_Shipping_Date__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Part Order Tracking Number" 
+                                         label="Part Order Tracking Number"
+                                         type="text"
+                                         value="{!v.componentRecord.Part_Order_Tracking_Number__c}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         aura:id ="fulfillerID"
+                                         name="Fulfiller ID" 
+                                         label="Fulfiller ID"
+                                         type="text"
+                                         value="{!v.componentRecord.Fulfiller_ID__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Part Order Status" 
+                                         label="Part Order Status"
+                                         type="text"
+                                         value="{!v.componentRecord.Part_Order_Status__c}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Replacement Part Item Number" 
+                                         label="Replacement Part Item Number"
+                                         type="text"
+                                         value="{!v.componentRecord.Replacement_Part_Item_Number__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-m-top--medium"></div>
+        <h3 class="slds-section-title--divider">Defect Details</h3>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Item Defect" 
+                                         label="Item Defect"
+                                         type="picklist"
+                                         value="{!v.componentRecord.Item_Defect__c}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Manufacturing Defect" 
+                                         label="Manufacturing Defect"
+                                         type="checkbox"
+                                         value="{!v.componentRecord.Manufacturing_Defect__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Defect Location" 
+                                         label="Defect Location"
+                                         type="picklist"
+                                         value="{!v.componentRecord.Defect_Location__c}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label">Defect Details</label>
+                    <lightning:inputRichText value="{!v.componentRecord.Defect_Details__c}"/>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="slds-m-top--medium"></div>
+        <h3 class="slds-section-title--divider">Shipping Details</h3>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Address Line1" 
+                                         label="Address Line1"
+                                         type="text"
+                                         value="{!v.componentRecord.Address_Line1__c}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Address Line2" 
+                                         label="Address Line2"
+                                         type="text"
+                                         value="{!v.componentRecord.Address_Line2__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="City" 
+                                         label="City"
+                                         type="text"
+                                         value="{!v.componentRecord.City__c}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="State" 
+                                         label="State"
+                                         type="text"
+                                         value="{!v.componentRecord.State__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_1-of-2">
+                <div class="slds-form-element">
+                    <div class="slds-form-element__control">
+                        <lightning:input
+                                         name="Zip" 
+                                         label="Zip"
+                                         type="text"
+                                         value="{!v.componentRecord.Zip__c}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</aura:component>

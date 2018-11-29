@@ -1,0 +1,24 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickAction" controller="TwilioSendSMSController">
+	<aura:attribute name="recordId" type="Id" />
+	<aura:attribute name="isLoading" type="Boolean" default="false"/>
+	<aura:attribute name="txtMessage" type="string" default=""/>
+	<aura:attribute name="toNumber" type="string"/>
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+	<aura:if isTrue="{!v.isLoading}">
+        <lightning:spinner aura:id="spinner" alternativeText="loading..."/>
+    </aura:if>
+
+    <div class="slds-form" >
+        <div class="slds-grid full slds-wrap">              
+            <lightning:input aura:id="toPhoneNumber" label="{!$Label.c.Twilio_Send_SMS_Label_To_Phone_Number}" name="toPhoneNumber" value="{!v.toNumber}"
+                class="slds-size--1-of-1 slds-p-horizontal_x-small" placeholder="{!$Label.c.Twilio_Send_SMS_Placeholder_Phone_Number}"/>                 
+            <lightning:textarea name="txtMesssage" value="{!v.txtMessage}" label="{!$Label.c.Twilio_Send_SMS_Label_Text_Message}" 
+                class="slds-size--1-of-1 slds-p-horizontal_x-small" placeholder="{!$Label.c.Twilio_Send_SMS_Placeholder_Text_Message}"/>                                       
+        </div>
+    </div>
+    <div class="slds-text-align_center">
+        <lightning:button label="{!$Label.c.Twilio_Send_SMS_Button_Label_Send}" class="slds-m-top--medium" variant="brand" onclick="{!c.sendMessage}"/>
+    </div>	
+</aura:component>

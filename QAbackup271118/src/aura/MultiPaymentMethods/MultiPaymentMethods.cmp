@@ -1,0 +1,111 @@
+<aura:component access="global" 
+                controller="MultiPaymentMethodsCtrl"
+                implements="flexipage:availableForAllPageTypes">
+    
+    <!-- attribute defintions for payment options -->
+    <aura:attribute name="paymentOptions" type="List" default="[
+                                                                {'label': 'Credit/Debit', 'value': 'Credit/Debit Card'},
+                                                                {'label': 'Financing', 'value': 'Financing'},
+                                                                {'label': 'Cash', 'value': 'Cash'},
+                                                                {'label': 'Check', 'value': 'Check'}
+                                                                ]"/> 
+    <aura:attribute name="currSelectedPaymentOptions" type="List" />
+    <aura:attribute name="prevSelectedPaymentOptions" type="List" />
+    <!-- / attribute defintions for payment options -->   
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="error" type="String" />
+    <aura:attribute name="message" type="String" default="" />
+    <aura:attribute name="messageType" type="String" default="" />
+    <aura:attribute name="guestId" type="String" />
+    <aura:attribute name="terminal" type="String" />
+    <aura:attribute name="currentSelectedType" type="String" default=""/>
+    <aura:attribute name="initPaymentMethodsByType" type="Object"/> 
+	<aura:attribute name="paymentMethods" type="PaymentMethodWrapper[]"/> 
+    <aura:attribute name="targetAmount" type="Double" /> 
+    <aura:attribute name="totalAmount" type="Double" default="0" />
+    <aura:attribute name="yearList" type="List" />
+    <aura:attribute name="monthList" type="List"/>
+	<aura:attribute name="payOptions" type="List" />
+    <aura:attribute name="payTerminalOptions" type="List" />
+    <!-- for terms display -->
+    <aura:attribute name="pmtToDisplayTerms" type="PaymentMethodWrapper"/> 
+    <aura:attribute name="showTerms" type="Boolean" default="false" />
+    <aura:attribute name="selectedItem" type="Integer" /> 
+    <!-- DEF-0874 fix -->
+    <aura:attribute name="paidAmt" type="Double" default="0"/>
+
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    <!--
+    <aura:handler name="NotifyParentCloseModal" event="c:CloseModalEvent" action="{!c.closeTerms}"/>-->
+	<aura:registerEvent name="NotifyParentPmtAdded" type="c:PaymentChangeEvent" />
+    <!-- used only for financing -->
+    <aura:handler name="addAnotherPaymentEvent" event="c:AddAnotherPayment" action="{!c.addAnotherPaymentEvtHandler}"/>
+    <aura:handler name="updateAmount" event="c:AmountAppliedEvent" action="{!c.updateAmountApplied}"/>
+    
+    <div class="paymentMethodWrapper">
+
+        <lightning:checkboxGroup name="Payment Options"
+                                 label=""
+                                 class="slds-list_horizontal"
+                                 options="{!v.paymentOptions }"
+                                 value="{!v.currSelectedPaymentOptions }"
+                                 onchange="{!c.handlePaymentOptionsChange }"/>         
+        
+        <aura:iteration items="{!v.paymentMethods}" var="pm" indexVar="idx">
+            <aura:if isTrue="{!(pm.paymentTrans.Payment_Type__c == 'Credit/Debit Card'
+                                ||
+                                pm.paymentTrans.Payment_Type__c == 'Cash'
+                                ||
+                                pm.paymentTrans.Payment_Type__c == 'Financing'
+                                ||
+                                pm.paymentTrans.Payment_Type__c == 'Check')}">
+                <!-- DEF-0874 - adding paidAmt -->
+                <aura:if isTrue="{!pm.paymentTrans.Payment_Type__c == 'Financing'}">
+                                    <c:ConciergeFinancingPayment guestId="{!v.guestId}" targetAmount="{!v.targetAmount}" 
+                        totalAmount="{!v.totalAmount}" pm="{!pm}"
+                        payTerminalOptions="{!v.payTerminalOptions}" 
+                        paidAmt="{!v.paidAmt}"/>
+                </aura:if>
+                <!-- DEF-0874 - adding paidAmt -->
+                <aura:if isTrue="{!pm.paymentTrans.Payment_Type__c == 'Credit/Debit Card'}">
+                                    <c:ConciergeCCPayment guestId="{!v.guestId}" targetAmount="{!v.targetAmount}" payTerminalOptions="{!v.payTerminalOptions}"     payOptions ="{!v.payOptions}" totalAmount="{!v.totalAmount}" indexNum="{!idx}" pm="{!pm}"
+                                        paidAmt="{!v.paidAmt}"/>
+                                   
+                </aura:if>
+                <!-- DEF-0874 - adding paidAmt -->
+                <aura:if isTrue="{!pm.paymentTrans.Payment_Type__c == 'Check'}">
+                                    <c:ConciergeCheckPayment guestId="{!v.guestId}" targetAmount="{!v.targetAmount}" totalAmount="{!v.totalAmount}" indexNum="{!idx}" pm="{!pm}"
+                                        paidAmt="{!v.paidAmt}"/>
+                                   
+                </aura:if>
+                <!-- DEF-0874 - adding paidAmt -->
+                <aura:if isTrue="{!pm.paymentTrans.Payment_Type__c == 'Cash'}">
+                 					<c:ConciergeCashPayment guestId="{!v.guestId}" targetAmount="{!v.targetAmount}" totalAmount="{!v.totalAmount}" indexNum="{!idx}" pm="{!pm}"
+                                        paidAmt="{!v.paidAmt}"/>
+                </aura:if>
+            </aura:if>
+        </aura:iteration>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="totalWrapper">
+                    <small>Amount Applied</small><br />
+                    <ui:outputNumber value="{!v.totalAmount}" format="0.00" />
+                </div>
+            </div> 
+            <div class="col-sm-6">
+                <div class="totalWrapper">
+                    <small>Amount Remaining</small><br />
+                    <ui:outputNumber value="{!v.targetAmount -v.totalAmount}" format="0.00" />
+                </div>
+            </div>   
+        </div>
+        <!-- terms modal -->
+        <aura:if isTrue="{!v.showTerms}">
+            <c:TermsSelection paymentInfo="{!v.pmtToDisplayTerms}" />
+        </aura:if>
+    </div>
+
+    
+</aura:component>

@@ -1,0 +1,19 @@
+<aura:component implements="lightning:appHomeTemplate" isTemplate="true" access="global">
+   <!-- <aura:set attribute="title" value="Concierge"/> -->
+
+    <ltng:require styles="{!$Resource.conciergeStyles}" />
+    <ltng:require styles="{!$Resource.openSans}" />
+    <ltng:require styles="{!$Resource.fontawesome + '/css/fontawesome-all.css'}" />
+
+    <ltng:require styles="{!$Resource.bootstrap + '/bootstrap/css/bootstrap.min.css'}" />
+    <!--<ltng:require scripts="{!$Resource.bootstrap + '/bootstrap/js/bootstrap.min.js'}"  />-->
+
+	<aura:attribute name="center" type="Aura.Component[]" />
+	<div>
+        <lightning:layout >
+            <lightning:layoutItem flexibility="grow">
+                {!v.center}
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

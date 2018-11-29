@@ -1,0 +1,43 @@
+.THIS .hideCmp {
+    display: none;
+  }
+  
+  .THIS .slds-has-error {
+    border-color: red !important;
+  }
+  
+  .THIS input[type="text"],
+  .THIS .uiInput--datetime,
+  .THIS select,
+  .THIS textarea {
+    width: 100% !important;
+  }
+
+  .THIS .slds-modal__content {
+    max-height: 650px;
+  }
+  
+  .THIS .slds-form-element__control .uiInput--select label:after {
+    top: 19px;
+  }
+  
+  .THIS .forcePageBlockItemEdit {
+    margin-bottom: 10px;
+  }
+  
+  .THIS .slds-modal__footer .greyButton {
+    margin-right: 10px;
+  }
+  
+  .THIS .errorMessage {
+    border:3px solid red;
+    background:#f2f2f2;
+    padding:15px 20px;
+    text-align:center;
+    border-radius:5px;
+  }
+  
+  .THIS .errorMessage h4 {
+    color:red !important;;
+    margin-bottom:0;
+  }

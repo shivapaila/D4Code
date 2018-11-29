@@ -1,0 +1,3 @@
+<apex:page standardController="Case_Line_Item__c" extensions="AshleyDirectLinkEncryption" action="{!openAD}">
+    <apex:slds />
+</apex:page>

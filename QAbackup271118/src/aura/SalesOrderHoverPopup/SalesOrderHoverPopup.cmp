@@ -1,0 +1,124 @@
+<aura:component implements="force:appHostable,force:hasRecordId,flexipage:availableForAllPageTypes,lightning:actionOverride" access="global" 
+                controller="SalesOrderHoverApexController">
+    <aura:attribute name="data" type="Object"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="PopupsoId" type="Id" />
+    <aura:attribute name="datalenght" type="integer" />
+    <aura:attribute name="Account" type="Id"/>
+    <aura:attribute name="SalesOrdLineItemData" type="Object"/>
+    <aura:attribute name="headerTitle" type="Aura.Component[]">
+        <h2>
+            <b>Sales Orders ({!v.datalenght}) </b>
+        </h2>
+    </aura:attribute>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+   
+    <lightning:card class="slds-card_boundary" iconName="custom:custom12" title="{!v.headerTitle}">
+        <lightning:spinner variant="brand" size="medium" aura:id="Id_spinner" class="slds-hide" /> 
+        <p class="slds-p-horizontal_small">
+          <div class="slds-scrollable--y" style="height: 15rem;">
+                <table class="slds-table slds-table--bordered slds-table_fixed-layout slds-no-row-hover slds-max-medium-table_stacked">
+                    <thead>
+                        <tr class="slds-text-title--caps">  
+                            <th scope="col" class="slds-text-align_center ">
+                                <div class="slds-truncate" title="">Sales Order</div>
+                            </th> 
+                            <th scope="col" class="slds-text-align_center " >
+                                <div class="slds-truncate" title="">Sales Status</div>
+                            </th> 
+                            <th scope="col" class="slds-text-align_center ">
+                                <div class="slds-truncate" title="">Purchase Value</div>
+                            </th>
+                            <th scope="col" class="slds-text-align_center ">
+                                <div class="slds-truncate" title="">Order Type</div>
+                            </th>
+                            <th scope="col" class="slds-text-align_center " >
+                                <div class="slds-truncate" title="">Delivery Date</div>
+                            </th>
+                            <th scope="col" class="slds-is-resizable slds-text-align_left slds-text-title_caps ">
+                                <div class="slds-truncate" title="">HOT Status</div>
+                            </th>
+                          </tr>
+                    </thead>
+				<!-- Fecthing the salesorder deatils -->
+                    <tbody>                        
+                        <aura:iteration var="Orders" items="{!v.data}">    
+                            <tr> 
+                                <td class="slds-text-align_center">
+                                    <a  href=""  data-value="{!Orders.Id}" 
+                                       onmouseenter="{!c.openPop}" aria-describedby="help" onmouseout="{!c.closePop}" 
+                                       onclick="{!c.navigateToRecord}" > 
+                                        {!Orders.phhSalesOrder__c}
+                                    </a>
+                                </td>
+                                <td class="slds-text-align_center" >
+                                    	{!Orders.phhSaleType__c}                                       
+                                </td>
+                                 <td class="slds-text-align_center" >
+                                   	    {!Orders.phhPurchaseValue__c}                                       
+                                </td> 
+                                <td class="slds-text-align_center" >
+                                        {!Orders.phhOrderType__c}                                       
+                                </td>
+                                 <td class="slds-text-align_center" >
+                                       <ui:outputDate format="MM/dd/yyyy" value="{!Orders.phhDatePromised__c}"/>                                      
+                                </td>
+                                <td class="slds-text-align_left" >
+                                        <ui:inputCheckbox aura:id="hotCheckBox" value="{!Orders.phhHot__c}"/> <aura:if isTrue="{!Orders.phhHot__c}">{!Orders.phhWindowBegin__c + ' - ' + Orders.phhWindowEnd__c} 
+                                        </aura:if>
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                   </table>
+            </div>
+        </p>
+        </lightning:card> 
+          
+         <section class="slds-popover  slds-hide  " role="dialog" id="help" style="position:fixed;" aura:id="pop">
+            <table aura:id="SalesorderID" class="slds-table slds-table--bordered  slds-align_absolute-left">  
+             <div class="slds-popover__body">
+               <header class="slds-popover__header slds-text-heading_small"><h3 id="dialog-heading-id-1" ><b>SalesOrder Line Items</b></h3></header>
+                <p > 
+                    <thead>
+                        <tr class="slds-text-title-caps">
+                            <th scope="col" class="slds-text-align_left">
+                                <div class="slds-truncate.slds-text-heading_small" title="">Item Sku</div>
+                            </th>                        
+                            <th scope="col" class="slds-text-align_left">
+                                <div class="slds-truncate.slds-text-heading_small" title="">Item Description</div>
+                            </th> 
+                            <th scope="col" class="slds-text-align_left">
+                                <div class="slds-truncate.slds-text-heading_small" title="">Quantity</div>
+                            </th>
+                            <th scope="col" class="slds-text-align_left">
+                                <div class="slds-truncate.slds-text-heading_small" title="">Delivery Type</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <!-- displaying the line item details based on salesorder -->
+                    <tbody>
+                        <aura:iteration var="LineItemValue" items="{!v.SalesOrdLineItemData}">    
+                            <tr>
+                                <td class="slds-text-align_left" >
+                                    {!LineItemValue.phdItemSKU__c}                                       
+                                </td>
+                                <td class="slds-text-align_left" >
+                                    {!LineItemValue.phdItemDesc__c}                                       
+                                </td>
+                                <td class="slds-text-align_center" >
+                                    {!LineItemValue.phdQuantity__c}                                       
+                                </td>
+                                <td class="slds-text-align_center" >
+                                    {!LineItemValue.phdDeliveryType__c}                                       
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </p>
+            </div>
+                </table>
+             </section> 
+              
+                      
+</aura:component>

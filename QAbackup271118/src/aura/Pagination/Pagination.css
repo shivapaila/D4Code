@@ -1,0 +1,16 @@
+.THIS .pageNumberWrapper {
+	border-radius: 0;
+    border: none;
+    background: #fff;
+    padding: 8px 16px;
+    line-height: 14px;
+    font-size: 12px;
+    margin:0 5px;
+}
+.THIS.paginationWrapper .slds-button-group button[disabled] {
+	background:#999;
+	cursor:not-allowed;
+}
+.THIS .smallMargin {
+    margin-right:5px;
+}

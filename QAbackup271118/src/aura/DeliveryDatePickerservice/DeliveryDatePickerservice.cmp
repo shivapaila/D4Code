@@ -1,0 +1,43 @@
+<aura:component controller="CheckoutController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:attribute name="GuestId" type="string"/>
+    <aura:attribute name="orderId" type="string"/>	
+    <aura:attribute name="orderLineId" type="string" />
+    <aura:attribute name="accountNumber" type="string" />	
+    <aura:attribute name="rdcId" type="string" />	
+    <aura:attribute name="deliveryMode" type="string" />
+    <aura:attribute name="selectedLineItems" type="List" />
+    <aura:attribute name="lineItem" type="List" />
+    <aura:attribute name="deliveryCalendar" type="Attributable"/>
+    <aura:attribute name="selectedDesiredDeliveryDate" type="String"/>
+    <aura:attribute name="isLoading" type="Boolean" default="false"/>
+    <aura:attribute name="selectedMonth" type="Attributable"/>	
+    <aura:attribute name="showCalender" type="Boolean" default="false"/>
+    <aura:attribute name="buttonClicked" type="Boolean" default="false"/>
+    <aura:attribute name="lineItemMap" type="List"/>
+    <aura:attribute name="showdatepicker" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.Init}"/>
+    <aura:handler event="c:DeliveryDateSelected" action="{!c.handleDeliveryDateSelected}"/>
+    <aura:registerEvent name="DeliveryDateChangeNotifyToCheckoutSummary" type="c:NotifyParentComponentEvent"/>
+    		<aura:if isTrue="{!v.showdatepicker}">
+            <div>
+                <input id="{!v.deliveryMode}" type="date" label="Choose Desired Delivery Date" value="{!v.selectedDesiredDeliveryDate}" class="uiInput--datetime uiInput--default" />
+                <!--ui:inputDateTime aura:id="{!v.deliveryMode}" label="Check Available Delivery Date" class="form-control"
+                                  value="{!v.selectedDesiredDeliveryDate}"  displayDatePicker="true" change="{!c.getDeliveryDate}" updateOn="change"/-->
+                <br />
+                <a id="Button" data-record="{!v.deliveryMode}"  onclick="{!c.getDeliveryDate}" class="marginRight">
+                     <small>Change Desired Date</small>
+                </a> 
+                <div class="calendar">
+                {!v.body}
+                    <!--c:DeliveryWindowLookup accountNumber="8888300" rdcId="480" selectedDesiredDeliveryDate="{!v.selectedDesiredDeliveryDate}" orderLineId="{!v.lineItem[0].Id}"/-->
+                    </div>
+                <a id="Button" data-record="{!v.deliveryMode}"  onclick="{!c.goBack}" class="orangeButton smallButton">Go Back</a>
+                </div>
+                <aura:set attribute="else">
+                    <aura:if isTrue="{!!v.buttonClicked}">
+                        <a class="orangeButton smallButton" data-record="{!v.deliveryMode}" onclick="{!c.pickdate}">Select Delivery Date</a>
+                    </aura:if>
+                </aura:set>
+    </aura:if>
+       
+</aura:component>

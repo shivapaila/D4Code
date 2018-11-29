@@ -1,0 +1,20 @@
+.THIS { 
+    width:100%;
+}
+.THIS .slds-float_left {
+    margin-top:21px;
+}
+.THIS .slds-badge {
+    background-color:#f68c2c;
+    color:#fff;
+    font-size:100%;
+}
+.THIS .selected {
+    background-color: #009900;
+    color:#fff;
+    font-size:100%;
+}
+.THIS .sWrapTest {
+    height:300px;
+    width:600px;
+}

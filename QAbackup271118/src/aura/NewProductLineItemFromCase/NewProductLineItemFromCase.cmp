@@ -1,0 +1,49 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride,force:lightningQuickAction" access="global" controller="NewProductLineFromCaseController">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="initializationData" type="Attributable" />
+    <aura:attribute name="isLoading" type="Boolean" default="false"/>
+    <aura:attribute name="openModal" type="boolean" default="false"/>
+    <aura:attribute name="openLineList" type="boolean" default="false"/>
+    <aura:attribute name="orderId" type="ID"/>
+    <aura:attribute name="options" type="List"/>
+    <aura:attribute name="mydata" type="Object"/>
+    <aura:attribute name="selectedRows" type="List" />
+    <aura:attribute name="lineItem" type="List"/>
+    <aura:attribute name="Sales_Order_id" type="id"/>
+    <aura:attribute name="selectedvals" type="List" />
+    <aura:attribute name="isSalesOrder" type="boolean" default="true"/>
+    <!-- aura:handler name="init" value="{!this}" action="{!c.myAction}" /-->
+
+    <aura:if isTrue="{!v.isLoading}">
+        <lightning:spinner aura:id="spinner" alternativeText="loading..."/>
+    </aura:if>
+
+    <div class="slds-card slds-align_absolute-center slds-form">
+        <lightning:button variant="base" label="New Product Line Item" onclick="{!c.openModal}" />
+    </div>
+    <div id="saleserror" class="alert alert-danger slds-theme_alert-texture slds-theme_warning slds-align_absolute-center" aria-hidden="true" role="alert"></div>
+    <aura:if isTrue="{!v.openModal}">
+        <div id="error" class="alert alert-danger slds-theme_alert-texture slds-theme_warning slds-align_absolute-center" aria-hidden="true" role="alert"></div>
+        <aura:if isTrue="{!v.openLineList}">
+            <div class="demo-only slds-align_absolute-center slds-text-align_center" >
+                <div  class="slds-table slds-table--bordered slds-table--fixed-layout slds-box slds-max-medium-table--stacked-horizontal slds-align_absolute-center slds-text-align_center" role="grid">  
+                    <div class="slds-text-align_center">
+                        <lightning:datatable columns="{!v.options}"
+                                             data="{!v.mydata}"
+                                             keyField="id"
+                                             selectedRows="{!v.selectedRows}"
+                                             onrowselection="{!c.getSelectedVal}"
+                                             aura:id="quoteField"
+                                             />
+                    </div>
+                </div>
+            </div>
+            <div class="slds-form-element">
+                <label class="slds-form-element__label">  </label>
+                <div class="slds-form-element__control">
+                    <button class="slds-button slds-button_brand" onclick="{!c.dosave}">save</button>
+                </div>
+            </div>
+        </aura:if>
+    </aura:if>
+</aura:component>

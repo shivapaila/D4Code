@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT">
+    <aura:attribute name="notifyParam" type="SObject"/>
+      <aura:attribute name="notifyParam1" type="SObject"/>
+</aura:event>

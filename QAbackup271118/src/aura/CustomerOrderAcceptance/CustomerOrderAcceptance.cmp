@@ -1,0 +1,58 @@
+<aura:component controller="CustomerOrderAcceptanceCntrl" access="global" implements="flexipage:availableForAllPageTypes">
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="guestId" type="String" />
+    <aura:attribute name="sigId" type="String" />
+    <aura:attribute name="entityName" type="String" />
+    <aura:attribute name="receiptUrl" type="String" />
+    
+    <aura:registerEvent name="NotifyParentCloseAcceptance" type="c:CloseModalEvent" />
+    <aura:registerEvent name="NotifyParentFinishedSign" type="c:CloseModalEvent" />
+    <!-- Need to fix this -->
+    <!--<ltng:require scripts="/resource/Jquery224" afterScriptsLoaded="{!c.handleScroll}"/>-->
+    <ltng:require scripts="/resource/Jquery224" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+
+    <div>
+        <section aura:id="tcDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+
+                <header class="slds-modal__header">
+                    <i class="fa fa-times float-right" onclick="{!c.cancelDialog}"></i>
+                    <h2 class="slds-text-heading--medium">{!$Label.c.Customer_Order_Acceptance}</h2>
+                </header>
+
+                <!--<ui:scrollerWrapper class="sWrapTest">-->
+                    <div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap">
+                        <div aura:id="tcsContent" class="tcsContent">
+                            <h4>{!$Label.c.AFHS}</h4>
+                            <br />
+                            <strong class="underline">{!$Label.c.Pending}</strong><br />
+                            <lightning:formattedRichText value="{!format($Label.c.Customer_Order_Acceptance_Terms,v.entityName)}"/>
+                        </div>
+                    </div>
+                <!--</ui:scrollerWrapper>-->
+                
+                <div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap signatureWrapper" style="padding-right:25px !important;">
+                    <!--<lightning:formattedRichText value="{!format($Label.c.Customer_Order_Acceptance_Terms,v.entityName)}"/>-->
+                        
+                    <div class="main text-center">
+                    	<BGSIGCAP:SignatureCapture aura:id="CoaSig" 
+                                                   recordId="{!v.sigId}" 
+                                                   startMsg="{!$Label.c.COA_Sign_Start_Msg}" 
+                                                   enterMsg="{!$Label.c.COA_Sign_Enter_Msg}"
+                                                   completeMsg="{!$Label.c.COA_Sign_Complete_Msg}" 
+                                                   saveAttachment="false"
+                                                   />
+                    </div>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning:button class="greyButton" aura:id="submit-button" variant="neutral" label="{!$Label.c.Cancel}" onclick="{!c.cancelDialog}" />
+                    <lightning:button class="orangeButton" aura:id="cancel-button" variant="brand" label="{!$Label.c.I_Accept}" onclick="{!c.goToNext}" />
+                </footer>
+            </div>
+        </section>
+ 
+    </div>
+</aura:component>

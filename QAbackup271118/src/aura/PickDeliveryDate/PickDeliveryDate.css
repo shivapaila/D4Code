@@ -1,0 +1,66 @@
+.THIS .dateTime-inputTime.form-element.form-element__control {
+    display: none;
+}
+.THIS .shippingMethodWrapper h4 {
+	margin-bottom:-5px;
+}
+.THIS .futureDateButtonWrapper {
+	margin:0;
+}
+.THIS .productTitle {
+	margin-bottom:-5px;
+}
+.THIS .deliveryMethodWrap {
+	margin-bottom:15px;
+	border-bottom:1px solid #f2f2f2;
+	padding-bottom:15px;
+}
+.THIS .cardWrapper {
+	background:#f2f2f2;
+	margin:5px 0 5px;
+}
+.THIS .deliveryMethodProducts {
+	margin-bottom:5px;
+	width:100%;
+    
+}
+.THIS .calendar .slds-badge {
+	background-color: #f68c2c;
+	font-size: 70%;
+	color: #fff;
+
+}
+
+.THIS .calendar .green {
+	background-color: #009900;
+	font-size: 11px;
+	display: block;
+	color: #fff;
+
+}
+
+.THIS .calendar .selected {
+    background-color: #009900;
+    color:#fff;
+}
+.THIS .sWrapTest {
+    height:300px;
+    width:1000px;
+}
+.THIS .calendar .tech-avail {
+width: 2;
+height: 0; 
+position: relative;
+top: -5px !important; 
+border-style: solid;
+border-width: 0 10px 10px 0;
+border-color: transparent #009900 transparent transparent;
+
+}
+.THIS .calendar .tech-availa  {
+width: 0;
+height: 0;
+border-style: solid;
+border-width: 0 20px 20px 0;
+border-color: transparent #0bb856 transparent transparent;
+}

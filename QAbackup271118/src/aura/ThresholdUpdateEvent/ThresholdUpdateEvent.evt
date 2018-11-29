@@ -1,0 +1,5 @@
+<aura:event type="COMPONENT" description="An event to Update THD or PDI in Shopping Cart Line Item  etc.">
+	<aura:attribute name="action" type="String"/>
+    <aura:attribute name="lineItemId" type="String"/>
+    <aura:attribute name="lineItemIds" type="String"/>
+</aura:event>

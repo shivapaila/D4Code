@@ -1,0 +1,647 @@
+<aura:component controller="ShoppingCartLineItemCmpCtrl" implements="c:ShoppingCartConstants" access="global">
+    <aura:attribute name="currentUserId" type="String"/>    
+    <aura:attribute name="inCheckoutPage" type="Boolean" default="false" />
+    <aura:attribute name="lineItemId" type="String" />
+    <aura:attribute name="productSKUId" type="String" />
+    <aura:attribute name="lineItem" type="Shopping_cart_line_item__c" default="{ 'sobjectType' : 'Shopping_cart_line_item__c' }"    />
+    <aura:attribute name="BestDate" type="String"/>
+    <aura:attribute name="msg" type="String"/>
+    <aura:attribute name="deliveryType" type="String"/>
+    <aura:attribute name="productDetail" type="ProductWrapper" />
+    <aura:attribute name="shippingWayList" type="PairObj[]" />
+    <aura:attribute name="discountReasonList" type="PairObj[]" />
+    <aura:attribute name="accountStoreInfo" type="String" />
+    <aura:attribute name="selectedDiscountType" type="String" />
+    <aura:attribute name="itemTotalPrice" type="Decimal" default="{!v.lineItem.List_Price__c*v.lineItem.Quantity__c}"/>
+    <aura:attribute name="averageDiscountCriteria" type="Decimal" default="0.00" />
+    <aura:attribute name="marketDiscountCriteria" type="Decimal" />
+    <aura:attribute name="fppTypes" type="WarrantyItemWrapper[]" />
+    <aura:attribute name="accountId" type="String" />
+    <aura:attribute name="showApproverSelectBox" type="Boolean" default="false" />
+    <aura:attribute name="isStarItem" type="Boolean" default="false" />
+    <aura:attribute name="zipcode" type="String"/>
+    <aura:attribute name="RendershpForUpdate" type="Boolean" />
+    <aura:attribute name="selectedShippingWay" type="String" />
+    <aura:attribute name="locked" type="Boolean" />
+    <aura:attribute name="SelectedWarranty" type="String" default='null' />
+    <aura:attribute name="opp" type="Opportunity" />
+    
+    <!-- DEF-0780 - ATC call -->
+    <aura:attribute name="bestDateMsg" type="String" default="Loading..."/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="init" value="{!v.RendershpForUpdate}" action="{!c.doInit}" />
+    <!-- helper components -->
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    <aura:registerEvent name="NotifyParentOpenDiscountModal" type="c:NotifyParentComponentEvent"/>
+    <aura:registerEvent name="shoppingCartLineItemEvent" type="c:ShoppingCartLineItemEvent"/>
+    <aura:registerEvent name="ThresholdUpdateEvent" type="c:ThresholdUpdateEvent"/>
+    <aura:handler event="c:DeliveryDateSelected" action="{!c.handleDeliveryDateSelected}"/>
+    
+    <!-- Threshold values -->
+    <aura:attribute name="Tresholdpopup" type="Boolean" default="false" />
+    <aura:attribute name="againTresholdpopup" type="Boolean" default="true"/>
+    <aura:attribute name="Premiumhomedelivery" type="Boolean" default="false" />
+    <aura:attribute name="freehomedelivery" type="Boolean" default="false" />
+    <aura:attribute name="tresholddeliveryvideo" type="Boolean" default="false" />
+    <aura:attribute name="deliveryvideopopup" type="Boolean" default="false" />
+    <aura:attribute name="tresholdEnabled" type="String" />
+    <aura:attribute name="tresholdenabledresponse" type="String" />
+    <!-- <aura:attribute name="tresholdenabledresponse" type="Object[]" />
+   
+            <aura:if isTrue="{!v.inCheckoutPage}">
+        <div class="row checkoutCartItems">
+            <div class="col-sm-5">
+                <div class="currentCartImage" style="{!'background-image:url(' + v.productDetail.ecommSmallImage + ')'}"></div>
+            </div>
+            <div class="col-sm-7">
+                <div class="itemTitle">{!v.isStarItem ? v.productSKUId : v.productDetail.productTitle}</div>
+                <small class="currentCartItemPrice">
+                    <strong>
+                        Quantity :
+                        <ui:outputNumber value="{!v.lineItem.Quantity__c}" /><br/>
+                        <ui:outputCurrency value="{!v.lineItem.Last_Price__c}" /><br/>
+                        <aura:if isTrue="{!v.lineItem.Delivery_Mode__c == 'HD'}">
+                                Home Delivery 
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.lineItem.Delivery_Mode__c == 'CPW'}">
+                                Customer Pickup Warehouse
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.lineItem.Delivery_Mode__c == 'CPS'}">
+                                Customer Pickup Store
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.lineItem.Delivery_Mode__c == 'DS'}">
+                                Direct Ship to Consumer
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.lineItem.Delivery_Mode__c== 'TW'}">
+                                Take With
+                            </aura:if>
+                    </strong>
+                </small>
+            </div>
+        </div>
+    </aura:if>-->
+    
+    
+    <aura:if isTrue="{!!v.inCheckoutPage}">
+        <div class="cardWrapper" aura:id="{!v.lineItemId}">
+            <div class="cartImageWrapper" style="{! 'background-image:url(' + v.lineItem.eComm_Small_Image__c + ');'}"></div>
+            
+            <aura:if isTrue="{!v.isStarItem}">
+                
+                <div class="cardContent">
+                    <div class="productTitle">
+                        <h5>
+                            <ui:outputText value="{!v.productSKUId}" />
+                        </h5>
+                        
+                    </div>
+                    <div class="priceWrapper">
+                        <h4>
+                            <ui:outputCurrency value="{!v.lineItem.Last_Price__c}" />
+                        </h4>
+                    </div>
+                    <div class="footerRowWrapper">
+                        
+                        <div class="cartItemActionsWrapper">
+                            <ui:menu >
+                                <ui:menuTriggerLink aura:id="trigger">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </ui:menuTriggerLink>
+                                <ui:menuList class="actionMenu" aura:id="actionMenu">
+                                    <a data-record="deleteConfirmContainer" onclick="{!c.openModal}">
+                                        <div class="iconWrapper">
+                                            <i class="far fa-trash-alt" />
+                                        </div>
+                                        Delete
+                                    </a>
+                                </ui:menuList>
+                            </ui:menu>
+                        </div>
+                    </div>
+                </div>
+                <aura:set attribute="else">
+                    
+                    <div class="cardContent">
+                        
+                        <div class="shippingWrapper">
+                            <aura:if isTrue="{!v.lineItem.Delivery_Mode__c == 'HD'}">
+                                <a class="shippingIcon" data-record="shippingContainer" onclick="{!c.openModal}">
+                                    <i class="far fa-home"></i>
+                                </a>
+                                <aura:set attribute="else">
+                                    <aura:if isTrue="{!v.lineItem.Delivery_Mode__c == 'DS'}">
+                                        <a class="shippingIcon" data-record="shippingContainer" onclick="{!c.openModal}">
+                                            <i class="far fa-envelope"></i>
+                                        </a>
+                                        <aura:set attribute="else">
+                                            <aura:if isTrue="{!v.lineItem.Delivery_Mode__c == 'TW'}">
+                                                <a class="shippingIcon" data-record="shippingContainer" onclick="{!c.openModal}">
+                                                    <i class="far fa-shopping-bag"></i>
+                                                </a>
+                                                <aura:set attribute="else">
+                                                    <aura:if isTrue="{!v.lineItem.Delivery_Mode__c == 'CPW'}">
+                                                        <a class="shippingIcon" data-record="shippingContainer" onclick="{!c.openModal}">
+                                                            <i class="far fa-warehouse-alt"></i>
+                                                        </a>
+                                                        <aura:set attribute="else">
+                                                            <aura:if isTrue="{!v.lineItem.Delivery_Mode__c == 'CPS'}">
+                                                                <a class="shippingIcon" data-record="shippingContainer" onclick="{!c.openModal}">
+                                                                    <i class="far fa-car"></i>
+                                                                </a>
+                                                                <aura:set attribute="else">
+                                                                    <a class="shippingIcon" data-record="shippingContainer" onclick="{!c.openModal}">
+                                                                        <i class="far fa-truck"></i>
+                                                                    </a>
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:set>
+                                    </aura:if>    
+                                </aura:set>
+                            </aura:if>					
+                        </div>
+                        
+                        <div class="productTitle">
+                            <a data-record="{!v.lineItem.Product_SKU__c}" onclick="{!c.navigateToProd}">
+                                <h5> 
+                                    <ui:outputText value="{!v.lineItem.Product_Title__c}" />
+                                </h5>
+                            </a>
+                        </div>
+                        
+                        <div class="qtyWrap">
+                            <aura:if isTrue="{!and(!v.locked, !v.inCheckoutPage)}">
+                                <div class="quantityButtonWrapper col-sm-3">
+                                    <!--<button class="float-left quantityButton" onclick="{!c.decrement}">
+                                <i class="fa fa-minus"></i>
+                            </button>-->
+                                    <div class="float-left">
+                                        <ui:inputNumber aura:id="itemQuantity" value="{!v.lineItem.Quantity__c}" size="3" updateOn="change" change="{!c.mannualUpdateQuantity}"
+                                                        />
+                                    </div>
+                                    <!--<button class="float-left quantityButton" onclick="{!c.increment}">
+                                <i class="fa fa-plus"></i>
+                            </button>-->
+                                </div>
+                                <aura:set attribute="else">
+                                    (
+                                    <ui:outputNumber value="{!v.lineItem.Quantity__c}" />)
+                                </aura:set>
+                            </aura:if>
+                            <div class="col-sm-7 skuAndColorWrapper">
+                                <a data-record="{!v.lineItem.Product_SKU__c}" onclick="{!c.navigateToProd}">
+                                    <div class="skuAndColor ">
+                                        <ui:outputText value="{!v.lineItem.Product_SKU__c}" /> (
+                                        <ui:outputText value="{!v.lineItem.Item_Color__c}" />)
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        <aura:if isTrue='{!v.msg != null}'>
+                            <div class="estimatedDelivery"><small>{!v.msg}</small></div>
+                        </aura:if>
+                        <div class="bestDelivery">
+                            <aura:if isTrue="{!and(v.BestDate != null)}">
+                                
+                                <small>Best Date:&nbsp;
+                                    <ui:outputDate value="{!v.BestDate}" format='MM.dd.yyyy'/>  
+                                </small>
+                                <aura:set attribute="else">
+                                    
+                                    
+                                    <small>Best Date:&nbsp;
+                                        <ui:outputText value="{!v.bestDateMsg}" />
+                                    </small>
+                                    
+                                    
+                                </aura:set>
+                            </aura:if>
+                            
+                        </div>
+                        <div class="deliverytype">
+                            <aura:if isTrue="{!v.lineItem.DeliveryType__c != null}">
+                                <small>Delivery Type:&nbsp;
+                                    <ui:outputText value="{!v.lineItem.DeliveryType__c}" />
+                                </small>
+                            </aura:if>
+                        </div>
+                        <div class="discountStatusWrapper">
+                            <aura:if isTrue="{!v.lineItem.Discount_Status__c != 'Not Applicable'}">
+                                <ui:outputText value="{!v.lineItem.Discount_Status__c}" />
+                            </aura:if>
+                        </div>
+                        
+                        <div class="priceWrapper">
+                            <aura:if isTrue="{!greaterthan(v.lineItem.List_Price__c,v.lineItem.Discount_Price__c)}">
+                                <h4 class="strikeThrough">
+                                    <ui:outputCurrency value="{!v.lineItem.List_Price__c*v.lineItem.Quantity__c}" />
+                                </h4>
+                            </aura:if>
+                            <h4>
+                                <ui:outputCurrency value="{!v.lineItem.Last_Price__c}" />
+                            </h4>
+                        </div>
+                        
+                        <div class="footerRowWrapper">
+                            <aura:if isTrue="{!v.lineItem.WarrantySku__c != null}">
+                                <div class="fppWrapper" data-record="FPPContainer" onclick="{!c.openModal}">
+                                    FPP
+                                    <i class="far fa-shield-check"></i>
+                                </div>
+                            </aura:if>
+                            <!-- OUT FOR NOW 1/18/2018
+                <a data-record="{!v.lineItemId}" onclick="{!c.moveToWishlist}"><i class="far fa-heart"></i> Move to Wishlist</a>
+                -->
+                            
+                            <div class="cartItemActionsWrapper">
+                                <ui:menu >
+                                    <ui:menuTriggerLink aura:id="trigger">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </ui:menuTriggerLink>
+                                    <ui:menuList class="actionMenu" aura:id="actionMenu">
+                                        
+                                        <a data-record="popUpContainer" onclick="{!c.openDiscountModal}" class="discountWrapper">
+                                            <div class="iconWrapper">
+                                                <i class="far fa-percent"></i>
+                                            </div> Discount</a>
+                                        <br />
+                                        <a data-record="FPPContainer" onclick="{!c.openModal}">
+                                            <div class="iconWrapper">
+                                                <i class="far fa-shield-check"></i>
+                                            </div>
+                                            FPP
+                                        </a>
+                                        <br />
+                                        
+                                        <div class="asIsWrapper">
+                                            <lightning:input type="checkbox" class="asis" label="Mark Item As Is" name="asis" checked="{!v.lineItem.As_Is__c}" onchange="{!c.changeAsIs}"
+                                                             />
+                                        </div>
+                                        <a data-record="deleteConfirmContainer" onclick="{!c.openModal}">
+                                            <div class="iconWrapper">
+                                                <i class="far fa-trash-alt" />
+                                            </div>
+                                            Delete
+                                        </a>
+                                        <br />
+                                    </ui:menuList>
+                                </ui:menu>
+                            </div>
+                        </div>
+                    </div>
+                </aura:set>
+                
+            </aura:if>
+            
+            
+        </div>
+        
+        <div aura:id="popUpContainer" role="dialog" class="slds-modal slds-fade-in-close">
+            
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <i class="fa fa-times float-right" data-record="popUpContainer" onclick="{!c.cancelModal}"></i>
+                    
+                    <h4 class="slds-text-heading--medium">Discount for: {!v.lineItem.Product_Title__c}</h4>
+                </div>
+                
+                <div class="slds-modal__content slds-p-around--medium">
+                    <!-- <div class="row">
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-6 maxDiscountWrapper">
+                        <span>Max Discount Allowed: {!v.body}%</span>
+                    </div>
+                    <div class="col-sm-3"></div>
+                </div>-->
+                    
+                    <div class="row">
+                        <div class="col-sm-4 labelShrink">
+                            <!--  <lightning:input type="radio" aura:id="discountFlag" label="Percent Discount" name="{!v.lineItemId+'_Percent'}" value="Percent"
+                            onchange="{!c.handleDiscountRadioClick}" checked="{!v.selectedDiscountType=='Percent' ? true:false}"
+                        />-->
+                            Discount
+                            <br />
+                            
+                            <lightning:input type="number" 
+                                             aura:id="percentDiscountAmount" name="percentDiscountAmount" 
+                                             value="{!v.lineItem.Discount__c}" formatter="percent-fixed" step="0.01"
+                                             max="100"
+                                             onchange="{!c.changeDiscount}"
+                                             />
+                        </div>
+                        
+                        
+                        <div class="col-sm-4 labelShrink">
+                            <!--    <lightning:input type="radio" aura:id="discountFlag" label="Flat Discounted Amount" name="{!v.lineItemId+'_Flat'}" value="Flat"
+                            onchange="{!c.handleDiscountRadioClick}" checked="{!v.selectedDiscountType=='Flat' ? true:false}"
+                        />-->
+                            Flat Discounted Amount
+                            <br />
+                            <lightning:input type="number" 
+                                             aura:id="flatDiscountAmount" name="flatDiscountAmount"  
+                                             value="{!v.lineItem.Flat_Discounted_Amount_On_Total__c}"
+                                             onchange="{!c.changeDiscount}" 
+                                             formatter="currency" step="0.01"
+                                             max="{!v.lineItem.List_Price__c*v.lineItem.Quantity__c}" />
+                            
+                            
+                            
+                        </div>
+                        <div class="col-sm-4 labelShrink">
+                            <!-- <lightning:input type="radio" aura:id="discountFlag" label="Price" name="{!v.lineItemId+'_Price'}" value="Price"
+                            onchange="{!c.handleDiscountRadioClick}" checked="{!v.selectedDiscountType=='Price' ? true:false}"
+                        />-->
+                            Price
+                            <br />
+                            
+                            <lightning:input type="number" 
+                                             aura:id="itemsPrice" name="itemsPrice"  value="{!v.lineItem.List_Price_on_Total__c}"
+                                             onchange="{!c.changeDiscount}" 
+                                             formatter="currency" step="0.01"
+                                             max="{!v.lineItem.List_Price__c*v.lineItem.Quantity__c}"/>
+                            
+                            
+                        </div>
+                        
+                    </div>
+                    
+                    <aura:if isTrue="{!v.showApproverSelectBox}">
+                        <div class="row">
+                            
+                            <aura:if isTrue="{!!v.locked}">
+                                <div class="col-sm-4 approverLabel">Approver:</div>
+                                <div class="col-sm-8">
+                                    <c:LookupComponent objectName="User" fieldSet="['Name','Id']"   whereCondition="{!' AND One_Source_ID__c =\''+v.accountStoreInfo+'\' AND Id != \''+v.currentUserId+'\''}"
+                                                       placeholder="Start Typing Approver's Name" comparisonField="['Name']" primaryDisplayField="Name"
+                                                       alternateDisplayField="['Name']" minimumCharacter="2" lightningIconName="standard:user" uniqueLookupIdentifier="testUser"
+                                                       lookupId="{!v.lineItem.Discount_Approver__c}" value="{!v.value}" readOnly="false" required="true"
+                                                       requiredErrorMessage="Approver is required" />
+                                </div>
+                                <aura:set attribute="else">
+                                    <div class="col-sm-4">Approver:</div>
+                                    <div class="col-sm-8">
+                                        <ui:outputText value="{!v.lineItem.Discount_Approver__r.Name}" />
+                                    </div>
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                    </aura:if>
+                    <div class="hideLabel">
+                        <small>Discount Reason</small>
+                        <lightning:select aura:id="discountReasonOption" name="selectedDiscountReason" class="">
+                            <option value="null">--None--</option>
+                            <aura:iteration items="{!v.discountReasonList}" var="discountReason">
+                                <option value="{!discountReason.value}">{!discountReason.label}</option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </div>
+                    
+                    <div class="hideLabel">
+                        <small>This item / All items</small>
+                        <lightning:select aura:id="discountApplyOption" name="selectedDiscountApplyOption" class="" onchange="{!c.changeDiscount}">
+                            <option value="0">Apply to this item</option>
+                            <option value="1">Apply to all items</option>
+                        </lightning:select>
+                    </div>
+                </div>
+                
+                <div class="slds-modal__footer">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <aura:if isTrue="{!v.lineItem.Discount_Status__c != 'Not Applicable'}">
+                                <ui:outputText value="{!v.lineItem.Discount_Status__c}" />
+                            </aura:if>
+                        </div>
+                        <div class="col-sm-4">
+                            
+                            <a data-record="popUpContainer" class="greyButton" onclick="{!c.cancelModal}">Cancel</a>
+                            
+                            <aura:if isTrue="{!!v.locked}">
+                                <a class="orangeButton" onclick="{!c.updateDiscount}">Select</a>
+                            </aura:if>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <div aura:id="FPPContainer" role="dialog" class="slds-modal slds-fade-in-close">
+            
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <i class="fa fa-times float-right" data-record="FPPContainer" onclick="{!c.cancelModal}"></i>
+                    <h3 class="slds-text-heading--medium">FPP for: {!v.lineItem.Product_Title__c}</h3>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium text-center">
+                    <div class="row">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-8 uiInput--select">
+                            
+                            <label></label>
+                            <!--   <select id="fppTypes" class="select slds-input" onchange="{!c.createFpp}">-->
+                            <select id="fppTypes" class="select slds-input" onchange="{!c.updateFPP}">
+                                <Option text="" label="Select a FPP " disabled="true" selected='selected' />
+                                <aura:iteration items="{!v.fppTypes}" var="opts" indexVar="index">
+                                    <!--   <aura:if isTrue="{!v.lineItem.Related_SKU__r.Product_SKU__c == opts.Warrantyitem}">-->
+                                    
+                                    <aura:if isTrue="{!v.lineItem.WarrantySku__c == opts.Warrantyitem}">
+                                        <Option text="{!opts.Warrantyitem}" label="{!opts.Warrantyitem}" selected='selected' />
+                                        <aura:set attribute="else">
+                                            <Option text="{!opts.Warrantyitem}" label="{!opts.Warrantyitem}" />
+                                        </aura:set>
+                                    </aura:if>
+                                </aura:iteration>
+                            </select>
+                        </div>
+                        <div class="col-sm-2"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center removeFpp">
+                            <aura:if isTrue="{!v.lineItem.WarrantySku__c != null}">
+                                <a class="greyButton" data-record="{!v.lineItemId}" onclick="{!c.deleteFPP}">Remove Selected FPP</a>
+                            </aura:if>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div aura:id="shippingContainer" role="dialog" class="slds-modal slds-fade-in-close">
+            
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <i class="fa fa-times float-right" data-record="shippingContainer" onclick="{!c.cancelModal}"></i>
+                    
+                    <h3 class="slds-text-heading--medium">Delivery Method for: {!v.lineItem.Product_Title__c}</h3>
+                </div>
+                <div  class="slds-modal__content slds-p-around--medium">
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col">
+                            <aura:iteration items="{!v.shippingWayList}" var="shippingWay">
+                                <div aura:id="shippingWayRadio">
+                                    <lightning:input type="radio" aura:id="shippingWay" label="{!shippingWay.label}" name="{!v.lineItemId+'_'+shippingWay.value}"
+                                                     value="{!shippingWay.value}" onchange="{!c.handleShippingWayRadioClick}" checked="{!v.selectedShippingWay==shippingWay.value ? true:false}"
+                                                     />
+                                </div>
+                            </aura:iteration>
+                            
+                        </div> 
+                        <div class="slds-col slds-col slds-size_8-of-12 slds-col slds-border_left slds-border_bottom slds-border_right slds-border_top">
+                            <!--<aura:iteration items="{!v.tresholdenabledresponse}" var="th">-->
+                            <aura:if isTrue="{!v.tresholdenabledresponse == '1'}"> 
+                                <aura:if  isTrue="{!or(v.lineItem.Delivery_Mode__c == 'HD', v.Tresholdpopup)}" > 
+                                    <aura:if isTrue="{!v.againTresholdpopup}"> 
+                                        <h3 class="slds-text-heading--medium">Choose Your method of delivery</h3>
+                                        <div class="slds-p-left_large">
+                                            <lightning:input type="radio" aura:id="Premiumdelivery" name="Premiumhomedelivery" label="{!$Label.c.PremiumDeliveryCharge}" value="{!v.Premiumhomedelivery}" onchange="{!c.checkPremiumhomedelivery}" checked="{!v.Premiumhomedelivery}"/>
+                                            <p class="slds-p-left_large slds-text-title_bold">Includes :</p>
+                                            <div class="slds-grid slds-gutters slds-p-left_x-large" style="background-color: rgb(254,251,250);">
+                                                <div>
+                                                    <div> 
+                                                        <p>1.&nbsp;<lightning:icon iconName="utility:home" size="small" />Placed in Room of Choice</p>
+                                                    </div>
+                                                    <br/>
+                                                    <div>
+                                                        <p>2.&nbsp;<lightning:icon iconName="utility:custom_apps" size="small" /> &nbsp; Assembly and Setup</p>
+                                                    </div>
+                                                    <br/>
+                                                    <div>
+                                                        <p>3.&nbsp;<lightning:icon iconName="utility:archive" size="small" /> &nbsp; Packing Removal</p>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-border_left slds-border_right">
+                                                    <div class="slds-p-top_x-large">
+                                                        <!--  <lightning:input type="radio" aura:id="deliveryvideo" name="tresholddeliveryvideo" label="Delivery Video" value="{!v.tresholddeliveryvideo}" onchange="{!c.checkdeliveryvideo}" checked="{!v.tresholddeliveryvideo}"/> --> 
+                                                        <c:AshleyDeliveryVideo />
+                                                    </div>	
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <div class="slds-p-left_large">
+                                            <lightning:input type="radio" aura:id="freetreshold" name="freehomedelivery" label="Free Threshold Home Delivery" value="{!v.freehomedelivery}" onchange="{!c.checkfreehomedelivery}" checked="{!v.freehomedelivery}"/>
+                                            <p class="slds-p-left_large">Delivered Through fast doorway.You are responsible for assembly,setup and Packaging removal.</p>
+                                            <br/>
+                                            <p class="slds-p-left_large">Usually delivers 2 to 3 weeks.</p>
+                                            <p class="slds-p-left_large">Fulfilled By: kingswere Furniture LLC an Ashley Furniture HomeStore</p>    
+                                        </div>
+                                        <!-- <div>
+                                            <lightning:button class="slds-align_absolute-center" variant="brand" label="Done" title="Done" onclick="{!c.donetreshold }" /> 
+                                            
+                                        </div>  -->
+                                        
+                                        
+                                    </aura:if>  
+                                </aura:if>
+                            </aura:if>
+                            <!--</aura:iteration> -->
+                        </div> 
+                    </div>
+                </div>
+                <div class="slds-modal__footer">
+                    <div class="text-right">
+                        <a data-record="shippingContainer" class="greyButton" onclick="{!c.cancelModal}">Cancel</a>
+                        <aura:if isTrue="{!!v.locked}">
+                            <a class="orangeButton" data-record="{!v.productSKUId}" onclick="{!c.updateDeliveryMode}">Select</a>
+                        </aura:if>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+        
+        <div aura:id="deleteConfirmContainer" role="dialog" class="slds-modal slds-fade-in-close">
+            
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <i class="fa fa-times float-right" data-record="deleteConfirmContainer" onclick="{!c.cancelModal}"></i>
+                    
+                    <h4 class="slds-text-heading--medium">Delete Item: {!v.lineItem.Product_Title__c}?</h4>
+                </div>
+                
+                <div class="slds-modal__content slds-p-around--medium text-center modalSizeFix">
+                    <p>Are you sure you want to delete this item?</p>
+                </div>
+                <div class="slds-modal__footer">
+                    <div class="text-right">
+                        <a data-record="deleteConfirmContainer" class="greyButton" onclick="{!c.cancelModal}">Cancel</a>
+                        <a class="orangeButton" data-record="{!v.lineItemId}" onclick="{!c.deleteLineItem}">Yes</a>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.inCheckoutPage}">     
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_2-of-4">
+                <div class="cartImageWrapper" style="{!'background-image:url(' + v.lineItem.eComm_Small_Image__c + ')'}"></div>
+            </div>
+            <div class="slds-col slds-size_2-of-4">
+                
+                <div>
+                    <a data-record="{!v.lineItem.Product_SKU__c}" onclick="{!c.navigateToProd}">
+                        <h5 class="checkout"> 
+                            <ui:outputText value="{!v.lineItem.Product_Title__c.length>0 ? v.lineItem.Product_Title__c:v.lineItem.Product_SKU__c}" />
+                        </h5>
+                    </a>
+                </div>
+                <div>
+                    <h4 class="checkout">
+                        Quantity:
+                        <ui:outputNumber value="{!v.lineItem.Quantity__c}" />
+                    </h4>
+                </div>
+                <div>
+                    <h4 class="checkout">
+                        <ui:outputCurrency value="{!v.lineItem.Last_Price__c}" />
+                    </h4>
+                </div>
+                
+                
+                <div>
+                    <h4  class="homeDelivery">
+                        <!--Home Delivery <br/> <ui:outputDate value="{!v.BestDate}" format='MM.dd.yyyy'/-->
+                        <!--REQ-450-->
+                        <aura:if isTrue="{!v.lineItem.Delivery_Mode__c == 'HD'}">
+                            Home Delivery 
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.lineItem.Delivery_Mode__c == 'CPW'}">
+                            Customer Pickup Warehouse
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.lineItem.Delivery_Mode__c == 'CPS'}">
+                            Customer Pickup Store
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.lineItem.Delivery_Mode__c == 'DS'}">
+                            Direct Ship to Consumer
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.lineItem.Delivery_Mode__c== 'TW'}">
+                            Take With
+                        </aura:if>
+                        <br/> <ui:outputDate value="{!v.lineItem.DeliveryDate__c}" />
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <hr/>
+    </aura:if>  
+    
+    
+    
+    <div class="slds-modal-backdrop slds-modal-backdrop--close" aura:id="backdropContainer"></div>
+</aura:component>

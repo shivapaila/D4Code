@@ -1,0 +1,21 @@
+<aura:component >
+    <aura:attribute name="ratingClass" type="String" />
+ 	<aura:attribute name="rating" type="Double" /> 
+
+    <!-- STAR RATING -->
+    <div class="{!v.ratingClass}">
+        <aura:iteration items="1,2,3,4,5" var="i">
+            <aura:if isTrue="{!lessthanorequal(i,v.rating)}">
+                <span class="fas fa-star checked"></span>
+            </aura:if>
+            <aura:if isTrue="{!greaterthan(i,v.rating)}">
+                <aura:if isTrue="{!lessthan(i,v.rating+1)}">
+                    <span class="fas fa-star-half checked"></span>
+                    <aura:set attribute="else">
+                        <span class="fas fa-star"></span>
+                    </aura:set>
+                </aura:if>
+            </aura:if>
+        </aura:iteration>
+    </div>
+</aura:component>

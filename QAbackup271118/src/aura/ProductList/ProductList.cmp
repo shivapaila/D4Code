@@ -1,0 +1,117 @@
+<aura:component implements="flexipage:availableForAllPageTypes" controller="ProductListCmpCtrl" access="global">
+    <aura:attribute name="parentCategoryId" type="String" />
+
+    <!--Search Products-->
+    <aura:attribute name="searchKey" type="String" />
+
+    <!--//UnComment ProductListFilterWrapper line if use Filter API-->
+    <aura:attribute name="categoryProductList" type="ProductListFilterWrapper[]" />
+    <aura:attribute name="categoryProductListToShow" type="ProductListFilterWrapper[]" />
+  	<aura:attribute name="showcustomerModal" type="Boolean" default="false" />
+  
+    <!--   //Comment ProductWrapper line if use Filter API-->
+    <!-- <aura:attribute name="categoryProductList" type="ProductWrapper[]"/>
+    <aura:attribute name="categoryProductListToShow" type="ProductWrapper[]"/>-->
+    <!--   //Comment until here-->
+    <aura:attribute name="totalDepth" type="Integer" />
+
+    <aura:attribute name="initialRow" type="Integer" required="true" default="12" />
+    <aura:attribute name="cursorIndex" type="Integer" default="0" />
+    <aura:attribute name="apiCursorIndex" type="Integer" default="0" />
+
+    <aura:attribute name="loadMoreDepth" type="Integer" required="true" default="12" />
+    <aura:attribute name="hasMore" type="Boolean" default="false" />
+    <aura:attribute name="viewLoadMoreButton" type="Boolean" default="false" />
+    <aura:attribute name="priceZone" type="String" />
+    <aura:attribute name="selectedProductDetail" type="ProductWrapper" />
+    <aura:attribute name="selectedProductPrice" type="ProductPriceWrapper"/>
+    
+
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="ProductDetailCheckNotifyToProductList" event="c:NotifyParentComponentEvent" action="{!c.updateProductPriceValidFlag}"
+    />
+    <aura:handler name="NotifyParentOpenCustomerModal" event="c:NotifyParentComponentEvent" action="{!c.openCustomModal}"/>
+    
+    <!-- In case add to cart for new guest, refresh concierge_head active cart numbers,so refresh whole page-->
+    <aura:handler name="FinishedAddToCart" event="c:NotifyParentComponentEvent" action="{!c.closeCustomerModalAndRefresh}"/>
+  	
+	<!-- event for notify concierge header to refresh-->
+     <aura:registerEvent name="NotifyHeaderComponentEvent" type="c:NotifyHeaderComponentEvent"/>
+
+    <div aura:id="productListPage">
+        <div class="filterRow">
+
+            <div class="row">
+                <div class="col-sm-3">
+                    <lightning:select aura:id="selectedPriceScope" name="selectedPriceScope" label="" onchange="{!c.switchFilter}">
+
+                    </lightning:select>
+                </div>
+
+                <div class="col-sm-3">
+                    <lightning:select aura:id="selectedColorType" name="selectedColorType" label="" onchange="{!c.switchFilter}">
+
+                    </lightning:select>
+                </div>
+
+                <div class="col-sm-3">
+                    <lightning:select aura:id="selectedFabricType" name="selectedFabricType" label="" onchange="{!c.switchFilter}">
+
+                    </lightning:select>
+                </div>
+
+                <div class="col-sm-3">
+                    <lightning:select aura:id="selectedLifestyleType" name="selectedLifestyleType" label="" onchange="{!c.switchFilter}">
+
+                    </lightning:select>
+                </div>
+            </div>
+
+        </div>
+        <!--   -->
+        <div class="row">
+            
+            <ul aura:id="productListWrapper" class="productListWrapper">
+                <aura:iteration items="{!v.categoryProductListToShow}" var="product">
+               	<c:ProductDetailCheck productDetailId="{!product.sku}" productDetail="{!product}" parentCategoryId="{!v.parentCategoryId}"/>
+                </aura:iteration>
+            </ul>
+            
+        </div>
+        <aura:if isTrue="{!v.viewLoadMoreButton}">
+            <aura:if isTrue="{!v.hasMore}">
+                <div class="text-center">
+                    <a class="orangeButton" onclick="{!c.loadMore}">{!$Label.c.LoadMoreLabel}</a>
+                </div>
+                <aura:set attribute="else">
+                    <aura:if isTrue="{!v.categoryProductList.length==0}">
+                        No Product Matched.
+                    </aura:if>
+                </aura:set>
+            </aura:if>
+            <aura:set attribute="else">
+                <lightning:spinner aura:id="largeSpinner" variant="brand" size="large"/>
+            </aura:set>
+        </aura:if>        
+          <!-- select customer modal --> 
+        <aura:if isTrue="{!v.showcustomerModal}">
+            <section aura:id="customerModal" role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="image-modal" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <i class="fa fa-times float-right" onclick="{! c.closeCustomerModal }" />
+                        <h3 class="slds-text-heading--medium">Add to Cart</h3>
+                    </header>
+                    <div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap modalFix">
+                         <c:MyCustomers showSelectButton="true" productDetail="{!v.selectedProductDetail}" productPrice="{!v.selectedProductPrice}" quantity="1"/>
+                    </div>
+                </div>
+            </section>
+        </aura:if>
+      <!-- backdrop for modals -->
+        <div class="slds-backdrop" aura:id="backdrop">
+        </div>
+    </div>
+   
+</aura:component>

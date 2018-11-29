@@ -1,0 +1,43 @@
+<aura:component access="global" 
+                controller="MultiPaymentMethodsCtrl"
+                implements="flexipage:availableForAllPageTypes">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="paymentInfo" type="PaymentMethodWrapper"/> 
+    <aura:attribute name="termOptions" type="FinanceTermsWrapper[]"/> 
+    <aura:attribute name="selectedTermCode" type="String"/> 
+
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+
+    <!--<aura:registerEvent name="NotifyParentCloseModal" type="c:CloseModalEvent"/>-->
+    <aura:registerEvent name="notifyTermsSelected" type="c:ConciergeFinancingTermsSelected"/>
+
+    <div>
+        <section aura:id="tcDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+            <div class="">
+
+                <div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap">
+                    <lightning:spinner aura:id="termsSpinner" />
+
+                    <div>Please Select Financing Terms</div>
+                    <!-- finance API defect fix - added onchange -->
+                    <lightning:select aura:id="terms" name="terms"
+                                      class="col-sm-12"
+                                      value="{!v.selectedTermCode}"
+                                      label="Finace Terms"
+                                      onchange="{!c.setThirdPartyTermsCode}">
+                        <option value="">Please Select an Option</option>
+                        <aura:iteration items="{!v.termOptions}" var="item">
+                            <option value="{!item.Code}">{!item.Description}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning:button aura:id="submit-button" variant="neutral" label="Cancel" onclick="{!c.closeDialog}" />
+                    <lightning:button aura:id="cancel-button" variant="brand" label="Submit" onclick="{!c.closeDialogSuccess}" />
+                </footer>
+            </div>
+        </section>
+    </div>
+
+</aura:component>

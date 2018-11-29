@@ -1,0 +1,74 @@
+<aura:component implements="flexipage:availableForAllPageTypes" controller="ProductHomeCmpCtrl" access="global" >
+    <aura:attribute name="categoryTree" type="ProductCategoryWrapper"/>
+    <aura:attribute name="parentCategoryId" type="String"/>
+    <aura:attribute name="categoryBreadCrumbLink" type="ProductCategoryWrapper[]"/>
+    <aura:attribute name="productDetailId" type="String"/>
+    <aura:attribute name="productDetailTitle" type="String"/>    
+    <aura:attribute name="noCategoryDropdownList" type="boolean" default="false"/>
+    <aura:attribute name="searchKey" type="String" default="" />
+    <aura:attribute name="isLoading" type="Boolean" default="false"/>
+
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+  
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.searchKey}" action="{!c.doInit}" />
+   
+    <aura:handler name="ProductDetailNotifyToProductHome" event="c:NotifyParentComponentEvent" action="{!c.handleLoadProductDetail}"/>
+
+    <aura:registerEvent name="productEvent" type="c:ProductEvent" />
+
+    <aura:method name="refreshView" action="{!c.refreshView}" >
+        <aura:attribute name="parentCategoryId" type="String" />
+        <aura:attribute name="productDetailId" type="String" />
+        <aura:attribute name="searchKey" type="String" />
+    </aura:method>    
+    
+    <aura:if isTrue="{!v.isLoading}">
+        <lightning:spinner aura:id="largeSpinner" variant="brand" size="large"/>
+    </aura:if>
+
+    <div class="container" aura:id="categoryListDiv">
+            <div class="breadcrumbWrapper">
+                <aura:iteration items="{!v.categoryBreadCrumbLink}" var="navigationCategory" >  
+                    <a data-record="{!navigationCategory.categoryId}" onclick="{!c.switchCategory}"> 
+                        {!navigationCategory.name}
+                    </a>
+                    > 
+                </aura:iteration>
+                <aura:if isTrue="{!or(and(v.searchKey!=null, v.noCategoryDropdownList==true), and(v.productDetailTitle!=null, v.noCategoryDropdownList==true))}">
+                    <a data-record="{!v.categoryTree.categoryId}" onclick="{!c.switchCategory}"> 
+                        {!v.categoryTree.name} 
+                    </a>
+                    > 
+                    <div class="currentBreadcrumbItem">
+                        <aura:if isTrue="{!v.productDetailTitle!=null}">
+                            {!v.productDetailTitle}
+                        </aura:if>
+                        <aura:if isTrue="{!and(v.searchKey!=null, v.searchKey.length>0)}">
+                            Search Result for key words: {!v.searchKey}
+                        </aura:if>
+                    </div>
+                    <aura:set attribute="else">
+                        <div class="currentBreadcrumbItem solo">
+                            {!v.categoryTree.name}
+                        </div>
+                    </aura:set>
+                </aura:if>
+            </div>
+            
+            <!-- PRODUCT CATEGORY DROPDOWN -->
+            <div class="productCategoryDropdownWrapper">
+                <aura:if isTrue="{!v.noCategoryDropdownList==false}">
+                    <lightning:select aura:id="selectedCategoryId" name="selectedCategory" onchange="{!c.switchCategoryBySelect}" class="productCategoryDropdown">
+                        <option value="">
+                            Subcategories of: <strong>{!v.categoryTree.name}</strong>
+                        </option>
+                        <aura:iteration items="{!v.categoryTree.categories}" var="categories">   
+                            <option value="{!categories.categoryId}">{!categories.name}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                </aura:if>
+            </div>
+         	{!v.body}
+    </div>
+</aura:component>

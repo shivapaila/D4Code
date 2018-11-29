@@ -1,0 +1,350 @@
+<aura:component controller="salesOrderRouting" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                                                           access="global" >
+	
+    <ltng:require styles="/resource/slds/assets/styles/salesforce-lightning-design-system.css" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.getSalesOrderData}"/> 
+    <!--<aura:handler name="initHis" value="{!this}" action="{!c.getSalesOrderHisData}"/>-->
+    
+    <aura:attribute name="recordId" type="Id" />  
+    <aura:attribute name="orders" type="SORoutingItems[]"/>
+    <aura:attribute name="ordersList" type="SORoutingItems[]"/>
+    <aura:attribute name="items" type="SORoutingItems.SOLineItem[]"/>
+    <aura:attribute name="itemsList" type="SORoutingItems.SOLineItem[]"/>       
+    <aura:attribute name="Hisorders" type="SORoutingItems[]"/>
+    <aura:attribute name="HisordersList" type="SORoutingItems[]"/>
+    <aura:attribute name="Hisitems" type="SORoutingItems.SOLineItem[]"/>
+    <aura:attribute name="HisitemsList" type="SORoutingItems.SOLineItem[]"/>
+    <aura:attribute name="totalSize" type="Integer"/>
+    <aura:attribute name="totalSizeHistory" type="Integer"/> 
+    <aura:attribute name="errorMsg" type="String"/>
+     <aura:attribute name="errorMsgHstryData" type="String"/>
+    <aura:attribute type="String"	name="sortField" />
+    <aura:attribute type="Boolean"	name="sortAsc" />
+    <aura:attribute type="Boolean"	name="sortHisAsc" />
+    <aura:attribute type="String"	name="SalesOrderNo" />
+    <aura:attribute type="Boolean"	name="isError" default="false"/>
+    <aura:attribute type="Boolean"	name="isHisError" default="false"/>
+    <aura:attribute type="Boolean"	name="isConfirm" default="true"/>
+    <aura:attribute name="routingPass" type="Integer"/>
+    
+    	    
+         <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+               <!-- <ui:inputText value="{!v.SalesOrderObj1.phdShipAddress1__c}" aura:id="address2" placeholder="Address 2"/> -->
+                <ui:outputText  value="{!v.orders.SalesOrderNumber}"  />
+            </div> 
+            
+     <div class="slds-form-element slds-hint-parent slds-p-around--x-small hasDiv">
+               <!-- <ui:inputText value="{!v.SalesOrderObj1.phdShipAddress1__c}" aura:id="address2" placeholder="Address 2"/> -->
+                <ui:outputText  value="{!v.orders.SalesOrderNumber}"  />
+            </div> 
+    <div class="slds-card__body">
+    	<lightning:card iconName="custom:custom41"> 
+            <aura:set attribute="title">
+                <b>Activity</b>
+            </aura:set>
+        </lightning:card>
+    </div>
+    <div></div> 
+    
+    <!-- Table-1 Start
+    <div class="slds-card__body">-->
+        <div class="slds-card slds-card_boundary">
+            
+        
+    	<!--<b><lightning:formattedText value="{!'Record Count: '+v.totalSize}" /></b> <br/><br/>-->
+       
+          <table class="slds-table slds-no-row-hover slds-table_cell-buffer">
+            <thead>
+                <tr class="slds-text-heading--label">
+                    <th scope="col" class="slds-cell-wrap">  Details </th>                  
+                    <th scope="col" class="slds-cell-wrap"> Confirmation Status </th>
+                    <th scope="col" class="slds-cell-wrap"> Confirm </th>
+                    
+                    <th scope="col" class="slds-cell-wrap" onclick="{!c.sortByOrdBegunTime}" aura:id="OrdBT"> 
+                        Cust Begin
+                        <aura:if isTrue="{!v.sortField=='BegunTime'}" >
+                            <span>
+                            	<aura:if isTrue="{!v.sortAsc}">
+                                    &#8593;
+                                    <aura:set attribute="else"> 
+                                        &#8595;
+                                    </aura:set>
+                                </aura:if>
+                            </span>
+                        </aura:if> 
+                    </th>
+                    <th scope="col" class="slds-cell-wrap" onclick="{!c.sortByOrdCompletedTime}"> 
+                        Cust End 
+                        <aura:if isTrue="{!v.sortField=='CompletedTime'}">
+                            <span>
+                            	<aura:if isTrue="{!v.sortAsc}">
+                                    &#8593;
+                                    <aura:set attribute="else"> 
+                                        &#8595;
+                                    </aura:set> 
+                                </aura:if>
+                            </span>
+                        </aura:if> 
+                    </th>
+                    <th scope="col" class="slds-cell-wrap" onclick="{!c.sortByOrdUSERNAME}"> 
+                        User Name 
+                        <aura:if isTrue="{!v.sortField=='UserName'}">
+                            <span>
+                            	<aura:if isTrue="{!v.sortAsc}">
+                                    &#8593;
+                                    <aura:set attribute="else"> 
+                                        &#8595;
+                                    </aura:set>
+                                </aura:if>
+                            </span>
+                        </aura:if> 
+                    </th>
+                    <th scope="col" class="slds-cell-wrap" onclick="{!c.sortByOrdRoutingPass}"> 
+                        Pass
+                        <aura:if isTrue="{!v.sortField=='RoutingPass'}">
+                            <span>
+                            	<aura:if isTrue="{!v.sortAsc}">
+                                    &#8593;
+                                    <aura:set attribute="else"> 
+                                        &#8595;
+                                    </aura:set>
+                                </aura:if>
+                            </span>
+                        </aura:if> 
+                    </th>
+                    <th scope="col" class="slds-cell-wrap" onclick="{!c.sortByOrdConfirmDT}"> 
+                        Confirmation Date/Time 
+                        <aura:if isTrue="{!v.sortField=='TimeChanged'}"> 
+                            <span>
+                            	<aura:if isTrue="{!v.sortAsc}">
+                                    &#8593;
+                                    <aura:set attribute="else"> 
+                                        &#8595;
+                                    </aura:set>
+                                </aura:if>
+                            </span>
+                        </aura:if> 
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:if isTrue="{!v.isError}">
+                    <tr align="center">
+                        <td colspan="8">
+                            
+                                <div class="slds-text-color_error" style="center">
+                                    <b><lightning:formattedText value="{!v.errorMsg}" /></b> 
+                                </div>
+                            
+                        </td>
+                    </tr>
+                </aura:if>
+				<aura:if isTrue="{!!v.isError}">    
+					<aura:iteration items="{!v.orders}" var="SO">
+				
+						<tr>
+							<td> 
+								<a data-orderlineid = "{!SO.SalesOrderNumber}" data-ordersfdcid="{!v.recordId}" onclick="{!c.launchLineItems}">Details</a>
+							</td>
+							<td>
+								<aura:if isTrue="{!SO.IsConfirmed}">
+										<span>
+											Confirmed 
+										</span>
+								</aura:if>
+							</td>
+							<td>
+								<aura:if isTrue="{!!SO.IsConfirmed}">
+										
+									<!--<button class="form-control" label="Confirm" press="{!c.updateSalesOrder}" id="{!SO.SalesOrderNumber}" disable="{!SO.IsConfirmed}">Confirm</button>-->
+                                    <button label="Confirm" data-orderlineid = "{!SO.RoutingPass}" onclick="{!c.updateSalesOrder}" style="background-color: #008CBA;">Confirm</button>
+										
+								</aura:if>
+                                <aura:if isTrue="{!SO.IsConfirmed}">
+										
+                                    <!--<button class="form-control" label="Confirm" press="{!c.updateSalesOrder}" id="{!SO.SalesOrderNumber}" disable="true">Confirm</button>-->
+                                    <button label="Confirm" data-orderlineid = "{!SO.RoutingPass}" onclick="{!c.updateSalesOrder}" style="background-color: #e7e7e7;color: black;" disabled="true">Confirm</button>
+										
+								</aura:if>
+							</td>
+							<td>
+								{!SO.CustomerWindowOpen}
+							</td>
+							<td>
+								{!SO.CustomerWindowClose}
+							</td>
+							<td>
+								{!SO.UserName}
+							</td>
+							<td>
+								{!SO.RoutingPass}
+							</td>
+							<td>
+								{!SO.ConfirmationDateTime}
+							</td>
+						</tr>
+						
+					</aura:iteration>
+                </aura:if>
+                <br/><br/>            
+               
+            </tbody>
+        </table>
+        <br/>        
+  </div>	
+    
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <!-- Table-1 END-->  
+    <!-- Table-2 Start--> 
+     
+    <div class="slds-card__body">
+    	<lightning:card iconName="custom:custom87">  
+            <aura:set attribute="title">
+                <b>History({!v.totalSizeHistory})</b>
+            </aura:set>
+        </lightning:card>
+    </div>
+    <div></div> 
+    <div class="slds-card slds-card_boundary">
+        
+       
+    	<!--<b><lightning:formattedText value="{!'Record Count: '+v.totalSize}" /></b> <br/><br/>-->
+        <table class="slds-table slds-table--cell-buffer">
+            <thead>
+                <tr class="slds-text-heading--label">
+                    <th scope="col">                    
+                        
+                    </th>
+                    <th scope="col" class="slds-truncate">Confirmation Status</th>
+                    
+                    <th scope="col" class="slds-cell-wrap" onclick="{!c.sortByBegunTime}">
+                        Cust Begin
+                        <aura:if isTrue="{!v.sortField=='BegunTime'}">
+                            <span>
+                            	<aura:if isTrue="{!v.sortHisAsc}">
+                                    &#8593;
+                                    <aura:set attribute="else"> 
+                                        &#8595;
+                                    </aura:set>
+                                </aura:if>
+                            </span>
+                        </aura:if>
+                     
+                    </th>                    
+                    <th scope="col" class="slds-cell-wrap" onclick="{!c.sortByCompletedTime}">
+                        Cust End
+                        <aura:if isTrue="{!v.sortField=='CompletedTime'}">
+                            <span>
+                            	<aura:if isTrue="{!v.sortHisAsc}">
+                                    &#8593;
+                                    <aura:set attribute="else"> 
+                                        &#8595;
+                                    </aura:set>
+                                </aura:if>
+                            </span>
+                        </aura:if> 
+                    </th>                    
+                    <th scope="col" class="slds-cell-wrap" onclick="{!c.sortByUSERNAME}">
+                        User Name
+                        <aura:if isTrue="{!v.sortField=='USERNAME'}">
+                            <span>
+                            	<aura:if isTrue="{!v.sortHisAsc}">
+                                    &#8593;
+                                    <aura:set attribute="else"> 
+                                        &#8595;
+                                    </aura:set>
+                                </aura:if>
+                            </span>
+                        </aura:if> 
+                    </th>                    
+                    <th scope="col" class="slds-cell-wrap" onclick="{!c.sortByRoutingPass}">
+                        Pass
+                        <aura:if isTrue="{!v.sortField=='RoutingPass'}">
+                            <span>
+                            	<aura:if isTrue="{!v.sortHisAsc}">
+                                    &#8593;
+                                    <aura:set attribute="else"> 
+                                        &#8595;
+                                    </aura:set>
+                                </aura:if>
+                            </span>
+                        </aura:if>
+                    </th>                    
+                    <th scope="col" class="slds-cell-wrap" onclick="{!c.sortByConfirmDT}">
+                        Confirmation Date/Time
+                        <aura:if isTrue="{!v.sortField=='TimeChanged'}">
+                            <span>
+                            	<aura:if isTrue="{!v.sortHisAsc}">
+                                    &#8593;
+                                    <aura:set attribute="else"> 
+                                        &#8595;
+                                    </aura:set>
+                                </aura:if>
+                            </span>
+                        </aura:if>
+                    </th>   
+                    
+                </tr>    
+            </thead> 
+            <tbody>
+                <aura:if isTrue="{!v.isHisError}">
+                    <tr align="center">
+                        <td colspan="7">
+                            
+                                <div class="slds-text-color_error" style="center">
+                                    <b><lightning:formattedText value="{!v.errorMsgHstryData}" /></b> 
+                                </div>
+                            
+                        </td>
+                    </tr>
+           		</aura:if>
+              <aura:if isTrue="{!!v.isHisError}">
+                <aura:iteration items="{!v.Hisorders}" var="SO">
+                    <tr>
+                        <td>
+                            <a data-orderlineid = "{!SO.SalesOrderNumber}" data-ordersfdcid="{!v.recordId}" onclick="{!c.launchHisLineItems}">Details</a>
+                        </td>
+                        <td>
+                           <aura:if isTrue="{!SO.IsConfirmed}">
+                                    <span>
+                                        Confirmed
+                                    </span>
+                        		</aura:if> 
+                        </td>
+                        <td>
+                            {!SO.CustomerWindowOpen}
+                        </td>
+                        <td>
+                            {!SO.CustomerWindowClose}
+                        </td>
+                        <td>
+                            {!SO.UserName}
+                        </td>
+                        <td >
+                            {!SO.RoutingPass}
+                        </td>
+                        <td>
+                            {!SO.ConfirmationDateTime}
+                        </td>
+                    </tr>
+                    
+                </aura:iteration> 
+               </aura:if> 
+                <br/><br/>            
+               
+            </tbody>
+        </table>
+        <br/>        
+   </div>
+     <div aura:id="lineItemPlaceHolder" />
+</aura:component>

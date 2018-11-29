@@ -1,0 +1,27 @@
+.THIS .productCategoryDropdownWrapper {
+    background:#e8e8e8;
+    margin-bottom:15px;
+    text-align:center;
+}
+.THIS .productCategoryDropdownWrapper .slds-form-element__label {
+    display:none;
+}
+.THIS .productCategoryDropdown select {
+    background:#f68c2c;
+    color:#fff !important;
+    margin:15px auto;
+}
+.THIS .productCategoryDropdown .slds-select_container {
+    width:60%;
+    margin:0 auto;
+}
+.THIS .productCategoryDropdown .slds-select_container:before, .THIS .productCategoryDropdown .slds-select_container:after {
+    color:#fff !important;
+}
+.THIS .productCategoryDropdown .slds-select_container:before {
+	display:none;    
+}
+.THIS .productCategoryDropdown .slds-select_container:after {
+    border:none;
+    top:30px !important;
+}

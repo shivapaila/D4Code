@@ -1,0 +1,21 @@
+.THIS {
+    margin:40px 0;
+}
+.THIS .BGSIGCAPSignatureCapture .box {
+	height:200px;
+}
+.THIS canvas {
+	margin-bottom:15px;
+}
+.THIS .BGSIGCAPSignatureCapture button {
+	background:#f68c2c;
+	color:#fff !important;
+	border:none;
+	border-radius:0;
+  }
+  .THIS .BGSIGCAPSignatureCapture button:last-child {
+	background:#999;
+	color:#fff !important;
+	border:none;
+	border-radius:0;
+  }

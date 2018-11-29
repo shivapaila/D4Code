@@ -1,0 +1,7 @@
+<aura:event type="APPLICATION" description="Event template">
+	<aura:attribute name="deliveryDate" type="String"/>
+	<aura:attribute name="orderID" type="String"/>
+	<aura:attribute name="orderLineId" type="String"/>
+    <aura:attribute name="msg" type="String"/>
+    <aura:attribute name="deliveryMode" type="String"/>
+</aura:event>

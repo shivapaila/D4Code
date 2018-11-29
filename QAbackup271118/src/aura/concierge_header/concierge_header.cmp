@@ -1,0 +1,66 @@
+<aura:component controller="ManageCustomerCarts" implements="flexipage:availableForAllPageTypes" access="global" >
+
+	<ltng:require styles="{!$Resource.conciergeStyles}" />
+	<ltng:require styles="{!$Resource.openSans}" />
+	<ltng:require styles="{!$Resource.fontawesome + '/css/fontawesome-all.css'}" />
+ 
+	<ltng:require styles="{!$Resource.bootstrap + '/bootstrap/css/bootstrap.min.css'}" />
+    <aura:attribute name="refresh" type="Boolean" />
+    <aura:attribute name="showModal" type="Boolean" default="false" />
+    <aura:attribute name="customerwithActiveCartLst" type="List[]"/>
+    <aura:attribute name="activeCartTotal" type="Integer"/>
+    <aura:handler name="init" value="{!this}" action="{!c.Init}"/>
+    <aura:handler name="change" value="{!v.refresh}" action="{!c.Init}"/>
+    
+    <!--refresh active cart number-->
+   <aura:handler event="c:NotifyHeaderComponentEvent" action="{!c.Init}"/>   
+ 	 <!-- AURA EVENTS -->
+    <aura:registerEvent name="NavigateToWrapperComponentAppEvent" type="c:NavigateToWrapperComponentAppEvent" />
+    
+    <!-- /AURA EVENTS -->     
+    <div>
+    	<!--<c:concierge_template />-->
+		
+		<div class="headerWrapper">
+			<div class="container">
+				<div class="row">
+					<div class="col-sm-4">
+						<a href="" onclick="{!c.navigateToHome}">
+							<img src="{!$Resource.AHSLogo}" class="logo" /> <small class="homeText"><i class="far fa-home"></i></small>
+						</a>
+					</div>
+					<div class="col-sm-7 text-right ">
+						<!-- HIDE FOR NOW 12/21
+						<ui:inputText placeholder="Search Products" class="search"> </ui:inputText> -->
+						<c:SearchProducts />			
+					</div>
+					<div class="col-sm-1">
+						<div class="text-center cartWrapper">
+							<a onclick="{!c.cartClick}"><i class="far fa-shopping-cart"></i>
+							<div class="cartNumber">{!v.activeCartTotal}</div>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+
+
+		<aura:if isTrue="{!v.showModal}">
+			<section aura:id="cartModal" role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="image-modal" class="slds-modal slds-fade-in-open">
+				<div class="slds-modal__container">
+					<header class="slds-modal__header">
+						<h2 class="pageTitle">Active Guest Carts</h2><i class="fa fa-times float-right" onclick="{!c.removecss}" />
+					</header>
+					<div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap">
+						<c:ActiveCustomerCarts customerwithActiveCartLst="{!v.customerwithActiveCartLst}" showModal="{!v.showModal}"/>
+					</div>
+				</div>
+			</section>
+		
+		</aura:if>
+		<div class="slds-backdrop" aura:id="overlay"></div> 
+		
+	</div>
+</aura:component>

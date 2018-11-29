@@ -1,0 +1,200 @@
+<aura:component access="global" 
+                implements="flexipage:availableForAllPageTypes"
+                controller="ConciergeFinancingPaymentController"
+                extends="c:PaymentBase">
+    <!-- incoming attributes from parent component -->
+    <aura:attribute name="guestId" type="String" />
+    <aura:attribute name="opportunityId" type="String" />
+	<aura:attribute name="pm" type="PaymentMethodWrapper"/> 
+    <aura:attribute name="targetAmount" type="Double" /> 
+    <aura:attribute name="totalAmount" type="Double" default="0" />
+	<aura:attribute name="payOptions" type="List" />
+	<aura:attribute name="payOptionsResult" type="Map" />
+    <aura:attribute name="payTerminalOptions" type="List" />
+    <!-- component specific attributes - will be set by the component -->
+    <aura:attribute name="oppty" type="Opportunity" />
+    <aura:attribute name="itemDetailsMap" type="Map" />
+    <aura:attribute name="accountLookupResponse" type="Object" />
+    <aura:attribute name="originalTargetAmount" type="Double" /> 
+    <aura:attribute name="originalTotalAmount" type="Double" default="0" />
+    <aura:attribute name="originalAmountRemaining" type="Double" default="0" />
+    <aura:attribute name="paymentTermsOptions" type="List" />
+    <aura:attribute name="selectedPaymentTerm" type="API_PaymentType.PaymentTermWrapper" />
+    <!-- DEF-0874 fix -->
+    <aura:attribute name="paidAmt" type="Double" default="0"/>
+    <!-- component specific boolean flags -->
+    <aura:attribute name="showSpinner" type="Boolean" default="true" />
+    <aura:attribute name="showPaymentSection" type="Boolean" default="true" />
+    <aura:attribute name="showAccountLookupModal" type="Boolean" default="false" />
+    <aura:attribute name="customerIdConfirmed" type="Boolean" default="false" />
+    <aura:attribute name="accountLookupSuccessful" type="Boolean" default="false" />
+    <aura:attribute name="applyTotalBalance" type="Boolean" default="false" />
+    <aura:attribute name="enableSelectTermsButton" type="Boolean" default="false" />
+    <aura:attribute name="termSelectionSuccessful" type="Boolean" default="false" />
+    <aura:attribute name="paymentSuccessful" type="Boolean" default="false" />
+    <aura:attribute name="showVoidConfirmation" type="Boolean" default="false" />
+    <!-- events fired from this component -->
+    <aura:registerEvent name="addAnotherPaymentEvent" type="c:AddAnotherPayment" />
+    <aura:registerEvent name="updateAmount" type="c:AmountAppliedEvent" />
+    <aura:registerEvent name="NotifyParentPmtAdded" type="c:PaymentChangeEvent" />
+    <!-- listening event handlers -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:handler name="change" value="{!v.showVoidConfirmation}" action="{!c.showHideVoidConfirmation}"/>
+	<aura:handler name="change" value="{!v.showAccountLookupModal}" action="{!c.showHideAccountLookup}"/>
+	<!-- spinner -->
+    <aura:if isTrue="{!v.showSpinner}">
+    	<lightning:spinner aura:id="financingSpinner" alternativeText="loading..."/>
+	</aura:if>
+	<div class="singlePaymentMethod">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="paymentMethodLabel">Financing</div>
+            </div>
+            <aura:if isTrue="{!v.showPaymentSection}">
+            <aura:if isTrue="{!!v.paymentSuccessful}">
+            <div class="col-sm-8">
+            	<!-- Payment Type -->
+				<small class="paymentInputLabel">Financing Type</small>
+                <ui:inputSelect aura:id="fin_Type" label="Financing Type" options="{!v.payOptions}" value="{!v.pm.paymentTrans.TenderCode__c}" change="{!c.clearOutAllFields}"/>
+                <!-- Payment Terminal -->
+                <small class="paymentInputLabel">Terminal</small>
+    			<ui:inputSelect aura:id="terminal" label="Terminal" options="{!v.payTerminalOptions}" value="{!v.pm.paymentTerminalSelected}"/>
+    			<!-- Financing Number -->
+                <small class="paymentInputLabel">Financing Number</small>
+                <ui:inputText aura:id="finc_no"  class="slds-input" value="{!v.pm.FINnum}" keypress="{!c.validateNumber}" keyup="{!c.validateNumber}" keydown="{!c.validateNumber}"  updateOn="keypress, keyup, keydown" maxlength="16"/>
+			</div>
+			<div class="col-sm-4">
+			</div>
+			<div class="col-sm-8">
+				<!-- Account Lookup -->
+				<div class="addNewButtonWrapper text-right">
+                	<a class="orangeButton" onclick="{!c.accountLookup}">Account Lookup</a>
+                </div>
+            </div>
+            </aura:if>
+            <!-- after successful account lookup -->
+			<aura:if isTrue="{!v.accountLookupSuccessful}">
+				<div class="col-sm-4">
+				</div>
+				<!-- Apply total balance to financing -->
+				<div class="col-sm-8">
+					<lightning:input type="checkbox" label="Apply Total Balance to Financing" name="applyTotalBalance" checked="{!v.applyTotalBalance}" onchange="{!c.applyAmount}"/>
+				</div>
+				<div class="col-sm-4">
+	                <b>
+                		Available Credit: ${!v.accountLookupResponse.AvailableCredit}
+                	</b>
+	            </div>
+	            <div class="col-sm-8">
+	            	<small class="paymentInputLabel">Amount</small>
+            		<ui:inputNumber aura:id="amt"  class="slds-input" value="{!v.pm.paymentTrans.Payment_Amount__c}" change="{!c.checkAmount}" />
+	            </div>
+	            <div class="col-sm-4">
+				</div>
+				<!-- Select Terms -->
+				<div class="col-sm-8">
+                	<small class="paymentInputLabel">Select Terms</small>
+                	<ui:inputSelect aura:id="selectTerms" label="Select Terms" value="{!v.pm.FINterms}" change="{!c.setSelectedPaymentTerm}">
+                		<aura:iteration items="{!v.paymentTermsOptions}" var="pTerm">
+                			<ui:inputSelectOption text="{!pTerm.TermsCode}" label="{!pTerm.TermsCodeDescription}" />
+                		</aura:iteration>
+                	</ui:inputSelect>
+                </div>
+                <!-- Process Payment -->
+                <div class="col-sm-4">
+				</div>
+				<div class="col-sm-8">
+
+		            <div class="addNewButtonWrapper text-right">
+                        <aura:if isTrue="{!v.termSelectionSuccessful}">
+                        	<a class="orangeButton" data-record="{!idx}" onclick="{!c.processPayment}">Process Payment</a>
+                    		<aura:set attribute="else">
+								<a class="greyButton disabled" onclick="return false;">
+									Process Payment
+								</a>
+						</aura:set>
+					</aura:if>
+                    </div>
+                </div>
+			</aura:if>
+			<!-- after successful payment -->
+			<aura:if isTrue="{!v.paymentSuccessful}">
+				<div class="col-sm-8">
+
+		            <div class="addNewButtonWrapper text-right">
+                        <a class="orangeButton" data-record="{!idx}" onclick="{!c.addAnotherFinancing}">Add Another Financing Option + <i class="fa far-plus"></i></a>
+                    </div>
+                </div>
+            	<div class="col-sm-6">
+					<div style="margin-bottom:15px;">
+						<a onclick="{!c.displayVoidConfirmation}" class="orangeButton smallButton" style="background:red !important;"><i class="fas fa-trash-alt"></i> Delete</a>  
+					</div>    
+				</div>
+				<div class="col-sm-6">
+					<b><small class="paymentInputLabel">Authorization Number:</small></b>
+					<ui:outputText aura:id="auth_no" value="{!v.pm.paymentTrans.AuthorizationNumber__c}"/>
+                </div>
+                <div class="col-sm-6">
+            		<b><small class="paymentInputLabel">Acct Number:</small></b>
+					<ui:outputText aura:id="auth_no" value="{!v.pm.paymentTrans.Account_Number__c}"/>
+				</div>
+				<div class="col-sm-6">
+					<b><small class="paymentInputLabel">Reference Number:</small></b>
+					<ui:outputText aura:id="auth_no" value="{!v.pm.paymentTrans.ReferenceNumber__c}"/>
+                </div>
+                <div class="col-sm-6">
+            		<b><small class="paymentInputLabel">Payment Type:</small></b>
+					<ui:outputText aura:id="auth_no" value="{!v.pm.paymentTrans.Payment_Type__c}"/>
+				</div>
+				<div class="col-sm-6">
+					<b><small class="paymentInputLabel">Terms Code Number:</small></b>
+					<ui:outputText aura:id="auth_no" value="{!v.pm.paymentTrans.TermsCode__c}"/>
+                </div>
+                <div class="col-sm-6">
+            		<b><small class="paymentInputLabel">Check/Document Number:</small></b>
+					<ui:outputText aura:id="auth_no" value="{!v.pm.paymentTrans.Check_DocumentNumber__c}"/>
+				</div>
+				<div class="col-sm-6">
+					<b><small class="paymentInputLabel">Amount:</small></b>
+					<ui:outputText aura:id="auth_no" value="{!'$' + v.pm.paymentTrans.Payment_Amount__c}"/>
+                </div>
+            </aura:if>
+            </aura:if>
+            <!-- account lookup modal -->
+            <aura:if isTrue="{!v.showAccountLookupModal}">
+            	<div class="col-sm-12">
+            		<h4 style="margin-top:15px;">Account Number ending in {!v.accountLookupResponse.AccountNumber} is Valid. </h4>
+								<em>Please Check Identification before Proceeding.</em><br/><br/>
+								Name: <strong>{!v.accountLookupResponse.Name}</strong><br/>
+								Address: <strong>{!v.accountLookupResponse.Address}</strong><br/>
+								City, State, Zip: <strong>{!v.accountLookupResponse.City}, {!v.accountLookupResponse.State}, {!v.accountLookupResponse.PostalCode}</strong> <br/><br/>
+								Total Credit Line: <strong>${!v.accountLookupResponse.TotalCredit}</strong> <br/>
+								Available Credit Line: <strong>${!v.accountLookupResponse.AvailableCredit}</strong> <br/><br/>
+            	</div>
+            	<div class="col-sm-12">
+            		<lightning:input type="checkbox" label="Customer ID is confirmed" name="customerIdConfirmed" checked="{!v.customerIdConfirmed}"/>
+            	</div>
+            	<div class="col-sm-12">
+            		<div class="addNewButtonWrapper text-right">
+	                	<a class="orangeButton" onclick="{!c.completeAccountLookup}">Continue</a>
+	                </div>
+            	</div>
+            </aura:if>
+            <!-- Void payment -->
+            <aura:if isTrue="{!v.showVoidConfirmation}">
+
+	            <div class="col-sm-8">
+					<div>
+						Are you sure you want to void this transaction?
+					</div>
+					<div style="margin-top:15px;">
+						<lightning:button label="Cancel" onclick="{!c.cancelVoidConfirmation}" class="greyButton"/> &nbsp;
+						<lightning:button label="Void" onclick="{!c.performVoidConfirmation}" class="orangeButton"/>
+					</div>
+				</div>
+				
+
+            </aura:if>
+		</div>
+	</div>
+</aura:component>

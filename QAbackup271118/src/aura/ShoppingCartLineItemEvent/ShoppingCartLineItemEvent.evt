@@ -1,0 +1,5 @@
+<aura:event type="COMPONENT" description="An event broadcast by the Shopping Cart Line Item for actions such as quantity updated, delivery mode selected, discount applied etc.">
+	<aura:attribute name="action" type="String"/>
+    <aura:attribute name="lineItemId" type="String"/>
+    <aura:attribute name="lineItemIds" type="String"/>
+</aura:event>

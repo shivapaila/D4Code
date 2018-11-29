@@ -1,0 +1,411 @@
+<aura:component controller="AddCustomerController" access="global" 
+                implements="flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <!-- EDQ Validation attributes Start -->
+    <ltng:require styles="{!$Resource.LightningValidationStylesheet}" />
+    <aura:attribute name="suggestions" type="Object[]" access="private" description="Suggestions"/>
+    <aura:attribute name="hasSuggestions" type="Boolean" access="private" default="false"/>
+ 	   <aura:attribute name="timeoutIdentifier" type="Integer" access="private"/>
+    <aura:attribute name="ShippingAddressObjectSnapshot" type="sObject" access="private" default="null"/>
+    <aura:attribute name="otherSuggestions" type="Object[]" access="private" description="Suggestions"/>
+    <aura:attribute name="hasOtherSuggestions" type="Boolean" access="private" default="false"/>
+    <aura:attribute name="BillingAddressObjectSnapshot" type="sObject" access="private" default="null"/>
+    <!-- EDQ Validation attributes End -->
+
+    <!-- record data attributes -->
+    <aura:attribute name="newCustomer" type="Account" default="{ 'sobjectType': 'Account'}" />
+    <aura:attribute name="error" type="String" />
+
+    <!-- using record data to pull contact for edit -->
+    <force:recordData aura:id="forceEditRecordCustomer"
+                      recordId="{!v.recordId}"
+                      targetFields="{!v.newCustomer}"
+                      fields="Id,FirstName,LastName,PersonEmail,Email_2__pc,Phone,
+                              Phone_2__pc,Phone_3__pc,Phone_Type__pc,Phone_2_Type__pc, 
+                              Phone_3_Type__pc,Primary_Language__pc,
+                              Tax_Exempt__pc,Twitter__pc,Facebook__pc,Instagram__pc,
+                              YouTube__pc,Snapchat__pc,Pinterest__pc,RecordTypeId"
+                      layoutType="FULL"
+                      targetError="{!v.error}"
+                      mode="EDIT" />
+    
+    <!-- form objects -->
+    <aura:attribute name="newShipping" type="Address__c" default="{ 'sobjectType': 'Address__c'}" />
+    <aura:attribute name="newBilling" type="Address__c" default="{ 'sobjectType': 'Address__c'}" />
+    
+    <!-- form fields -->
+    <aura:attribute name="useShipping" type="Boolean" default="false" />
+    <aura:attribute name="primeLangValues" type="Object" />
+    <aura:attribute name="phoneTypeValues" type="Object" />
+    <aura:attribute name="title" type="String" />
+    <aura:attribute name="body" type="String" />
+    
+    <!-- helper attribs -->
+    <aura:attribute name="modalContext" type="String" default="New" />
+    <aura:attribute name="message" type="String" default="" />
+    <aura:attribute name="messageType" type="String" default="" />
+    <aura:attribute name="inSvcConsole" type="Boolean" default="false" />
+    <aura:attribute name="isExecuting" type="Boolean" access="PRIVATE" default="false"/>    
+    
+    <!-- adding new customer cart (DEF-0191)-->
+    <aura:attribute name="productDetail" type="ProductWrapper" />
+    <aura:attribute name="productPrice" type="ProductPriceWrapper"/>
+	<aura:attribute name="quantity" type="Integer" default="1" />
+	<aura:attribute name="addNewCustomerCart" type="Boolean" default="false" />
+    <!-- end of adding new customer cart (DEF-0191)-->
+    
+	<aura:registerEvent name="NotifyParentCloseModal" type="c:CloseModalEvent"/>
+	<aura:registerEvent name="NotifyParentAddToCart" type="c:NotifyParentComponentEvent"/>
+    <c:PickListValues sObjectName="Account" fieldName="Primary_Language__pc" picklistValues="{!v.primeLangValues}" />
+    <!-- note: 	we're assuming that the same picklist values are available for the 3 phone numbers, 
+				and avoiding some extra calls by fetching this once and using it for all 3 -->
+    <c:PickListValues sObjectName="Account" fieldName="Phone_Type__pc" picklistValues="{!v.phoneTypeValues}" />
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    
+    <aura:if isTrue="{!v.isExecuting}">
+        <lightning:spinner aura:id="largeSpinner" variant="brand" size="large" />
+    </aura:if>
+    <div>
+        <section aura:id="createDialog" role="dialog" tabindex="-1" height = "100%" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container adjust_container">
+        
+                <header class="slds-modal__header">
+                    <aura:if isTrue="{!v.modalContext=='New'}">
+                        <h2 class="slds-text-heading--medium">Create a New Guest</h2>
+                    </aura:if>
+                    <aura:if isTrue="{!v.modalContext=='Edit'}">
+                        <h2 class="slds-text-heading--medium">Edit {!v.newCustomer.FirstName}&nbsp;{!v.newCustomer.LastName}</h2>
+                    </aura:if>
+                </header>
+                
+                
+                <div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap">
+                    <ui:scrollerWrapper>
+                        <!-- messaging --> 
+                        <div class="{v.messageType}"><ui:outputText value="{!v.message}" /></div>
+                        <div><ui:outputText value="{!v.error}" /></div>
+                        <div class="row">
+                            <!-- FORM -->
+                            <lightning:input aura:id="firstname" label="First Name"
+                                            class="col-sm-6"
+                                            name="firstname"
+                                            value="{!v.newCustomer.FirstName}"
+                                            placeholder="First Name"
+                                            required="true"/> 
+                            <lightning:input aura:id="lastname" label="Last Name"
+                                            class="col-sm-6"
+                                            name="lastname"
+                                            value="{!v.newCustomer.LastName}"
+                                            placeholder="Last Name"
+                                            required="true"/>     
+                            <lightning:input aura:id="email" label="Email" type="email"
+                                            class="col-sm-6"
+                                            name="email"
+                                            value="{!v.newCustomer.PersonEmail}"
+                                            placeholder="Email" 
+                                            /> 
+                            <lightning:input aura:id="email2" label="Email2" type="email"
+                                            class="col-sm-6"
+                                            name="email2"
+                                            value="{!v.newCustomer.Email_2__pc }"
+                                            placeholder="Email2" /> 
+                            <lightning:input aura:id="phone" label="Phone" type="tel"
+                                            class="col-sm-6"
+                                            name="phone"
+                                            value="{!v.newCustomer.Phone }"
+                                            placeholder="Phone"
+                                            
+                                             /> 
+                            <!-- phone type --> 
+                            <lightning:select aura:id="phonetype" name="phonetype" 
+                                            class="col-sm-6"
+                                            value="{!v.newCustomer.Phone_Type__pc}"
+                                            label="Phone Type">
+                                <option value="">Phone Type</option>
+                                <aura:iteration items="{!v.phoneTypeValues}" var="item">
+                                    <option value="{!item}">{!item}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                            <lightning:input aura:id="phone2" label="Phone 2" type="tel"
+                                            class="col-sm-6"
+                                            name="phone2"
+                                            value="{!v.newCustomer.Phone_2__pc}"
+                                            placeholder="Phone 2" /> 
+                            <!-- phone type 2 --> 
+                            <lightning:select aura:id="phonetype2" name="phonetype2" 
+                                            class="col-sm-6"
+                                            value="{!v.newCustomer.Phone_2_Type__pc }"
+                                            label="Phone Type 2">
+                                <option value="">Phone Type 2</option>
+                                <aura:iteration items="{!v.phoneTypeValues}" var="item">
+                                    <option value="{!item}">{!item}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                            <lightning:input aura:id="phone3" label="Phone 3" type="tel"
+                                            class="col-sm-6"
+                                            name="phone3"
+                                            value="{!v.newCustomer.Phone_3__pc}"
+                                            placeholder="Phone 3" /> 
+                            <!-- phone type 3 --> 
+                            <lightning:select aura:id="phonetype3" name="phonetype3" 
+                                            class="col-sm-6"
+                                            value="{!v.newCustomer.Phone_3_Type__pc }"
+                                            label="Phone Type 3">
+                                <option value="">Phone Type 3</option>
+                                <aura:iteration items="{!v.phoneTypeValues}" var="item">
+                                    <option value="{!item}">{!item}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                            <lightning:select aura:id="primarylang" name="primarylang" 
+                                            class="col-sm-12"
+                                            value="{!v.newCustomer.Primary_Language__pc }"
+                                            label="Primary Language">
+                                <option value="">Primary Language</option>
+                                <aura:iteration items="{!v.primeLangValues}" var="item">
+                                    <option value="{!item}">{!item}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                            <br />
+                            <lightning:input aura:id="taxExempt" label="Tax Exempt" type="checkbox"
+                                            class="col-sm-12"
+                                            name="taxExempt"
+                                            checked="{!v.newCustomer.Tax_Exempt__pc}" /> 
+                            
+                            <br />
+            
+                            <aura:if isTrue="{!v.modalContext=='New'}">
+                                <div id="ship" class="col-sm-6" >
+                                    <!-- EDQ added DIV container for address suggestions -->
+                                    <div class="search-result-wrapper search-result-wrapper-wider" onfocusout="{!c.onElementFocusedOut}">
+                                        <!-- shipping -->
+                                        <!-- EDQ added SPAN wrapper -->
+                                        <span onkeydown="{!c.handleSuggestionNavigation}" >
+                                            <!-- EDQ added onchange attribute -->
+                                            <lightning:input aura:id="shippingstreet" label="Shipping Street"
+                                                            name="shippingstreet"
+                                                            value="{!v.newShipping.Address_Line_1__c}"
+                                                            placeholder="Street"
+                                                            onchange="{!c.handleSearchChange}"
+                                            />
+                                        </span>
+                                        <!-- EDQ added Shipping validation loader -->
+                                        <div aura:id="loader" class="slds-spinner_container spinner-inner invisible">
+                                            <div class="slds-spinner slds-spinner--small" aria-hidden="false" role="alert">
+                                                <div class="slds-spinner__dot-a"></div>
+                                                <div class="slds-spinner__dot-b"></div>
+                                            </div>
+                                        </div>
+                                        <!-- EDQ added Shipping validation search results dropdown -->
+                                        <div class="searchResults">
+                                            <aura:renderif isTrue="{!v.hasSuggestions}">
+                                                <ul class="searchResults">
+                                                    <aura:iteration items="{!v.suggestions}" var="suggestion">
+                                                        <li class="resultItem">
+                                                            <a id="{!globalId + '-suggestion-index-' + suggestion.index}"
+                                                            tabindex="0"
+                                                            href="javascript:void(0);"
+                                                            title="{!suggestion.format}"
+                                                            onclick="{!c.handleResultSelect}"
+                                                            onkeyup="{!c.onSuggestionKeyUp}">{!suggestion.suggestion}</a>
+                                                        </li>
+                                                    </aura:iteration>
+                                                </ul>
+                                            </aura:renderif>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- EDQ added onchange attribute -->
+                                <lightning:input aura:id="shippingapt" label="Shipping House/Apt No."
+                                                class="col-sm-6"
+                                                name="shippingapt"
+                                                value="{!v.newShipping.Address_Line_2__c}"
+                                                placeholder="House/Apt Number"
+                                                onchange="{!c.onAddressChanged}" />
+                                <!-- EDQ added onchange attribute -->
+                                <lightning:input aura:id="shippingcity" label="Shipping City"
+                                                class="col-sm-6"
+                                                name="shippingcity"
+                                                value="{!v.newShipping.City__c}"
+                                                placeholder="City"
+                                                onchange="{!c.onAddressChanged}" />
+                                <!-- FIXME - waiting on andress standardization tool to implement billing state dropdown -->
+                                <!-- EDQ added onchange attribute -->
+                                <lightning:input aura:id="shippingstate" label="Shipping State"
+                                                class="col-sm-6"
+                                                name="shippingstate"
+                                                value="{!v.newShipping.State__c}"
+                                                placeholder="State"
+                                                onchange="{!c.onAddressChanged}" />
+                                <!-- EDQ added onchange attribute -->
+                                <lightning:input aura:id="shippingpostalcode" label="Shipping Postal Code"
+                                                class="col-sm-6"
+                                                name="shippingpostalcode"
+                                                value="{!v.newShipping.Zip_Code__c}"
+                                                placeholder="Postal Code"
+                                                onchange="{!c.onAddressChanged}" />
+                                <!-- Added hidden fields for address validation --> 
+                                <lightning:input aura:id="shippingAddrValStatus" label="Shipping Address Validation Status"
+                                                class="col-sm-6"
+                                                name="shippingaddressvalidationstatus"
+                                                value="{!v.newShipping.Address_Validation_Status__c}"/>
+                                <lightning:input aura:id="shippingAddrValTmStmp" label="Shipping Address Validation Timestamp"
+                                                class="col-sm-6 slds-hide"
+                                                name="shippingvalidationStamp"
+                                                type="datetime-local"
+                                                value="{!v.newShipping.Address_Validation_Timestamp__c}"/>
+                                <br /><br />
+                                <!-- billing -->
+                                <lightning:input aura:id="useshipping" 
+                                                class="col-sm-12" 
+                                                checked="{!v.useShipping}" type="checkbox" 
+                                                label="Use Shipping Address" name="useshipping" />
+                                <aura:if isTrue="{!not(v.useShipping)}">
+                                    <div class="col-sm-6">
+                                        <!-- EDQ added DIV container for address suggestions -->
+                                        <div class="search-result-wrapper search-result-wrapper-wider" onfocusout="{!c.onOtherElementFocusedOut}">
+                                            <!-- EDQ added SPAN wrapper -->
+                                            <span onkeydown="{!c.handleOtherSuggestionNavigation}">
+                                                <!-- EDQ added onchange attribute -->
+                                                <lightning:input aura:id="billingstreet" label="Billing Street"
+                                                                name="billingstreet"
+                                                                value="{!v.newBilling.Address_Line_1__c}"
+                                                                placeholder="Street"
+                                                                onchange="{!c.handleOtherSearchChange}" />
+                                            </span>
+                                            <!-- EDQ added Billing validation loader -->
+                                            <div aura:id="otherLoader" class="slds-spinner_container spinner-inner invisible">
+                                                <div class="slds-spinner slds-spinner--small" aria-hidden="false" role="alert">
+                                                    <div class="slds-spinner__dot-a"></div>
+                                                    <div class="slds-spinner__dot-b"></div>
+                                                </div>
+                                            </div>
+                                            <!-- EDQ added Billing validation search results dropdown -->
+                                            <div class="searchResults">
+                                                <aura:renderif isTrue="{!v.hasOtherSuggestions}">
+                                                    <ul class="searchResults">
+                                                        <aura:iteration items="{!v.otherSuggestions}" var="suggestion">
+                                                            <li class="resultItem">
+                                                                <!-- EDQ added onclick and onkeyup attributes -->
+                                                                <a id="{!globalId + '-other-suggestion-index-' + suggestion.index}"
+                                                                tabindex="0"
+                                                                href="javascript:void(0);"
+                                                                title="{!suggestion.format}"
+                                                                onclick="{!c.handleOtherResultSelect}"
+                                                                onkeyup="{!c.onOtherSuggestionKeyUp}">{!suggestion.suggestion}</a>
+                                                            </li>
+                                                        </aura:iteration>
+                                                    </ul>
+                                                </aura:renderif>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- EDQ added onchange attribute -->
+                                    <lightning:input aura:id="billingapt" label="Billing House/Apt No."
+                                                    class="col-sm-6"
+                                                    name="billingapt"
+                                                    value="{!v.newBilling.Address_Line_2__c}"
+                                                    placeholder="House/Apt Number"
+                                                    onchange="{!c.onOtherAddressChanged}" />
+                                    <!-- EDQ added onchange attribute -->
+                                    <lightning:input aura:id="billingcity" label="Billing City"
+                                                    class="col-sm-6"
+                                                    name="billingcity"
+                                                    value="{!v.newBilling.City__c}"
+                                                    placeholder="City"
+                                                    onchange="{!c.onOtherAddressChanged}" />
+                                    <!-- FIXME - waiting on andress standardization tool to implement billing state dropdown -->
+                                    <!-- EDQ added onchange attribute -->
+                                    <lightning:input aura:id="billingstate" label="Billing State"
+                                                    class="col-sm-6"
+                                                    name="billingstate"
+                                                    value="{!v.newBilling.State__c}"
+                                                    placeholder="State"
+                                                    onchange="{!c.onOtherAddressChanged}" />
+                                    <!-- EDQ added onchange attribute -->
+                                    <lightning:input aura:id="billingpostalcode" label="Billing Postal Code"
+                                                    class="col-sm-6"
+                                                    name="billingpostalcode"
+                                                    value="{!v.newBilling.Zip_Code__c}"
+                                                    placeholder="Postal Code"
+                                                    onchange="{!c.onOtherAddressChanged}" />
+                                    <!-- Added hidden fields for address validation --> 
+                                    <lightning:input aura:id="billingAddrValStatus" label="Billing Address Validation Status"
+                                                    class="col-sm-6"
+                                                    name="billingaddressvalidationstatus"
+                                                    value="{!v.newBilling.Address_Validation_Status__c}"/>
+                                    <lightning:input aura:id="billingAddrValTmStmp" label="Billing Address Validation Timestamp"
+                                                    class="col-sm-6 slds-hide"
+                                                    name="billingvalidationstamp"
+                                                    type="datetime-local"
+                                                    value="{!v.newBilling.Address_Validation_Timestamp__c}"/>
+                                    <br />
+                                </aura:if>
+                                <br />
+                            </aura:if>    
+                            
+                            <!-- social -->
+                            <lightning:input aura:id="twitter" label="Twitter"
+                                            class="col-sm-6"
+                                            name="twitter"
+                                            value="{!v.newCustomer.Twitter__pc}"
+                                            placeholder="Twitter Handle" /> 
+                            <lightning:input aura:id="facebook" label="Facebook"
+                                            class="col-sm-6"
+                                            name="facebook"
+                                            value="{!v.newCustomer.Facebook__pc}"
+                                            placeholder="Facebook Name" /> 
+                            <lightning:input aura:id="instagram" label="Instagram"
+                                            class="col-sm-6"
+                                            name="instagram"
+                                            value="{!v.newCustomer.Instagram__pc}"
+                                            placeholder="Instagram Name" /> 
+                            <lightning:input aura:id="snapchat" label="Snapchat"
+                                            class="col-sm-6"
+                                            name="snapchat"
+                                            value="{!v.newCustomer.Snapchat__pc}"
+                                            placeholder="Snapchat Name" /> 
+                            <lightning:input aura:id="youtube" label="YouTube"
+                                            class="col-sm-6"
+                                            name="youtube"
+                                            value="{!v.newCustomer.YouTube__pc}"
+                                            placeholder="YouTube Name" />                     
+                            <lightning:input aura:id="pinterest" label="Pinterest"
+                                            class="col-sm-6"
+                                            name="pinterest"
+                                            value="{!v.newCustomer.Pinterest__pc}"
+                                            placeholder="Pinterest Name" /> 
+
+                        
+
+                            <div class="noteWrapper">
+                            <div class="noteHeader">
+                                <h5>Customer Note</h5>
+                            </div>
+
+                                <!-- note -->
+                                <lightning:input aura:id="title" label="Title"
+                                                class="col-sm-12"
+                                                name="title"
+                                                value="{!v.title}"
+                                                placeholder=""/> 
+                                <lightning:input aura:id="note" label="Note"
+                                                class="col-sm-12"
+                                                name="note"
+                                                value="{!v.body}"
+                                                placeholder=""/> 
+                            </div>
+
+                        </div>
+                    </ui:scrollerWrapper>
+                </div> 
+                
+        
+                <footer class="slds-modal__footer">
+                    <lightning:button class="greyButton" variant="neutral" label="Cancel" disabled="{!v.isExecuting}" onclick="{!c.cancelDialog}" />
+                    <lightning:button class="orangeButton" variant="brand" label="Submit" disabled="{!v.isExecuting}" onclick="{!c.saveRecords}"  />
+                </footer>
+            </div>
+        </section>
+    </div>
+</aura:component>

@@ -1,0 +1,4 @@
+<aura:component implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global" >
+    <c:ManageTasks />
+    <c:NavigatorCmp />
+</aura:component>

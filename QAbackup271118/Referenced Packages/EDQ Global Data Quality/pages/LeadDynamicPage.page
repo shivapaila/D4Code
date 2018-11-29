@@ -1,0 +1,21 @@
+<apex:page standardController="Lead" tabStyle="Lead" extensions="EDQ.LeadDataQualityExt" action="{!PageRenderer.RedirectToStandardPageInCaseOfAnError}" applybodytag="false">
+<body id="lightningStyle">
+    <apex:stylesheet value="{!URLFOR($Resource.EDQ__DynamicPageCss)}"/>
+    <apex:stylesheet value="{!IF(PageRenderer.IsSalesforce1 == true, urlfor($Resource.EDQ__EDQAssets, 'styles/LightningCss.css') , '' )}" />
+    <apex:form styleClass="edq-{!PageRenderer.SObjectName}" id="experianForm">
+        <apex:pageMessages id="messages" escape="false"/>
+    
+        <c:DuplicatesTable Duplicates="{!PageRenderer.Duplicates}" pagerenderer="{!PageRenderer}" />
+        <apex:sectionheader title="{!$ObjectType.Lead.label} Edit" subtitle="{!PageRenderer.TabLabel}"/>
+            
+        <apex:dynamicComponent componentValue="{!PageRenderer.PageBody}" />
+        
+        <apex:outputPanel id="experianDataQuality">
+            <c:DataQualityDynamic PageRenderer="{!PageRenderer}" />
+        </apex:outputPanel>
+        
+        <c:DataQualityDynamicScripts PageRenderer="{!PageRenderer}" />
+        
+    </apex:form>
+   </body>
+</apex:page>

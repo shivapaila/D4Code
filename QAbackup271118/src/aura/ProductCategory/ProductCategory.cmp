@@ -1,0 +1,43 @@
+<aura:component implements="flexipage:availableForAllPageTypes" controller="ProductHomeCmpCtrl" access="global" >
+   
+    <aura:attribute name="parentCategoryId" type="String"/>
+    <aura:attribute name="categoryTree" type="ProductCategoryWrapper"/>
+    <aura:attribute name="categoryTreeToShow" type="ProductCategoryWrapper[]"/>
+    
+    <aura:attribute name="initialRow" type="Integer" required="true" default="12"/>
+    <aura:attribute name="cursorIndex" type="Integer" default="0"/>
+    <aura:attribute name="loadMoreDepth" type="Integer" required="true" default="12"/>
+    <aura:attribute name="hasMore" type="Boolean"  default="false"/>
+    <aura:attribute name="viewLoadMoreButton" type="Boolean" default="true"/>
+    
+  	<c:ToastErrorHandler aura:id="toastErrorHandler" />
+
+    <!-- AURA EVENTS -->
+    <aura:registerEvent name="productEvent" type="c:ProductEvent" />
+    <!-- /AURA EVENTS -->     
+  
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <div aura:id="productCategoryPage">
+        <div class="row">
+            <ul class="productCategoryWrapper">
+                <aura:iteration items="{!v.categoryTreeToShow}" var="categories">   
+                    <li class="col-sm-4 productCategory"> 
+                        <a data-record="{!categories.categoryId}" 
+                            onclick="{!c.switchCategory}" 
+                            href="javascript:void(0);"> 
+                            <img src="{!$Resource.CategoryImage+'/'+categories.categoryImagePath+'.jpg'}"  class="categoryImage"/><br />
+                            <h4>{!categories.name}</h4>
+                        </a>
+                    </li>
+                </aura:iteration>
+            </ul>
+        </div>
+        <aura:if isTrue="{!v.viewLoadMoreButton}">
+            <aura:if isTrue="{!v.hasMore}">
+                <div class="text-center">
+                    <a class="slds-button slds-button--neutral uiButton" onclick="{!c.loadMore}">{!$Label.c.LoadMoreLabel}</a>
+                </div>
+            </aura:if>
+        </aura:if>
+    </div>
+</aura:component>

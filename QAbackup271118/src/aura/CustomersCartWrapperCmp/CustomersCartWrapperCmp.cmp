@@ -1,0 +1,21 @@
+<aura:component implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global" >
+    <aura:attribute name="recordId" type="Id"/>
+    <aura:attribute name="pageReference" type="Object"/>
+    <aura:attribute name="renderSubComponent" type="Boolean" />
+    <aura:attribute name="SubComponent" type="Boolean"  />
+
+ 	<aura:handler name="init" value="{!this}" action="{!c.init}"/> 
+    <aura:handler name="change" value="{!v.pageReference}" action="{!c.init}" />
+    
+    <ui:scrollerWrapper>
+    
+    <div>
+    <c:concierge_header />
+     
+    <aura:if isTrue="{!v.renderSubComponent}">
+        <c:ShoppingCartDetail recordId="{!v.recordId}" SubComponent="{!v.SubComponent}" />
+    </aura:if>
+    <c:NavigatorCmp />
+    </div>
+    </ui:scrollerWrapper>
+</aura:component>

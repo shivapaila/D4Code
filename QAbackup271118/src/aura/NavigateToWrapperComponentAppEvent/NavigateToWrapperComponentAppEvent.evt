@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION" description="Event template" access="global">
+    <aura:attribute name="targetCmpName" type="String" />
+    <aura:attribute name="cmpParameters" type="String" />
+    <aura:attribute name="targetCmpParameters" type="Object"/>
+</aura:event>

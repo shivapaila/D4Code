@@ -1,0 +1,13 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="lineItem" type="Shopping_cart_line_item__c"/>
+    <div>
+        <aura:if isTrue="{!v.lineItem.isCallItem__c}">
+            <div class="slds-float_right callWrapper">
+                <i class="far fa-phone"></i> CALL
+            </div>
+        </aura:if>
+
+        <h6 class="productTitle"><ui:outputText value="{!v.lineItem.Product_Title__c.length>0 ? v.lineItem.Product_Title__c : '(no title)'}"/></h6>
+        <small>({!v.lineItem.Product_SKU__c})</small>     
+    </div>
+</aura:component>

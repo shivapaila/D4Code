@@ -1,0 +1,59 @@
+.THIS .termsLanguage {
+   font-size:80%;
+   padding-bottom:25px;
+}
+.THIS canvas {
+   margin-bottom:10px;
+   scroll-behavior:unset;
+   -webkit-overflow-scrolling: unset;
+}
+.THIS .BGSIGCAPSignatureCapture button {
+   background:#f68c2c;
+   color:#fff !important;
+   border:none;
+   border-radius:0;
+ }
+ .THIS .BGSIGCAPSignatureCapture button:last-child {
+   background:#999;
+   color:#fff !important;
+   border:none;
+   border-radius:0;
+ }
+.THIS .tcsContent h4 {
+   margin-bottom:0;
+}
+.THIS .tcsContent strong.underline {
+   text-decoration:underline;
+   margin-top:10px;
+}
+.THIS .signatureWrapper {
+   height:400px;
+   border-top:1px solid #dddbda;
+}
+.THIS .slds-modal__container .uiScrollerWrapper.scrollable {
+   max-height:15%;
+}
+.THIS .slds-modal {
+   overflow: hidden;
+}
+.THIS .slds-modal .slds-modal__container {
+   padding-top:2%;
+}
+.THIS canvas#paint {
+   height: 175px !important;
+   width:100%;
+   scroll-behavior:unset;
+   display:static;
+}
+.THIS .main.text-center {
+   width:100%;
+}
+.THIS .tcsContent{
+    height: 350px;
+    overflow-y: scroll;
+}
+.THIS .slds-modal__content.slds-p-around--medium.slds-grid.slds-wrap {
+  height: 350px;
+  min-height: 350px;
+  max-height: 350px;
+}

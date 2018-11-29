@@ -1,0 +1,75 @@
+.THIS {
+   margin-top:35px;
+}
+.THIS .slds-input-has-icon--left-right .slds-input {
+   padding:5px 14px 6px 28px;
+}
+.THIS .slds-input__icon--right {
+   padding:1px !important;
+   height:auto;
+   width:auto;
+   line-height:1px !important;
+   right:25px;
+}
+.THIS .search.selection {
+   padding:5px 6px;
+   background:#f2f2f2;
+   color:#353534;
+   width: 100%;
+   margin-bottom: 15px;
+   text-align:left;
+}
+.THIS .search.selection label {
+   display:inline-block;
+   margin-right:5px;
+}
+.THIS .search.selection small {
+   color:#999;
+}
+.THIS .addSplit label {
+   margin-bottom:5px;
+}
+.THIS label {
+   font-size:12px !important;
+}
+.THIS .currentSplits {
+   margin-bottom:15px;
+}
+.THIS .inputPercent {
+   width:100% !important;
+   padding:5px 6px !important;
+}
+.THIS .slds-input-has-icon_left-right .slds-input {
+   padding-top:5px;
+   padding-bottom:5px;
+}
+.THIS .slds-input__icon-group_right .slds-input__icon_right {
+   padding: 0 !important;
+   line-height: 0 !important;
+   background: #fff !important;
+   color: #f68c2c !important;
+}
+.THIS label, .THIS .uiLabel-left span {
+   font-weight:bold;
+}
+.THIS .rsaSearch .slds-form-element {
+   margin-bottom:10px;
+   display:block;
+}
+.THIS .search.results {
+   display: block;
+   width: 100%;
+   margin-bottom: 15px;
+   text-align:left;
+}
+
+.THIS .inCheckout{
+   display: block;   
+}
+.THIS .hideLabel label, 
+.THIS .cLookupComponent label {
+   display:none;
+}
+.THIS .hideLabel input {
+   padding:5px;
+}

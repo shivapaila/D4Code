@@ -1,0 +1,27 @@
+<aura:component controller="ViewCustomerOrdersController">
+    <aura:attribute name="productSKUId" type="String" />   
+    <aura:attribute name="productDetail" type="ProductWrapper" />
+    <aura:attribute name="orderItem" type="SalesOrderItem__x" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    
+    <div class="row itemRow">
+        <aura:if isTrue="{!v.productDetail.ecommSmallImage != null}">
+            <div class="col-sm-2 productImage" style="{!'background-image:url(' + v.productDetail.ecommSmallImage + ')'}"></div>
+            <aura:set attribute="else">
+                <div class="col-sm-2 productImage" style="{!'background-image:url(' + $Resource.placeholder + ')'}"> </div>
+            </aura:set>
+        </aura:if>
+        <div class="col-sm-6">
+             <strong>{!v.productDetail.productTitle==undefined ? '(no title)' : v.productDetail.productTitle}</strong><br />
+            <small>{!v.productSKUId}</small><br />
+            <small>{!v.orderItem.phdItemDesc__c}</small>
+        </div>
+        <div class="col-sm-2">
+              <ui:outputCurrency value="{!v.orderItem.phdAmount__c}" currencyCode="USD" />
+            
+        </div>
+        <div class="col-sm-2">{!v.orderItem.phdQuantity__c}</div>
+    </div>
+</aura:component>

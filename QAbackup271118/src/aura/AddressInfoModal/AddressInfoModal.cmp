@@ -1,0 +1,44 @@
+<aura:component controller="ShoppingCartDetailCmpCtrl" implements="c:ShoppingCartConstants" access="global">
+    <aura:registerEvent name="NotifyParentCloseModal" type="c:CloseModalEvent"/>
+    <aura:attribute name="opp" type="Opportunity" />
+    
+    <aura:attribute name="cartStateList" type="PairObj[]" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+
+    <aura:registerEvent name="shoppingCartLineItemEvent" type="c:ShoppingCartLineItemEvent"/>
+    <aura:registerEvent name="NotifyParentAddressInfoCloseModal" type="c:CloseModalEvent" />
+    
+    <div>
+        <section aura:id="mandatoryAddressInput" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container adjust_container">
+                <div class="slds-modal__header">
+                    <h3 class="slds-text-heading--medium">Please input zipcode and state for:{!v.opp.Contact__r.Name}</h3>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium">
+                    <div class="row"> 
+                        
+                        <div class="col-sm-4">Guest's ZipCode</div>
+                        <div class="col-sm-8">  <ui:inputText aura:id="zipCode" value="" required="true"/></div>
+                    
+                    </div>
+                    <div class="row"> 
+                        <div class="col-sm-4">  Guest's State  </div>
+                        <div class="col-sm-8">  <lightning:select aura:id="stateOption" name="selectedState"  class="">
+                        <aura:iteration items="{!v.cartStateList}" var="cartState" >
+                            <option value="{!cartState.value}">{!cartState.label}</option>
+                        </aura:iteration>
+                    </lightning:select>
+                        </div></div>
+                    
+                    
+                </div>
+                <div class="slds-modal__footer">
+                    <div class="text-right">
+                        <a class="orangeButton" onclick="{!c.updateAddressInfo}">Save</a>
+                    </div>
+                </div>          
+            </div>
+        </section>
+    </div>	
+</aura:component>

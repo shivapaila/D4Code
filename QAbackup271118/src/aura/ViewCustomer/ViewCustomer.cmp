@@ -1,0 +1,263 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:appHostable,lightning:actionOverride" 
+                access="global" controller="ViewCustomerController">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <!-- Validation attributes -->
+    <ltng:require styles="{!$Resource.LightningValidationStylesheet}" />
+    <aura:attribute name="suggestions" type="Object[]" access="private" description="Suggestions"/>
+    <aura:attribute name="hasSuggestions" type="Boolean" access="private" default="false"/>
+    <aura:attribute name="timeoutIdentifier" type="Integer" access="private"/>
+    <aura:attribute name="addressObjectSnapshot" type="sObject" access="private" default="null"/>
+   
+    <aura:attribute name="AddTypeValues" type="Object"/>
+    <aura:attribute name="contactRecord" type="Account" />
+	<aura:attribute name="addresses" type="List" />
+	<aura:attribute name="end" type="Integer" default="2" />
+    <aura:attribute name="addrExpand" type="String" default="view more addresses" />
+    <aura:attribute name="showModal" type="Boolean" default="false" />
+
+    <!-- fields for address form -->
+    <aura:attribute name="open" type="Boolean" default="false" />
+	<aura:attribute name="newAddress" type="Address__c" 
+                    default="{ 'sobjectType': 'Address__c' }"  />
+     <c:PickListValues sObjectName="Address__c" fieldName="Address_Type__c" picklistValues="{!v.AddTypeValues}"/>
+    
+    <force:recordData aura:id="forceRecordContact"
+                      recordId="{!v.recordId}"
+                      targetFields="{!v.contactRecord}"
+                      fields="Id,FirstName,LastName,PersonEmail,Owner.Name,Phone,Phone_Type__pc,Phone_2__pc,Phone_2_Type__pc,Phone_3__pc,Phone_3_Type__pc"
+                      mode="VIEW" />
+
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    <aura:handler name="NotifyParentCloseModal" event="c:CloseModalEvent" action="{!c.closeModal}"/>
+    
+    <div class="container">
+        <div class="float-right">
+            <a onclick="{!c.handleShowEdit}" class="orangeButton">
+                EDIT GUEST <i class="fa fa-edit"></i>
+            </a>
+        </div>
+
+        <i class="far fa-user headerIcon float-left"></i> 
+        <h3>{!v.contactRecord.FirstName}&nbsp;{!v.contactRecord.LastName}'s  Information</h3>
+
+        <div class="cardWrapper">
+            <div class="cardContent">
+                <a onclick="{!c.makeMyGuest}" data-record="{!v.recordId}" class="orangeButton float-right">
+                    {!$Label.c.UpdateOwnerButton}
+                </a>
+                <div class="row">
+                    
+                    <div class="col-sm-6 labelNoPad">
+                        <label title="Name">Name</label>
+                        <span class="fieldData" title="Contact Name">{!v.contactRecord.FirstName}&nbsp;{!v.contactRecord.LastName}</span>
+                    </div>
+
+                    <div class="col-sm-6 labelNoPad">
+                        <aura:if isTrue="{!v.contactRecord.Phone}">
+                            <label title="Phone">Phone</label>
+                            <span class="fieldData" title="Contact Phone">
+                                {!v.contactRecord.Phone} 
+                                <aura:if isTrue="{!v.contactRecord.Phone_Type__pc}">
+                                    ({!v.contactRecord.Phone_Type__pc})
+                                </aura:if>
+                            </span>
+                            <aura:set attribute="else">
+                                &nbsp;
+                            </aura:set>
+                        </aura:if>
+                    </div> 
+                    
+                    <div class="col-sm-6">
+                        <label title="Email">Email</label>
+                        <span class="fieldData" title="Contact Email">{!v.contactRecord.PersonEmail}</span>
+                    </div>            
+
+                    <div class="col-sm-6">
+                        <aura:if isTrue="{!v.contactRecord.Phone_2__pc}">
+                            <label title="Phone">Phone 2</label>
+                            <span class="fieldData" title="Contact Phone 2">
+                                {!v.contactRecord.Phone_2__pc} 
+                                <aura:if isTrue="{!v.contactRecord.Phone_2_Type__pc}">
+                                    ({!v.contactRecord.Phone_2_Type__pc})
+                                </aura:if>
+                            </span>
+                            <aura:set attribute="else">
+                                &nbsp;
+                            </aura:set>
+                        </aura:if>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label title="Name">RSA</label>
+                        <span class="fieldData" title="Contact RSA">{!v.contactRecord.Owner.Name}</span>
+                    </div>
+                    
+                    <div class="col-sm-6">
+                        <aura:if isTrue="{!v.contactRecord.Phone_3__pc}">
+                            <label title="Phone">Phone 3</label>
+                            <span class="fieldData" title="Contact Phone 3">
+                                {!v.contactRecord.Phone_3__pc} 
+                                <aura:if isTrue="{!v.contactRecord.Phone_3_Type__pc}">
+                                    ({!v.contactRecord.Phone_3_Type__pc})
+                                </aura:if>
+                            </span>
+                            <aura:set attribute="else">
+                                &nbsp;
+                            </aura:set>
+                        </aura:if>
+                    </div>                 
+                </div>
+
+                <div class="row">
+                    <aura:iteration var="addr" items="{!v.addresses}" indexVar="index" end="{!v.end}">
+                        <div class="col-sm-12">
+                            <label title="{!'Address ' +index+1}">Address {!index+1}</label>
+                            <span class="fieldData" title="{!'Contact Address ' +index+1}">
+                                {!addr.Address_Line_1__c}, 
+                                <aura:if isTrue="{!addr.Address_Line_2__c}">
+                                    {!addr.Address_Line_2__c}, 
+                                </aura:if>
+                                {!addr.City__c}, {!addr.State__c}&nbsp;{!addr.Zip_Code__c}
+                                <aura:if isTrue="{!addr.Preferred__c}">
+                                    &nbsp;<sup><i class="fa fa-star"></i></sup>
+                                </aura:if>
+                                &nbsp;<i class="{!equals(addr.Id,v.newAddress.Id) ? 'editing far fa-edit clickable': 'far fa-edit clickable'}" 
+                                         data-index="{!index}" onclick="{!c.loadAddr}"></i>
+                            </span>
+                        </div>
+                    </aura:iteration>
+
+                    <div class="col-sm-12 addNewAddress">
+                        <a href="" class="orangeButton" onclick="{!c.toggleAddrEdit}">Add New Address &nbsp; <i class="{!v.open ? 'far fa-minus' : 'far fa-plus'}"></i></a>
+                        <br />
+                        <!-- show/hide based on if the add new address button is clicked -->
+                        <div aura:id="addrForm" class="{!v.open ? 'newAddressFields' : 'newAddressFields slds-hide'}">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="search-result-wrapper search-result-wrapper-inline" onfocusout="{!c.onElementFocusedOut}">
+                                        <ui:inputText class="slds-input" value="{!v.newAddress.Address_Line_1__c}" placeholder="Address Line 1"
+                                                      aura:id="street"
+                                                      updateOn="keyup"
+                                                      keyup="{!c.handleSearchChange}"
+                                                      change="{!c.onAddressChanged}"
+
+                                        />
+                                        <!-- address validation loader -->
+                                        <div aura:id="loader" class="slds-spinner_container spinner-inner invisible">
+                                            <div class="slds-spinner slds-spinner--small" aria-hidden="false" role="alert">
+                                                <div class="slds-spinner__dot-a"></div>
+                                                <div class="slds-spinner__dot-b"></div>
+                                            </div>
+                                        </div>
+                                        <!-- address validation search results dropdown -->
+                                        <div class="searchResults">
+                                            <aura:renderif isTrue="{!v.hasSuggestions}">
+                                                <ul class="searchResults">
+                                                    <aura:iteration items="{!v.suggestions}" var="suggestion">
+                                                        <li class="resultItem">
+                                                            <a id="{!globalId + '-suggestion-index-' + suggestion.index}"
+                                                               tabindex="0"
+                                                               href="javascript:void(0);"
+                                                               title="{!suggestion.format}"
+                                                               onclick="{!c.handleResultSelect}"
+                                                               onkeyup="{!c.onSuggestionKeyUp}">{!suggestion.suggestion}</a>
+                                                        </li>
+                                                    </aura:iteration>
+                                                </ul>
+                                            </aura:renderif>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <ui:inputText class="slds-input" value="{!v.newAddress.Address_Line_2__c}"
+                                                  placeholder="Address Line 2"
+                                                  aura:id="street2"
+                                                  change="{!c.onAddressChanged}" />
+                                </div>
+                                
+                                <div class="col-sm-4 preferredCheckboxWrapper">
+                                    <div class="preferredCheckbox">Preferred</div>
+                                    <ui:inputCheckbox class="slds-input" value="{!v.newAddress.Preferred__c}"/>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <ui:inputText class="slds-input" value="{!v.newAddress.City__c}"
+                                                  placeholder="City"
+                                                  aura:id="city"
+                                                  change="{!c.onAddressChanged}" />
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <ui:inputText class="slds-input" value="{!v.newAddress.State__c}"
+                                                  placeholder="State"
+                                                  aura:id="state"
+                                                  change="{!c.onAddressChanged}" />
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <ui:inputText class="slds-input" value="{!v.newAddress.Zip_Code__c}"
+                                                  placeholder="Zip Code"
+                                                  aura:id="zip"
+                                                  change="{!c.onAddressChanged}" />
+                                </div>
+     
+                                
+                            </div>
+
+                            <!-- Added hidden fields for address validation -->
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <ui:inputText aura:id="addrValStatus" placeholder="Validation Status"
+                                             class="slds-input"
+                                             value="{!v.newAddress.Address_Validation_Status__c}"/>
+                                </div>
+                                <div class="col-sm-4">
+                                    <lightning:select aura:id="addType" 
+                                                      value="{!v.newAddress.Address_Type__c}">
+                                        <option value="">Select Billing Or Shipping </option>
+                                        <aura:iteration items="{!v.AddTypeValues}" var="item">
+                                            <option value="{!item}">{!item}</option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+                                
+                                <div class="col-sm-4">
+                                    <lightning:input aura:id="addrValTmStmp" label="Address Validation Timestamp"
+                                             class="col-sm-6 slds-hide"
+                                             value="{!v.newAddress.Address_Validation_Timestamp__c}"/>
+                                </div>
+                            </div>
+
+                            <div class="row buttonRow">
+                                <div class="col-sm-12">
+                                    <a href="" onclick="{!c.cancelAddrEdit}" class="greyButton">Cancel</a> 
+                                    <a href="" onclick="{!c.saveAddr}" class="orangeButton">Save</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <aura:if isTrue="{!greaterthan(v.addresses.length,2)}">
+                        <div class="col-sm-12">
+                            <a href="javascript:void(0)" onclick="{!c.toggleAddresses}">
+                                {!v.addrExpand}
+                            </a>
+                        </div>
+                    </aura:if>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- edit customer modal --> 
+        <aura:if isTrue="{!v.showModal}">
+            <c:AddCustomer recordId="{!v.recordId}" />
+        </aura:if>
+        <div class="slds-backdrop" aura:id="overlay"></div>
+    </div>
+</aura:component>

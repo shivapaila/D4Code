@@ -1,0 +1,25 @@
+<aura:component controller="ManageRelatedNotesController">
+    <aura:attribute name="note" type="Object" default="null" />
+    <aura:attribute name="rowIndex" type="String"/>
+    <aura:registerEvent name="deleteNoteEvent" type="c:DeleteNoteEvent"/>
+    <aura:registerEvent name="editNoteEvent" type="c:EditNoteEvent"/>
+    
+    <div class="row noteSection">
+        <div class="col-sm-12">
+
+            <a class="float-right deleteNote" href="" onclick="{!c.handleRemoveNote}">
+                <i class="far fa-trash-alt"></i>
+            </a>
+            
+            <a class="float-right editNote" href="" onclick="{!c.handleEditNote}">
+                <i class="far fa-edit"></i>
+            </a>
+
+            <h4 class="noteHeader">{!v.note.title}</h4> 
+            <aura:unescapedHtml value="{!v.note.body}"/>
+
+            
+        </div>
+    </div>
+    <br />
+</aura:component>

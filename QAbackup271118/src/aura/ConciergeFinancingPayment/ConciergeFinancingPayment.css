@@ -1,0 +1,301 @@
+.THIS .formWrapper {
+	margin-bottom:20px;
+}
+.THIS .formWrapper input {
+	width:100%;
+}
+.THIS .inline {
+	display:inline-block;
+	margin-right:5px;
+}
+.THIS .radioWrapper {
+	width:100%;
+	display:block;
+	margin:5px 0 15px;
+}
+.THIS .selected {
+	color:#353534;
+}
+.THIS .slds-radio .slds-form-element__label, .THIS .slds-checkbox .slds-form-element__label {
+	font-size:14px;
+}
+.THIS .inlineLabel {
+	margin-top:6px;
+}
+.THIS .formWrapper .row {
+	margin-bottom:10px;
+}
+.THIS .currentBreadcrumbItem {
+	margin-left:0;
+}
+.THIS .buttonWrapper {
+	margin-top:10px;
+}
+.THIS .buttonWrapper a {
+    font-size: 11px;
+    width: 100% !important;
+    padding: 11px 0;
+    text-align: center;
+    display: block;
+}
+.THIS .buttonWrapper a.orangeButtonLarge {
+	margin-top:10px;
+}
+.THIS .currentCartImage {
+	width:80px;
+	height:70px;
+	background-position:center;
+	background-size:cover;
+	background-repeat:no-repeat;
+}
+.THIS .currentCartItemPrice {
+	margin-top:0;
+	display:block;
+}
+.THIS .tabbedIn {
+	margin-left:35px;
+	margin-top:0;
+}
+.THIS .paymentMethodWrapper {
+	margin-top:45px;
+}
+.THIS .slds-tabs--default__item {
+	border-radius: 0;
+    border: none;
+    color: #fff;
+    background: #f68c2c;
+    padding: 8px 16px;
+    line-height: 14px;
+    font-size: 12px;
+    cursor: pointer;
+    border:none;
+    letter-spacing:0;
+    margin:0;
+    text-transform:none;
+    height:auto;
+    margin-right:15px;
+}
+.THIS .slds-tabs--default__item.slds-has-focus {
+    background: #3366cc;
+    font-weight:300;
+}
+.THIS .slds-tabs--default__item.slds-active .slds-tabs--default__link:hover {
+	color:#fff;
+}
+.THIS .slds-tabs_default__nav, .THIS .slds-tabs--default__nav {
+	border-bottom:none;
+}
+.THIS .slds-tabs_default__item:focus:after, 
+.THIS .slds-tabs_default__item.slds-has-focus:after, 
+.THIS .slds-tabs--default__item:focus:after, 
+.THIS .slds-tabs--default__item.slds-has-focus:after {
+	content:none;
+}
+.THIS .slds-tabs_default__link, 
+.THIS .slds-tabs--default__link {
+	height:auto;
+	line-height:100%;
+	overflow:visible;
+}
+.THIS .tabContent {
+	padding:0 15px;
+	margin-top:-15px;
+}
+.THIS .tabContent.noPadd {
+	padding:0;
+}
+.THIS .scanButton {
+	margin-top:5px;
+	display:inline-block;
+}
+.THIS .select {
+	width:100%;
+	font-size:13px;
+}
+.THIS div.uiInput--select label:after{
+	width:8%;
+}
+.THIS .paymentButtonWrapper {
+	width:100%;
+	display:block;
+	text-align:right;
+	height:100px;
+	margin-top:15px;
+}
+.THIS .paymentButtons {
+	width:190px;
+	float:right;
+}
+.THIS .paymentButtonWrapper a {
+	width:100%;
+	display:block;
+	text-align:center;
+	margin-bottom:10px;
+}
+.THIS .warningText {
+	color:red;
+}
+.THIS .slds-modal__footer .greyButton {
+	margin-right:10px;
+}
+.THIS .deliveryMethodProducts {
+	margin-bottom:15px;
+}
+.THIS .slds-tabs--default__item:focus, 
+.THIS .slds-tabs--default__item.slds-has-focus {
+	color:#fff;
+}
+.THIS .singlePaymentMethod {
+	background:#f2f2f2;
+	padding:10px 15px;
+	margin-bottom:15px;
+}
+.THIS .paymentMethodWrapper h4 {
+	margin-bottom:0;
+}
+.THIS .paymentMethodWrapper .subHeader {
+	margin-bottom:15px;
+	display:block;
+}
+.THIS .paymentMethodLabel {
+	float:left;
+	background:#353534;
+	color:#fff;
+	padding:4px 8px;
+	border-radius:3px;
+	font-size:11px;
+	margin-top:5px;
+}
+.THIS .paymentInputLabel {
+	display:block;
+}
+.THIS .addNewButtonWrapper {
+	margin:15px 0 20px;
+}
+.THIS .paymentMethodPicklist {
+	margin-bottom:20px;
+}
+.THIS .finalizeOrder small {
+	display:block;
+	margin-bottom:7px;
+}
+.THIS .shorter {
+    width : 50%
+}
+.THIS .fixCheckbox span.slds-checkbox {
+	width:100% !important;
+}
+
+
+
+/* HIDE SHOW WORK */
+
+/**
+ * Code for checkboxes
+ */
+ .THIS .checkbox {
+	position: relative;
+	width: 1rem;
+	height: 1rem;
+	margin-right: .75rem;
+	cursor: pointer;
+	-webkit-appearance: none;
+		-moz-appearance: none;
+			  appearance: none;
+	outline: 0;
+	/**
+	 * Iterate over map and autogenerate helper classes.
+	* See "https://codepen.io/fxm90/pen/zGjjrJ" for an example
+	*/
+ }
+ .THIS .checkbox:before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 1;
+	width: 100%;
+	height: 100%;
+	border: 2px solid #f2f2f2;
+	transition: all 0.3s ease-in-out;
+ }
+ .THIS .checkbox:checked:before {
+	height: 50%;
+	-webkit-transform: rotate(-45deg);
+			  transform: rotate(-45deg);
+	border-top-style: none;
+	border-right-style: none;
+ }
+ .THIS .checkbox--red:checked:before {
+	border-color: #f44336;
+ }
+ .THIS .checkbox--pink:checked:before {
+	border-color: #e91e63;
+ }
+ .THIS .checkbox--purple:checked:before {
+	border-color: #9c27b0;
+ }
+ .THIS .checkbox--deep-purple:checked:before {
+	border-color: #673ab7;
+ }
+ .THIS .checkbox--indigo:checked:before {
+	border-color: #3f51b5;
+ }
+ .THIS .checkbox--blue:checked:before {
+	border-color: #2196f3;
+ }
+ .THIS .checkbox--light-blue:checked:before {
+	border-color: #03a9f4;
+ }
+ .THIS .checkbox--cyan:checked:before {
+	border-color: #00bcd4;
+ }
+ .THIS .checkbox--teal:checked:before {
+	border-color: #009688;
+ }
+ .THIS .checkbox--green:checked:before {
+	border-color: #4caf50;
+ }
+ .THIS .checkbox--light-green:checked:before {
+	border-color: #8bc34a;
+ }
+ .THIS .checkbox--lime:checked:before {
+	border-color: #cddc39;
+ }
+ .THIS .checkbox--yellow:checked:before {
+	border-color: #ffeb3b;
+ }
+ .THIS .checkbox--amber:checked:before {
+	border-color: #ffc107;
+ }
+ .THIS .checkbox--orange:checked:before {
+	border-color: #ff9800;
+ }
+ .THIS .checkbox--deep-orange:checked:before {
+	border-color: #ff5722;
+ }
+ .THIS .checkbox--blue-grey:checked:before {
+	border-color: #607d8b;
+ }
+ 
+ /**
+  * Notice: Checkbox is styled via import of my other pen (https://codepen.io/fxm90/pen/JdmaeL)
+  */
+  .THIS .trigger input[type="checkbox"] + span {
+	visibility: hidden;
+	opacity: 0;
+	transition: visibility 0s linear 0.33s, opacity 0.33s linear;
+ }
+ .THIS .trigger input[type="checkbox"]:checked + span {
+	visibility: visible;
+	opacity: 1;
+	transition-delay: 0s;
+ }
+ 
+ .THIS .msg {
+	display: block;
+	margin-top: 8px;
+	padding: 8px 12px;
+	border: 1px solid #ddd;
+	border-radius: 3px;
+ }

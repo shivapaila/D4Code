@@ -1,0 +1,256 @@
+<aura:component implements="flexipage:availableForAllPageTypes" controller="ProductDetailCmpCtrl"  access="global" >
+    <ltng:require scripts="{!$Resource.Jquery224}"  />
+     <aura:attribute name="parentCategoryId" type="String" />
+    <aura:attribute name="productDetailId" type="String" />
+    <aura:attribute name="searchKey" type="String" />
+	<aura:attribute name="selectedColor" type="String" />
+    <aura:attribute name="productDetail" type="ProductWrapper" />
+    <aura:attribute name="quantity" type="Integer" default="1" />
+	<aura:attribute name="productPrice" type="ProductPriceWrapper"/>
+	<!-- helper components -->
+	<c:ToastErrorHandler aura:id="toastErrorHandler" /> 
+    <aura:handler event="c:getProductPricesEvent" action="{!c.handlePriceEvent}"/>
+    <!-- expand/contract -->
+    <aura:attribute name="descriptionLinkText" type="String" default="More +" />
+    <aura:attribute name="dimensionLinkText" type="String" default="More +" />
+    
+    <!-- carousel variables and defaults --> 
+    <aura:attribute name="start" type="Integer" default="0" />
+    <aura:attribute name="end" type="Integer" default="3" />
+    <aura:attribute name="mainImage" type="String" />
+    <aura:attribute name="showModal" type="Boolean" default="false" />
+    <aura:attribute name="showcustomerModal" type="Boolean" default="false" />
+    <aura:attribute name="showDeliveryModal" type="Boolean" default="false" />
+    <aura:attribute name="foundProductDetail" type="Boolean" default="false" />
+   
+    <aura:registerEvent name="productEvent" type="c:ProductEvent" />   
+    <!-- event for navigating to related products -->
+    <aura:registerEvent name="ProductDetailNotifyToProductHome" type="c:NotifyParentComponentEvent"/>
+	<!-- event for notify concierge header to refresh-->
+      <aura:registerEvent name="NotifyHeaderComponentEvent" type="c:NotifyHeaderComponentEvent"/>
+	
+    <!-- In case add to cart for new guest, refresh concierge_head active cart numbers,so refresh whole page-->
+    <aura:handler name="FinishedAddToCart" event="c:NotifyParentComponentEvent" action="{!c.closeCustomerModalAndRefresh}"/>
+  	
+    <!-- initialization -->
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.productDetailId}" action="{!c.doInit}" />
+    <aura:handler name="NavigateToWrapperComponentAppEvent" event="c:NavigateToWrapperComponentAppEvent" action="{!c.doIn}"/>
+    
+    <div class="row">
+		 <div class="col-sm-6">
+
+            <div class="mainProductImage" style="{! 'background-image:url(' + v.mainImage +'?$AFHS-PDP-Zoomed$)'}"  onclick="{!c.showImageModal}" />
+
+            <!-- large image modal -->
+            <aura:if isTrue="{!v.showModal}">
+                <section aura:id="imageModal" role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="image-modal" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <i class="fa fa-times float-right" onclick="{! c.closeImageModal }" />
+                        </header>
+                        <div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap text-center">
+                            <img src="{!v.mainImage+'?$AFHS-PDP-Zoomed$'}" class="modalProductImage" />
+                        </div>
+                    </div>
+                </section>
+            </aura:if>
+            <div class="slds-backdrop" aura:id="overlay" onclick="{! c.closeImageModal }" >
+            </div>
+
+            <!-- carousel -->
+            <div class="scrollWrapper">
+
+                <div class="chevronWrapper left">
+                <!-- THIS OUT WITH SWIPE METHOD  -->    
+                    <!-- <i class="far fa-chevron-left" onclick="{! c.shiftImageLeft }"/> -->
+                    <lightning:buttonIcon iconName="utility:chevronleft" alternativeText="left" variant="bare" size="large" onclick="{!c.shiftImageLeft}" />
+                     
+                 <!--   <aura:if isTrue="{!greaterthan(v.start,0)}">
+                        <i class="far fa-chevron-left" onclick="{! c.shiftImageLeft }" />
+                    </aura:if>-->
+                  
+                </div>
+
+                <div class="chevronWrapper right">
+                    <!-- THIS OUT WITH SWIPE METHOD-->
+                      <!-- <i class="far fa-chevron-right" onclick="{! c.shiftImageRight }"/> -->
+                      <lightning:buttonIcon iconName="utility:chevronright" alternativeText="right" variant="bare" size="large" onclick="{!c.shiftImageRight}" />
+                <!--  <aura:if isTrue="{!greaterthan(v.productDetail.media.length, v.end)}">
+                        <i class="far fa-chevron-right" onclick="{! c.shiftImageRight }" />
+                    </aura:if> -->
+                   
+                </div>
+
+                <div aura:id="productThumbWrapperElement" class="productThumbWrapper scroll-horizontal">
+                    <div class="noLineBreaks" >
+                        <!-- TOOK THIS OUT OF THE aura:iteration FOR THE TOUCH HORZ SCROLL: -->
+                           
+                       
+                        <aura:iteration var="m" items="{!v.productDetail.media}"  >
+                            <div class="productThumb">
+                                <div class="productThumbImage" 
+                                     style="{! 'background-image:' + 'url(' + m.href + ')'}"
+                                     data-record="{!m.href}"
+                                     onclick="{!c.changeImage}"
+                                     /> 
+                            </div>
+                        </aura:iteration>
+                        
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="descriptionWrapper">
+                <h4 class="sectionHeader">Description</h4>
+                <div aura:id="productDescription" class="details">{!v.productDetail.detailedDescription}</div>
+                <a href="javascript:void(0);" onclick="{!c.expandDescription}">{!v.descriptionLinkText}</a>
+            </div>
+
+            <div class="dimensionWrapper">
+                <h4 class="sectionHeader">Dimensions</h4>
+                <div class="details">{!v.productDetail.dimensionDescription}</div>
+                <a href="javascript:void(0);" onclick="{!c.expandDimension}">{!v.dimensionLinkText}</a>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <h2 class="productTitle">{!v.productDetail.productTitle}</h2> 
+            <div class="productSKU">
+                <strong>{!v.productDetail.sku}  
+                    <!-- OUT ON 1/8 <c:ProductNailedDamagedQtyForProductDetail productDetailId="{!v.productDetailId}" />
+                    --> 
+                </strong>
+            </div>
+
+            <div class="overallRatingWrapper">
+                <aura:if isTrue="{!v.foundProductDetail}">
+                	<c:ProductReviewAndRating productDetailId="{!v.productDetailId}" onlyRating="true" starSize="Large"/>
+                </aura:if>
+            </div>
+
+            <aura:if isTrue="{!greaterthan(v.productDetail.variants.length,1)}">
+                <div class="otherSizes">
+                    <ui:inputSelect aura:id="mattressField" label="Sizes:" 
+                                      change="{!c.mattressSelect}">
+                        <ui:inputSelectOption text="" label="Other Sizes" />
+                        <aura:iteration items="{!v.productDetail.variants}" var="variant">
+                            <ui:inputSelectOption text="{!variant.sku}" label="{!variant.size}"/>
+                        </aura:iteration>
+                    </ui:inputSelect>
+                </div>
+            </aura:if>
+            
+            <div class="colorWrapper">
+                <aura:iteration items="{!v.productDetail.swatches}" var="swatch">
+                    <div class="{!swatch.sku == v.productDetail.sku ? 'productSwatchImage selected' : 'productSwatchImage'}" style="{! 'background-image:url(' + swatch.imageSource +')'}" 
+                         alt="{!swatch.color}" data-record="{!swatch.sku}" onclick="{!c.goToProduct}"></div>
+                </aura:iteration>
+                <aura:if isTrue="{!!empty(v.productDetail.swatches)}"> 
+                    <div class="selectedColorWrapper">
+                        <small>Selected color: <strong>{!v.productDetail.itemColor}</strong></small>
+                    </div>
+                </aura:if>
+            </div>
+
+            <div class="priceWrapper">
+                <aura:if isTrue="{!v.foundProductDetail}">
+                    <c:ProductPriceForProductDetail productDetailId="{!v.productDetailId}" />
+                </aura:if>
+            </div>
+
+            <!-- QUANTITY SECTION -->
+            <div class="quantityWrapper">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <label>Quantity</label>
+                        <div class="quantityButtonWrapper">
+                            <button class="float-left quantityButton" onclick="{!c.decrement}">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <div class="float-left quantityNumber">{!v.quantity}</div>
+                            <button class="float-left quantityButton" onclick="{!c.increment}">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+
+            <!-- ADD TO CART SECTION -->
+            <div class="addToCartWrapper"> 
+                <div class="row">
+                    <div class="col-sm-6 paddRightOff">
+                        <button class="orangeButtonLarge" onclick="{!c.addToCart}">
+                            ADD TO CART
+                        </button>
+                    </div>
+                    <div class="col-sm-6 paddLeftOff">
+                        <aura:if isTrue="{!v.foundProductDetail}">
+                            <c:ProductAvailableQtyForProductDetail productDetailId="{!v.productDetailId}" />
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+
+            <div class="estimatedDeliveryDateWrapper">
+                <button class="darkGreyButtonLarge" onclick="{!c.openDeliveryModal}">
+                    ESTIMATED DELIVERY DATE
+                </button>
+            </div>
+
+             <div class="reviewDetailsWrapper">
+                 <aura:if isTrue="{!v.foundProductDetail}">
+                     <c:ProductReviewAndRating productDetailId="{!v.productDetailId}" onlyRating="false" starSize="Small"/>
+                 </aura:if>
+            </div>
+
+            <!-- complete the set -->
+            <aura:if isTrue="{!!empty(v.productDetail.crossSells)}">
+                <h4 class="sectionHeader completeTheSet">Complete The Set</h4>
+                <div class="row">
+                    <aura:iteration var="cs" items="{!v.productDetail.crossSells}" indexVar="index" end="3" >
+                        <div class="col-sm-4" data-record="{!cs.sku}" style="cursor:pointer" onclick="{!c.goToProduct}">
+                            <img src="{!cs.imageUrl}" class="completeTheSetImage" alt="{!cs.name}" />
+                            <br/>
+                            <div class="completeTheSetItem">{!cs.name}</div>
+                        </div>
+                    </aura:iteration>
+                </div>   
+            </aura:if>
+		</div>  
+
+         <!-- select customer modal --> 
+        <aura:if isTrue="{!v.showcustomerModal}">
+            <section aura:id="customerModal" role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="image-modal" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <i class="fa fa-times float-right" onclick="{! c.closeCustomerModal }" />
+                    </header>
+                    <div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap modalFix">
+                         <c:MyCustomers showSelectButton="true" productDetail="{!v.productDetail}" productPrice="{!v.productPrice}" quantity="{!v.quantity}"/>
+                    </div>
+                </div>
+            </section>
+        </aura:if>
+         <!-- select delivery modal --> 
+        <aura:if isTrue="{!v.showDeliveryModal}">
+            <section aura:id="deliveryModal" role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="image-modal" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <i class="fa fa-times float-right" onclick="{! c.closeDeliveryModal }" />
+                        <h4>Estimated Delivery Date for: {!v.productDetail.productTitle}</h4>
+                    </header>
+                    <div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap text-center">
+                        <c:EstimatedDeliveryDate searchSku="{!v.productDetail.sku}" numSelected="{!v.quantity}" />
+                    </div>
+                </div>
+            </section>
+        </aura:if>
+        <!-- backdrop for modals -->
+        <div class="slds-backdrop" aura:id="backdrop">
+        </div>
+    </div>
+</aura:component>

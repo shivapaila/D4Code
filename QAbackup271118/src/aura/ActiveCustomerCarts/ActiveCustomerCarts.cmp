@@ -1,0 +1,78 @@
+<aura:component controller="ManageCustomerCarts" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" access="global" >
+	<aura:handler name="init" value="{!this}" action="{!c.Init}"/>
+    <aura:attribute type="Integer" name="pageNumber" default="1" />
+    <aura:attribute type="Integer" name="maxPage" default="1" />
+    <aura:attribute name="currentList" type="List[]"/>
+    <aura:attribute name="CartGuestId" type="string"/>
+  	<aura:attribute name="customerwithActiveCartLst" type="List[]"/>
+    <aura:attribute name="searchKeyword" type="string"/>
+    <aura:attribute name="showModal" type="Boolean"/>
+    <aura:attribute name="Message" type="boolean" default="false" description="use for display no record found message"/>
+    <aura:attribute name="initialLst" type="List[]"/>
+    <aura:handler name="change" value="{!v.pageNumber}" action="{!c.renderPage}" />
+   <aura:handler name="change" value="{!v.customerwithActiveCartLst}" action="{!c.Init}" />
+    <!--<aura:registerEvent name="NotifyHeaderComponentEvent" type="c:NotifyHeaderComponentEvent"/> --> 
+   <div class="container" >
+        <div class="customerSearchWrapper">
+               <ui:inputText aura:id="searchId" class="customerSearch" value="{!v.searchKeyword}" required="true" placeholder="Search My Guests" keyup="{!c.search}" updateOn="keyup"/>
+            <!-- <lightning:input value="{!v.searchKeyword}"
+                             	class="customerSearch"
+                                 aura:id="searchId" 
+                                 placeholder="Search My Guests" keyup="{!c.search}" updateOn="keyup"
+                                 type="string"
+                                 required="true" /> -->
+            </div>
+        
+        <aura:if isTrue="{!v.Message}">
+                <div class="cardWrapper">
+                    <div class="cardContent">
+                        <div class="slds-text-color--error"> No results found. Please modify your search.</div>
+                    </div>
+                </div>
+            </aura:if>
+        <div class="row">
+                <aura:iteration var="wrapper" items="{!v.currentList}" indexVar="i">
+                    <div class="col-sm-6 activeCartWrapper">
+                        
+                            <div class="cardWrapper">
+                                <div class="cardContent">   
+                                    
+                                     <a data-record="{!wrapper.oppRecord.AccountId}" onclick="{!c.goToRecord}">
+                                        <i class="far fa-user"></i>&nbsp;{!wrapper.oppRecord.Account.Name} &nbsp;&nbsp;
+                                    </a>
+                                    
+                                   
+                                </div>
+
+                                <div class="removeActiveCart">
+                                    <aura:if isTrue="{!wrapper.selected}">
+                                        <div class="confirm">
+                                            <div class="confirmText">
+                                                Are you sure?
+                                            </div>
+                                            <div class="confirmButtons">
+                                                <a id='{!i}' class="orangeButton marginRight smallButton" onclick="{!c.removeOpp}">Yes</a>
+                                                <a id='{!i}' class="greyButton smallButton" onclick="{!c.cancel}" >No</a>
+                                            </div>
+                                        </div>
+                                        <aura:set attribute="else">
+                                            <a id='{!i}' onclick="{!c.confirm}" >
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+
+
+                            </div>
+                        
+                       
+                        
+                    </div>
+            </aura:iteration>
+        </div>
+         <div class="paginationWrapper">
+            <c:Pagination currentPageNumber="{!v.pageNumber}" maxPageNumber="{!v.maxPage}" />
+        </div>
+    </div>
+</aura:component>

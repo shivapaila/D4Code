@@ -1,0 +1,25 @@
+<aura:component controller="Utilities_SalesAndService" access="global" 
+                implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:appHostable,lightning:actionOverride" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="isConciergeUser" type="Boolean" />
+    <aura:if isTrue="{!v.isConciergeUser}">
+        <!-- if not a driver, show the customer info --> 
+        <aura:if isTrue="{!v.recordId}">
+            <c:ViewCustomer recordId="{!v.recordId}" />
+            <c:ManageRelatedNotes parentId="{!v.recordId}" />
+            <c:RelatedCustomerCases recordId="{!v.recordId}"/>
+            <c:UpcomingAppointments recordId="{!v.recordId}"/>
+            <c:UpcomingTasks recordId="{!v.recordId}"/>
+            <c:AllCustomerCarts recordId="{!v.recordId}"/>
+            <c:ViewCustomerOrderHistory contactId="{!v.recordId}" />
+            <c:WishListCmp recordId="{!v.recordId}" />
+        </aura:if>
+        
+        <aura:set attribute="else">
+            <!-- if a driver, show default record view --> 
+            <force:recordView recordId="{!v.recordId}" type="FULL"/>
+        </aura:set>
+    </aura:if>
+    
+</aura:component>

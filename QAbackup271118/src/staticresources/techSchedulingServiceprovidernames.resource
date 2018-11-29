@@ -1,0 +1,1 @@
+["AFFINITY    ","ASHLEY      ","USQUALITY   "]

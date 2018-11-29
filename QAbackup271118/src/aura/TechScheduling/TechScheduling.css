@@ -1,0 +1,68 @@
+.THIS.slds-spinner_container {  
+    z-index: 10000;
+    position: fixed;   
+}
+
+.THIS div.workloaddetails {
+    font-weight: bold !important;
+    padding-bottom:1px;
+}
+
+/*
+.THIS.ui-datepicker .ui-state-default {
+	color: deepskyblue;
+	background: ghostwhite;
+}
+*/
+
+
+.THIS.slds-modal__container{
+    max-width: 70rem !important;
+    width:70% !important;
+    
+}
+.THIS.event a {
+    background-color: #42B373 !important;
+    background-image :none !important;
+    color: #ffffff !important;
+}
+
+
+.THIS .progress-bar--style-custom{
+    background-color: Red; 
+}
+
+.THIS .table-test thead th span {
+    background-color: #16325c;
+    color: white
+}
+
+.THIS .tech-avail a {
+    background-color: green !important;
+    background-image :none !important;
+    color: #ffffff !important;
+}
+
+.THIS .tech-not-avail a {
+    background-color: red !important;
+    background-image :none !important;
+    color: #ffffff !important;
+}
+
+.THIS .tech-leave span {
+    background-color: #4B0082 !important;
+    background-image :none !important;
+    color: #ffffff !important;
+}
+
+.THIS .tech-leave a {
+    background-color: purple !important;
+    background-image :none !important;
+    color: #ffffff !important;
+}
+
+.THIS .tech-partially-avail a {
+    background-color: yellow !important;
+    background-image :none !important;
+    color: #000000 !important;
+}

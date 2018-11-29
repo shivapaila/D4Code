@@ -1,0 +1,156 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride" controller="SalesOrderLineItemRelatedListController">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="lineItems" type="SalesOrderItem__x[]" default="[]"/>
+    <aura:attribute name="PopupsoId" type="Id" />
+    <aura:attribute name="SalesOrdLineItemData" type="SalesOrderItem__x[]" default="[]"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="lineItemsEstArrival" type="List" default="[]"/>
+
+  <!--create a component attributs -->
+    <aura:attribute name="showSpinner" type="boolean" default="false"/>
+     <!--loading spinner start... style=Brand Medium (blue dots)-->
+
+    <lightning:card iconName="custom:custom41">
+<aura:if isTrue="{!v.showSpinner}">
+    <div class="slds-spinner_container">
+        <lightning:spinner aura:id="spinner" variant="brand" size="medium"/>
+    </div>
+</aura:if>
+        <aura:set attribute="title">
+            <b>{!$Label.c.Sales_Order_Line_Related_List_Card_Title_Sales_Order_Items}</b>
+        </aura:set>
+        
+        <p class="slds-p-horizontal_small">
+            <aura:if isTrue="{!v.lineItems != null}">
+                <div class="slds-scrollable--x">
+                    <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal">
+                        <thead>
+                            <tr class="slds-text-title--caps">  
+                                <th></th> 
+                                <th scope="col" class="slds-text-align_center">
+                                    <div class="slds-truncate" title="{!$Label.c.Sales_Order_Line_Field_Label_Item_SKU}">{!$Label.c.Sales_Order_Line_Field_Label_Item_SKU}</div>
+                                </th>                        
+                                <th scope="col" class="slds-text-align_center">
+                                    <div class="slds-truncate" title="{!$Label.c.Sales_Order_Line_Field_Label_Item_Description}">{!$Label.c.Sales_Order_Line_Field_Label_Item_Description}</div>
+                                </th> 
+                                <th scope="col" class="slds-text-align_center">
+                                    <div class="slds-truncate" title="{!$Label.c.Sales_Order_Line_Field_Label_Quantity}">{!$Label.c.Sales_Order_Line_Field_Label_Quantity}</div>
+                                </th>
+                                <th scope="col" class="slds-text-align_center">
+                                    <div class="slds-truncate" title="{!$Label.c.Sales_Order_Line_Field_Label_Delivery_Type}">{!$Label.c.Sales_Order_Line_Field_Label_Delivery_Type}</div> 
+                                </th>
+                                <th scope="col" class="slds-text-align_center">
+                                    <div class="slds-truncate" title="{!$Label.c.Sales_Order_Line_Field_Label_Delivered_Date}">{!$Label.c.Sales_Order_Line_Field_Label_Delivered_Date}</div> 
+                                </th>
+                                <th scope="col" class="slds-text-align_center">
+                                    <div class="slds-truncate" title="{!$Label.c.Sales_Order_Line_Field_Label_Sale_Status}">{!$Label.c.Sales_Order_Line_Field_Label_Sale_Status}</div> 
+                                </th>
+                                <th scope="col" class="slds-text-align_center">
+                                    <div class="slds-truncate" title="{!$Label.c.Sales_Order_Field_Label_Est_Arrival}">{!$Label.c.Sales_Order_Field_Label_Est_Arrival}</div> 
+                                </th>
+                                <th scope="col" class="slds-text-align_center">
+                                    <div class="slds-truncate" title="{!$Label.c.Sales_Order_Field_Label_Ship_Address}">{!$Label.c.Sales_Order_Field_Label_Ship_Address}</div> 
+                                </th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration var="lineItem" items="{!v.lineItems}" indexVar="index">    
+                                <tr> 
+                                    <td>
+                                        <a onclick="{!c.launchLineItemDeatil}" data-orderlineid = "{!lineItem.ExternalId}" data-ordersfdcid="{!v.recordId}">{!$Label.c.Sales_Order_Line_Related_List_Link_View_Details}</a> 
+                                    </td>  
+                                    <td class="slds-text-align_center" data-label="{!$Label.c.Sales_Order_Line_Field_Label_Item_SKU}">
+                                        {!lineItem.phdItemSKU__c}                                       
+                                    </td>                          
+                                    <td class="slds-text-align_center" data-label="{!$Label.c.Sales_Order_Line_Field_Label_Item_Description}">
+                                        {!lineItem.phdItemDesc__c}                                       
+                                    </td> 
+                                    <td class="slds-text-align_center" data-label="{!$Label.c.Sales_Order_Line_Field_Label_Quantity}">
+                                        {!lineItem.phdQuantity__c}                                       
+                                    </td> 
+                                    <td class="slds-text-align_center" data-label="{!$Label.c.Sales_Order_Line_Field_Label_Delivery_Type}">
+                                        {!lineItem.phdDeliveryTypeDesc__c}                                       
+                                    </td> 
+                                    <td class="slds-text-align_center" data-label="{!$Label.c.Sales_Order_Line_Field_Label_Delivered_Date}">
+                                        <ui:outputDate value="{!lineItem.phdPurchaseDate__c}"/>                                 
+                                    </td>
+                                    <td class="slds-text-align_center" data-label="{!$Label.c.Sales_Order_Line_Field_Label_Sale_Status}">
+                                        {!lineItem.phdSaleType__c}                                      
+                                    </td>
+                                     <td class="slds-text-align_center" data-label="{!$Label.c.Sales_Order_Field_Label_Est_Arrival}">
+                                        <aura:iteration var="lineItemsEstArrival" items="{!v.lineItemsEstArrival}" indexVar="index2">
+                                            <aura:if isTrue= "{!index==index2}">
+                                                {!lineItemsEstArrival}                                       
+                                            </aura:if> 
+                                        </aura:iteration>
+                                    </td> 
+                                    <td class="slds-text-align_center" data-label="{!$Label.c.Sales_Order_Line_Field_Label_Ship_Address_1}">
+                                        
+                                        <a  href="{!$Label.c.NavigateToSobjectUrl + lineItem.Id + '/view'}"  data-value="{!lineItem.Id}" 
+                                           onmouseenter="{!c.openPop}" aria-describedby="help" onmouseout="{!c.closePop}" 
+                                           onclick="{!c.openTab}" > 
+                                            {!lineItem.phdShipAddress1__c +'... '}                                        
+                                        </a>
+                                    </td>
+                                   
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </div>
+            </aura:if>
+        </p>
+    </lightning:card>
+    <div aura:id="lineItemDetailsPlaceHolder" />
+    <section class="slds-popover slds-hide slds-border_right" role="dialog" id="help" style="position:fixed;" aura:id="pop">
+        <table aura:id="SalesorderID" class="slds-table slds-table--bordered  slds-align_absolute-left">  
+            <div class="slds-popover__body">
+                <header class="slds-popover__header slds-text-heading_small"><h3 id="dialog-heading-id-1" ><b>Ship Address Details</b></h3></header>
+                <p > 
+                    <thead>
+                        <tr class="slds-text-title-caps">
+                            <th scope="col" class="slds-text-align_left">
+                                <div class="slds-truncate.slds-text-heading_small" title="">Ship Address 1</div>
+                            </th>                        
+                            <th scope="col" class="slds-text-align_left">
+                                <div class="slds-truncate.slds-text-heading_small" title="">Ship Address 2</div>
+                            </th> 
+                            <th scope="col" class="slds-text-align_left">
+                                <div class="slds-truncate.slds-text-heading_small" title="">Ship City</div>
+                            </th>
+                            <th scope="col" class="slds-text-align_left">
+                                <div class="slds-truncate.slds-text-heading_small" title="">Ship State</div>
+                            </th>                        
+                            <th scope="col" class="slds-text-align_left">
+                                <div class="slds-truncate.slds-text-heading_small" title="">Ship Zip</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration var="LineItemValue" items="{!v.SalesOrdLineItemData}">    
+                            <tr>
+                                <td class="slds-text-align_left" >
+                                    {!LineItemValue.phdShipAddress1__c}                                       
+                                </td>
+                                <td class="slds-text-align_left" >
+                                    {!LineItemValue.phdShipAddress2__c}                                       
+                                </td>
+                                <td class="slds-text-align_center" >
+                                    {!LineItemValue.phdShipCity__c}                                       
+                                </td>
+                                <td class="slds-text-align_left" >
+                                    {!LineItemValue.phdShipState__c}                                       
+                                </td>
+                                <td class="slds-text-align_center" >
+                                    {!LineItemValue.phdShipZip__c}                                       
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </p>
+            </div>
+        </table> 
+    </section>
+
+</aura:component>

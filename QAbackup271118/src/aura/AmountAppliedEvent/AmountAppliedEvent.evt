@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name="amount" type="Decimal"/>
+    <aura:attribute name="type" type="String" />
+    <aura:attribute name="pmWrapper" type="PaymentMethodWrapper"/>
+    <aura:attribute name="indexNum" type="Integer"/>
+</aura:event>

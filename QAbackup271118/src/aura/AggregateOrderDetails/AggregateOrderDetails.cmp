@@ -1,0 +1,45 @@
+<aura:component controller="AggOrderDetails_Controller" implements="flexipage:availableForAllPageTypes,force:appHostable,force:hasRecordId" access="global" >
+	 <aura:attribute name="recordId" type="Id" /> <!-- It will holds the Account Id -->
+     <aura:attribute name="orderDetails" type="AggOrderDetails_Wrapper" />   
+     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />     
+    
+     <div class="slds-form--stacked slds-p-around--medium slds-m-bottom--x-small">
+  		<div class="slds-form-element">
+            <!-- This IF will check whether there is any exception or not -->
+            <aura:if isTrue="{!v.orderDetails.isException}">
+                <!-- DEF-0146 - Adding the message from External Object Exception when there are no records -->
+                <aura:if isTrue="{!v.orderDetails.externalObjectExceptionMsg != ''}">
+                    <b><ui:outputText value="{!v.orderDetails.externalObjectExceptionMsg}"/></b>
+                    <!-- DEF-0146 - if it is not related to the external object exception, default message will be shown -->
+                    <aura:set attribute="else">
+                        <b><ui:outputText value="{!$Label.c.Exception_Message_on_Sales_Order_Details}"/></b>
+                    </aura:set>
+                </aura:if>
+                <!-- If no exception then data will be shown -->
+                <aura:set attribute="else"> 
+                    <!-- It is visible for all Users-->
+                    <label class="slds-form-element__label">Number of Purchases</label>
+                    <div class="slds-form-element__control">
+                        <b><ui:outputText value="{!v.orderDetails.totalCount}"/></b> 
+                    </div>
+                    <br/>
+                    
+                    <aura:if isTrue="{!v.orderDetails.isDelTech}">
+                        <!-- It is visible only for Delivery or Tech Users-->
+                        <label class="slds-form-element__label">Spend Level</label>
+                        <div class="slds-form-element__control">
+                            <b><ui:outputText value="{!v.orderDetails.spendLevel}"/></b>
+                        </div>
+                        <aura:set attribute="else">
+                            <!-- It is visible to all Users except Delivery and Tech-->
+                            <label class="slds-form-element__label">Customer Lifetime Value</label>
+                            <div class="slds-form-element__control">
+                                <b><ui:outputText value="{!v.orderDetails.totalAmount}"/></b>
+                            </div>	
+                        </aura:set>
+                    </aura:if> 
+                </aura:set>
+            </aura:if>
+        </div>
+    </div>
+</aura:component>

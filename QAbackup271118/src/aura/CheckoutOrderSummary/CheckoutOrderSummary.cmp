@@ -1,0 +1,100 @@
+<aura:component controller="ShoppingCartDetailCmpCtrl" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="recordId" type="String"/>
+   	<aura:attribute name="isRenderForUpdate" type="Boolean"/>
+    
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    <aura:attribute name="shoppingCartEstimatedTax" type="Decimal"/>
+    <aura:attribute name="shoppingCartTotal" type="Decimal"/>
+    <aura:attribute name="shoppingCartTotalBeforeTax" type="Decimal"/>
+    <aura:attribute name="shoppingCartDeliveryFee" type="Decimal"/>
+    
+    <aura:attribute name="shoppingCartRecycleFee" type="Decimal" />    
+    <aura:attribute name="shoppingCartWarrantyFee" type="Decimal" />
+    
+    <aura:attribute name="shoppingCartWarrantyItemFee" type="ShoppingCartResponseWrapper.PairValueObj[]" />
+   
+    <aura:attribute name="shoppingCartNextDayCharge" type="Decimal" />
+    <aura:handler name="change" value="{!v.shipToAddress}" action="{!c.reloadSummary}"/>
+    <aura:handler name="change" value="{!v.guestId}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.isRenderForUpdate}" action="{!c.reloadSummaryForDeliveryDateUpdated}" />
+    <aura:registerEvent name="DeliveryDateChangeNotifyToCheckoutSummary" type="c:NotifyParentComponentEvent"/>
+    <aura:attribute name="shipToAddress" type="String" />
+    <h5>Order Summary</h5>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="float-left">
+                Items
+            </div>
+            <div class="float-right">
+                <ui:outputCurrency value="{!v.shoppingCartTotalBeforeTax}"/>
+            </div>
+        </div>
+        
+        <div class="col-sm-12">
+            <div class="float-left">
+                Shipping
+            </div>
+            <div class="float-right">
+                <ui:outputCurrency value="{!v.shoppingCartDeliveryFee}"/>
+            </div>
+        </div>
+        <aura:if isTrue="{!v.shoppingCartNextDayCharge>0}">
+            <div class="col-sm-12">
+                <div class="float-left">
+                    Next Day Charge
+                </div>
+                <div class="float-right">
+                    <ui:outputCurrency value="{!v.shoppingCartNextDayCharge}"/>
+                </div>
+            </div>
+            
+        </aura:if> 
+        <div class="col-sm-12">
+            <div class="float-left">
+                Taxes
+            </div>
+            <div class="float-right">
+                <ui:outputCurrency value="{!v.shoppingCartEstimatedTax}"/>
+            </div>
+        </div>
+        
+      
+        <aura:if isTrue="{!v.shoppingCartWarrantyItemFee.length>0}">
+            <aura:iteration items="{!v.shoppingCartWarrantyItemFee}" var="warrantyItem">
+                
+                <div class="col-sm-12">
+                    <div class="float-left">
+                        {!warrantyItem.key}
+                    </div>
+                    <div class="float-right">
+                        <ui:outputCurrency value="{!warrantyItem.value}" />
+                    </div>
+                </div>
+            </aura:iteration>
+            
+            
+        </aura:if>
+        <aura:if isTrue="{!v.shoppingCartRecycleFee>0}">
+            
+            <div class="col-sm-12">
+                <div class="float-left">
+                    Recycle
+                </div>
+                <div class="float-right">
+                    <ui:outputCurrency value="{!v.shoppingCartRecycleFee}"/>
+                </div>
+            </div>
+        </aura:if>
+    </div>
+    
+    <hr />
+    <div class="row">
+        <div class="col-sm-12">
+            <h5>Order Total:
+                <div class="float-right"><ui:outputCurrency value="{!v.shoppingCartTotal}"/></div>
+            </h5>
+        </div>
+    </div>
+    
+</aura:component>

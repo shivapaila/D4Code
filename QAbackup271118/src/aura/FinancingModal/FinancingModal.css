@@ -1,0 +1,36 @@
+.THIS .slds-modal__header h3 {
+	margin-bottom:0;
+}
+.THIS .totalRow {
+	background:#999;
+	padding:8px 12px;
+	color:#fff;
+}
+.THIS .totalWrapper {
+	margin-bottom:25px;
+}
+.THIS .lightningInput .slds-form-element__label {
+	display:none;
+}
+.THIS .percentDiscount .lightningInput {
+	width:70%;
+	display:inline-block;
+}
+.THIS .percentOff {
+	display:inline-block;
+	margin-left:5px;
+}
+.THIS .paddingTopFix {
+	padding-top:6px;
+}
+.THIS .lightText {
+	color:#cacaca;
+}
+.THIS .slds-form-element__help {
+	font-size:10px;
+	position:absolute;
+	top:28px;
+}
+.THIS .financingTable .col-sm-4 {
+	margin-bottom:6px;
+}

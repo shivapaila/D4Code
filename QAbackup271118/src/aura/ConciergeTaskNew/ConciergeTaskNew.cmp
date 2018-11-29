@@ -1,0 +1,624 @@
+<aura:component implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global" controller="ConciergeTaskNewController">
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="customerId" type="Id" />
+	<aura:attribute name="newTask" type="Task" access="global" default="{'sobjectType' : 'Task'}"/>
+	<aura:attribute name="uiIsReminderSet" type="Boolean" />
+	<aura:attribute name="uiReminderDateTime" type="DateTime" />
+	<aura:attribute name="showError" type="Boolean" />
+	<aura:attribute name="errorTitle" type="String" />
+	<aura:attribute name="errorMsg" type="String" />
+	<aura:attribute name="uiRecurrenceInterval" type="String" default="Every Day"/>
+	<aura:attribute name="uiRecurrenceIntervalOptions" type="List" />
+
+	<aura:attribute name="uiRecurrenceIntervalWeek" type="String" default="Every Week"/>
+	<aura:attribute name="uiRecurrenceIntervalOptionsWeek" type="List" />
+	<aura:attribute name="uiRecurrenceIntervalWeekValues" type="List" />
+
+	<aura:attribute name="uiRecurrenceIntervalMonth" type="String" default="Every Month"/>
+	<aura:attribute name="uiRecurrenceWhenMonth" type="String" default="Specific Days" />
+	<aura:attribute name="uiRecurrenceDayOfMonth" type="String" default="1" />
+	<aura:attribute name="uiRecurrenceInstanceMonth" type="String" default="First" />
+
+	<aura:attribute name="uiRecurrenceWhenYear" type="String" default="Specific Date" />
+
+    <aura:registerEvent name="NavigateToWrapperComponentAppEvent" type="c:NavigateToWrapperComponentAppEvent" />
+	<aura:registerEvent name="ConciergeDestroyNewTask" type="c:ConciergeDestroyNewTask" />
+	<div aura:id="recordEditModal" role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="image-modal" class="slds-modal slds-fade-in-open slds-scrollable_y">
+
+		<div class="slds-modal__container">
+
+			<header class="slds-modal__header">
+				<i class="fa fa-times float-right" onclick="{!c.close}" />
+				<h3>Create Task</h3>
+			</header>
+
+			<div>
+				<div class="slds-modal__content slds-p-around--medium ">
+					<ui:scrollerWrapper>
+						<aura:if isTrue="{!v.showError}">
+							<div class="errorMessage">
+								<h4>{!v.errorMsg}</h4>
+							</div>
+						</aura:if>
+
+
+						<h4 class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container">
+							Task Details
+						</h4>
+
+						<div class="slds-grid full forcePageBlockSectionRow">
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+											<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+												<span>Subject</span>
+												<span class="required">*</span>
+											</label>
+											<!--<force:inputField aura:id="taskSubject" value="{!v.newTask.Subject}" />-->
+											<ui:inputText value="{!v.newTask.Subject}" />
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+											<!--
+											<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+												<span>Assigned To</span>
+												<span class="required">*</span>
+											</label>
+											<force:inputField aura:id="taskOwnerId" value="{!v.newTask.OwnerId}" />
+										-->
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<!--div class="slds-grid full forcePageBlockSectionRow"-->
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>Type</span>
+													<span class="required">*</span>
+												</label>
+												<force:inputField aura:id="taskType" value="{!v.newTask.Type}"/>
+											</div>
+										</div>
+									</div>
+								</div>
+									<!--
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput&REPLACEHYPHEN&default uiInput&REPLACEHYPHEN&input">
+										</div>
+										</div>
+									</div>
+								</div>
+						</div>
+							-->
+					
+							<div class="slds-grid full forcePageBlockSectionRow">
+									<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+										<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+											<div class="slds-form-element__control">
+													<aura:if isTrue="{!v.customerId == null}">
+														<div class="uiInput uiInputText uiInput--default uiInput--input">
+															<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+																	<span>Related To</span>
+															</label>
+															<force:inputField aura:id="taskWhatId"  value="{!v.newTask.WhatId}" />
+														</div>
+														<aura:set attribute="else">
+															<div class="uiInput uiInputText uiInput--default uiInput--input">
+																	<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+																		<span>Related To</span>
+																	</label>
+																	<force:outputField aura:id="taskWhatId"  value="{!v.newTask.WhatId}" />
+															</div>
+														</aura:set>
+													</aura:if>
+											</div>
+								</div>
+							</div>
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+											<aura:renderIf isTrue="{!!v.newTask.IsRecurrence}">
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>Due Date</span>
+												</label>
+												<force:inputField aura:id="taskActivityDate" value="{!v.newTask.ActivityDate}" />
+											</aura:renderIf>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="slds-grid full forcePageBlockSectionRow">
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+											<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+												<span>Sales Order</span>
+											</label>
+											<force:inputField aura:id="taskSalesOrder" value="{!v.newTask.Sales_Order__c}" />
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!--
+						<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput&REPLACEHYPHEN&default uiInput&REPLACEHYPHEN&input">
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>Account</span>
+												</label>
+												<force:inputField aura:id="taskAccount" value="{!v.newTask.Account__c}"/>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput&REPLACEHYPHEN&default uiInput&REPLACEHYPHEN&input">
+										</div>
+										</div>
+									</div>
+								</div>
+						</div>
+						-->
+						<div class="slds-grid full forcePageBlockSectionRow">
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+											<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+												<span>Comments</span>
+											</label>
+											<force:inputField aura:id="taskDescription" value="{!v.newTask.Description}" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<h4 class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container">
+							Additional Information
+						</h4>
+						<div class="slds-grid full forcePageBlockSectionRow">
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+											<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+												<span>Reminder Set</span>
+											</label>
+											<ui:inputCheckbox aura:id="uiIsReminderSet" value="{!v.uiIsReminderSet}" />
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="slds-grid full forcePageBlockSectionRow">
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+											<aura:if isTrue="{!v.uiIsReminderSet}">
+												<ui:inputDateTime aura:id="uiReminderDateTime" value="{!v.uiReminderDateTime}" displayDatePicker="true" />
+											</aura:if>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="slds-grid full forcePageBlockSectionRow">
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+											<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+												<span>Priority</span>
+											</label>
+											<force:inputField aura:id="taskPriority" value="{!v.newTask.Priority}" />
+										</div>
+									</div>
+								</div>
+							</div>
+						
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+											<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+												<span>Status</span>
+											</label>
+											<force:inputField aura:id="taskStatus" value="{!v.newTask.Status}" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<h4 class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container">
+							Other Information
+						</h4>
+						<div class="slds-grid full forcePageBlockSectionRow">
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+											<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+												<span>Create Recurring Series of Tasks</span>
+											</label>
+											<ui:inputCheckbox aura:id="uiIsRecurrence" value="{!v.newTask.IsRecurrence}" />
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+								<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+									<div class="slds-form-element__control">
+										<div class="uiInput uiInputText uiInput--default uiInput--input">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<aura:if isTrue="{!v.newTask.IsRecurrence}">
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<lightning:select name="uiRecurrenceType" label="Frequency" value="{!v.newTask.RecurrenceType}">
+													<option value="RecursDaily">Daily</option>
+													<option value="RecursWeekly">Weekly</option>
+													<option value="RecursMonthly">Monthly</option>
+													<option value="RecursYearly">Yearly</option>
+												</lightning:select>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</aura:if>
+						<!-- Daily -->
+						<aura:if isTrue="{!v.newTask.RecurrenceType == 'RecursDaily'}">
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<lightning:select name="uiRecurrenceInterval" label="Repeat" value="{!v.uiRecurrenceInterval}">
+													<option value="Every Day">Every Day</option>
+													<option value="Every Other Day">Every Other Day</option>
+													<option value="Custom">Custom</option>
+												</lightning:select>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<aura:if isTrue="{!v.uiRecurrenceInterval == 'Custom'}">
+													<lightning:select name="uiRecurrenceType" label="Every" value="{!v.newTask.RecurrenceInterval}">
+														<aura:iteration items="{!v.uiRecurrenceIntervalOptions}" var="item">
+															<option value="{!item.value}" label="{!item.label}">1</option>
+														</aura:iteration>
+													</lightning:select> Day(s)
+												</aura:if>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</aura:if>
+
+						<!-- Weekly -->
+						<aura:if isTrue="{!v.newTask.RecurrenceType == 'RecursWeekly'}">
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<lightning:select name="uiRecurrenceInterval" label="Repeat" value="{!v.uiRecurrenceIntervalWeek}">
+													<option value="Every Week">Every Week</option>
+													<option value="Every Other Week">Every Other Week</option>
+													<option value="Custom">Custom</option>
+												</lightning:select>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<aura:if isTrue="{!v.uiRecurrenceIntervalWeek == 'Custom'}">
+													<lightning:select name="uiRecurrenceType" label="Every" value="{!v.newTask.RecurrenceInterval}">
+														<aura:iteration items="{!v.uiRecurrenceIntervalOptions}" var="item">
+															<option value="{!item.value}" label="{!item.label}">1</option>
+														</aura:iteration>
+													</lightning:select> Week(s)
+												</aura:if>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<lightning:checkboxGroup aura:id="weekCheckboxGroup" options="{!v.uiRecurrenceIntervalOptionsWeek}" value="{!v.uiRecurrenceIntervalWeekValues}"/>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</aura:if>
+
+						<!-- Monthly -->
+						<aura:if isTrue="{!v.newTask.RecurrenceType == 'RecursMonthly'}">
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<lightning:select name="uiRecurrenceInterval" label="Repeat" value="{!v.uiRecurrenceIntervalMonth}">
+													<option value="Every Day">Every Month</option>
+													<option value="Every Other Day">Every Other Month</option>
+													<option value="Custom">Custom</option>
+												</lightning:select>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<aura:if isTrue="{!v.uiRecurrenceIntervalMonth == 'Custom'}">
+													<lightning:select name="uiRecurrenceType" label="Every" value="{!v.newTask.RecurrenceInterval}">
+														<aura:iteration items="{!v.uiRecurrenceIntervalOptions}" var="item">
+															<option value="{!item.value}" label="{!item.label}">1</option>
+														</aura:iteration>
+													</lightning:select> Month(s)
+												</aura:if>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<lightning:select name="uiRecurrenceWhen" label="When" value="{!v.uiRecurrenceWhenMonth}">
+													<option value="Specific Days">Specific Days</option>
+													<option value="Relative Days">Relative Days</option>
+												</lightning:select>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<aura:if isTrue="{!v.uiRecurrenceWhenMonth == 'Specific Days'}">
+													<lightning:select name="uiRecurrenceDayOfMonth" label="Day" value="{!v.newTask.RecurrenceDayOfMonth}">
+														<aura:iteration items="{!v.uiRecurrenceIntervalOptions}" var="item">
+															<option value="{!item.value}" label="{!item.label}">1</option>
+														</aura:iteration>
+													</lightning:select>
+												</aura:if>
+												<aura:if isTrue="{!v.uiRecurrenceWhenMonth == 'Relative Days'}">
+													<lightning:select name="uiRecurrenceDayOfMonth" label="Day" value="{!v.newTask.RecurrenceInstance}">
+														<option value="First">First</option>
+														<option value="Second">Second</option>
+														<option value="Third">Third</option>
+														<option value="Fourth">Fourth</option>
+														<option value="Last">Last</option>
+													</lightning:select>
+													<lightning:select name="uiRecurrenceWeekMaskMonth" label="Repeat On" value="{!v.newTask.RecurrenceDayOfWeekMask}">
+														<option value="1">Sunday</option>
+														<option value="2">Monday</option>
+														<option value="4">Tuesday</option>
+														<option value="8">Wednesday</option>
+														<option value="16">Thursday</option>
+														<option value="32">Friday</option>
+														<option value="64">Saturday</option>
+													</lightning:select>
+												</aura:if>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</aura:if>
+
+						<!-- Yearly -->
+						<aura:if isTrue="{!v.newTask.RecurrenceType == 'RecursYearly'}">
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<lightning:select name="uiRecurrenceWhenYear" label="When" value="{!v.uiRecurrenceWhenYear}">
+													<option value="Specific Date">Specific Date</option>
+													<option value="Relative Date">Relative Date</option>
+												</lightning:select>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<aura:if isTrue="{!v.uiRecurrenceWhenYear == 'Relative Date'}">
+													<lightning:select name="uiRecurrenceDayOfYear" label="Day" value="{!v.newTask.RecurrenceInstance}">
+														<option value="First">First</option>
+														<option value="Second">Second</option>
+														<option value="Third">Third</option>
+														<option value="Fourth">Fourth</option>
+														<option value="Last">Last</option>
+													</lightning:select>
+													<lightning:select name="uiRecurrenceWeekMaskYear" label="Repeat On" value="{!v.newTask.RecurrenceDayOfWeekMask}">
+														<option value="1">Sunday</option>
+														<option value="2">Monday</option>
+														<option value="4">Tuesday</option>
+														<option value="8">Wednesday</option>
+														<option value="16">Thursday</option>
+														<option value="32">Friday</option>
+														<option value="64">Saturday</option>
+													</lightning:select>
+													<lightning:select name="uiRecurrenceMonthOfYear" label="Month" value="{!v.newTask.RecurrenceMonthOfYear}">
+														<option value="January">January</option>
+														<option value="February">February</option>
+														<option value="March">March</option>
+														<option value="April">April</option>
+														<option value="May">May</option>
+														<option value="June">June</option>
+														<option value="July">July</option>
+														<option value="August">August</option>
+														<option value="September">September</option>
+														<option value="October">October</option>
+														<option value="November">November</option>
+														<option value="December">December</option>
+													</lightning:select>
+												</aura:if>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</aura:if>
+
+						<aura:if isTrue="{!v.newTask.IsRecurrence}">
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>Start Date</span>
+												</label>
+												<ui:inputDate aura:id="recurrenceStartDateOnly" displayDatePicker="true" value="{!v.newTask.RecurrenceStartDateOnly}"/>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput--default uiInput--input">
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>End Date</span>
+												</label>
+												<ui:inputDate aura:id="recurrenceEndDateOnly" displayDatePicker="true" value="{!v.newTask.RecurrenceEndDateOnly}"/>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</aura:if>
+
+						<!--
+						<h3 class="slds-section__title slds-theme&REPLACEHYPHEN&shade primaryPaletteBorder test-id__section-header-container">
+								System Information
+							</h3>
+							<div class="slds-grid full forcePageBlockSectionRow">
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput&REPLACEHYPHEN&default uiInput&REPLACEHYPHEN&input">
+												<label class="label inputLabel uiLabel-left form-element__label uiLabel">
+													<span>Name</span>
+												</label>
+												<force:inputField aura:id="taskWhoId" value="{!v.newTask.WhoId}"/>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="slds-has-flexi-truncate slds-p-horizontal_medium full forcePageBlockItem forcePageBlockItemEdit">
+									<div class="slds-form-element slds-form-element_edit slds-hint-parent slds-p-vertical_xx-small">
+										<div class="slds-form-element__control">
+											<div class="uiInput uiInputText uiInput&REPLACEHYPHEN&default uiInput&REPLACEHYPHEN&input">
+										</div>
+										</div>
+									</div>
+								</div>
+						</div>
+					-->
+				</ui:scrollerWrapper>
+				</div>
+
+				<footer class="slds-modal__footer">
+					<button class="greyButton" onclick="{!c.close}">Cancel</button>
+					<button class="slds-button slds-button--neutral slds-button--brand" onclick="{!c.addTask}">Save</button>
+				</footer>
+			</div>
+		</div>
+	</div>
+</aura:component>

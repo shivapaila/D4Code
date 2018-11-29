@@ -1,0 +1,83 @@
+<aura:component controller="TextOptInController" implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" >
+    <aura:attribute name="showSignature" type="Boolean" default="false"/>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="oppty" type="Opportunity" />
+    <aura:attribute name="shipPhone" type="String" />
+    <!--REQ-455 - Text Opt In-->
+    <aura:attribute name="entityFullName" type="String"/>
+    
+    <aura:attribute name="guestObj" type="Account" />
+    <aura:attribute name="guestName" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.Init}"/>
+    <aura:attribute name="SigObjId" type="String" />
+    <aura:attribute name="checkedTime" type="DateTime" />
+
+    <!-- Registered Events -->
+    <aura:registerEvent name="NotifyParentTextOptInDecline" type="c:CloseModalEvent" />
+    <aura:registerEvent name="NotifyParentTextOptInComplete" type="c:CloseModalEvent" />
+
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    <ltng:require scripts="/resource/Jquery224"/>
+    <div>
+        <section aura:id="desiredDeliveryDateDialog" role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+    <div class="slds-modal__container">
+        <header class="slds-modal__header">
+                    <!--<i class="fa fa-times float-right" onclick="{!c.cancelDialog}"></i>-->
+            <h2>Text Opt-In</h2>
+        </header>
+         <div class="slds-modal__content slds-p-around--medium slds-grid slds-wrap">
+            <ui:scrollerWrapper >
+                <div class="cardContent">
+                    <div class="row">
+                        <div class="">
+                            
+                            <div class="checkboxWrapper">
+                                <ui:inputCheckbox aura:id="promotionalEmails" label="Receive promotional emails"
+                                                value="{!v.oppty.Survey_Opt_In__c}"/>
+                            </div> 
+                            <br />
+                            <div class="checkboxWrapper">
+                                <ui:inputCheckbox aura:id="textMessages" label="Opt into text messages" 
+                                                value="{!v.oppty.Text_Message_Opt_In__c}" change="{!c.onCheckTextOptIn}"/> 
+                            </div>
+                            
+                        </div>
+                        <aura:if isTrue="{!v.showSignature}">
+                            
+                            <div class="col-sm-12 signatureArea">
+                                <aura:if isTrue="{!v.oppty.Text_Message_Opt_In__c}">
+                                    <div id="legalContent" class="legalVerbiage">
+                                    <h2>{!$Label.c.legal_verbiage_for_Opt_into_text_messages_heading}</h2>
+                                    <p><!--REQ-455 - Text Opt In--><!--{!$Label.c.legal_verbiage_for_Opt_into_text_messages_content} -->
+                                        {!format($Label.c.legal_verbiage_for_Opt_into_text_messages_content, v.entityFullName)}
+                                        <br/><br/> Phone Number(s): <ui:outputPhone value="{!v.shipPhone}"/>
+                                    </p>
+                                    </div>
+                                </aura:if>
+                                <aura:if isTrue="{!v.SigObjId}">
+                                    <BGSIGCAP:SignatureCapture recordId="{!v.SigObjId}" startMsg="Click the button to get started"
+                                                               enterMsg=""
+                                                               completeMsg="Here is the signature you entered"
+                                                               saveAttachment="false"       
+                                                               width="100%"
+                                                               height="250px"/>
+                                    <aura:set attribute="else">
+                                        <span><em>Loading Signing Pad</em></span>
+                                    </aura:set>
+                                </aura:if>
+                                <!--{!v.body} -->
+                            </div>
+                        </aura:if>
+                    </div>
+                </div>
+            </ui:scrollerWrapper>
+        </div>
+        <footer class="slds-modal__footer">
+            <a class="greyButton" onclick="{!c.decline}">Decline</a>
+            <a class="orangeButton" onclick="{!c.accept}">Accept</a>
+        </footer>
+    </div>
+    </section>
+    </div>
+</aura:component>

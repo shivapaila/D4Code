@@ -1,0 +1,40 @@
+<aura:component controller="EstimatedDeliveryDateController">
+    <aura:attribute name="searchSku" type="String"/>
+    <aura:attribute name="numSelected" type="Integer" default="1"/>
+    <aura:attribute name="searchZip" type="String"/>
+    <aura:attribute name="noResults" type="Boolean" default="false" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="nextDate" type="String" />
+    <div class="container">
+        <div>This search returns the first available delivery date in the next 30 days.</div>
+        <br />
+        <div><h5>Searching for {!v.searchSku} (qty: {!v.numSelected}) </h5>
+            <div class="zipSearchWrapper">
+                <ui:inputText aura:id="searchId" class="zipSearch" value="{!v.searchZip}" required="true" placeholder="Enter Zip Code" /><br />
+                <button class="orangeButton" onclick="{!c.search}" style="margin-top:10px;">
+                    Search
+                </button>
+            </div>
+        </div>
+        <!-- out for now the spinners look bad 1/19/2018
+        <aura:if isTrue="{!v.showSpinner}">        
+            <lightning:spinner variant="brand" size="medium"/>
+        </aura:if>
+        -->
+
+        <br />
+        
+        <aura:if isTrue="{!v.noResults}">
+            <div aura:id="noDateResults">
+                No dates found in next 30 days
+            </div>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.nextDate}">
+            <div aura:id="dateResults">
+                Next available date is: {!v.nextDate}
+            </div>
+        </aura:if>        
+        
+    </div>
+</aura:component>

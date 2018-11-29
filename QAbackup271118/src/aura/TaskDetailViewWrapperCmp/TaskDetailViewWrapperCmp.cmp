@@ -1,0 +1,17 @@
+<aura:component implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global">
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="pageReference" type="Object"/>
+
+    <aura:attribute name="renderRecordView" type="Boolean" default="false" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <ui:scrollerWrapper>
+        <c:concierge_header /> 
+        
+        <aura:if isTrue="{!v.renderRecordView}">
+            <c:ConciergeRecordView recordId="{!v.recordId}" />
+        </aura:if>
+
+        <c:NavigatorCmp />
+    </ui:scrollerWrapper>
+</aura:component>

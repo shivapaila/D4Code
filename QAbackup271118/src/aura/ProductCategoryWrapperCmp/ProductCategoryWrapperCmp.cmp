@@ -1,0 +1,27 @@
+<aura:component implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global" >
+	<aura:attribute name="parentCategoryId" type="String" />
+	<aura:attribute name="productDetailId" type="String" />
+	<aura:attribute name="searchKey" type="String" />
+
+    <aura:attribute name="pageReference" type="Object"/>
+    <aura:attribute name="renderProduct" type="Boolean" default="false" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" /> 
+    <aura:handler name="change" value="{!v.pageReference}" action="{!c.init}" />
+    <aura:handler name="productEvent" event="c:ProductEvent" action="{!c.handleProductEvent}" />
+    <ui:scrollerwrapper>
+        <c:RSAAccountInfo />
+        <c:concierge_header />
+            
+        
+            <div class="wrapComp">
+                <aura:if isTrue="{!v.renderProduct}">
+                    <c:ProductHome aura:id="productHomeId" parentCategoryId="{!v.parentCategoryId}" productDetailId="{!v.productDetailId}" searchKey="{!v.searchKey}"/>
+                </aura:if>
+            </div>
+        
+        
+        <c:NavigatorCmp />
+    </ui:scrollerwrapper>
+    
+</aura:component>

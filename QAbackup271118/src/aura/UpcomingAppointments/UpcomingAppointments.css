@@ -1,0 +1,56 @@
+.THIS .dateTime-inputDate.form-element.form-element__control {
+    pointer-events: none;
+     opacity: 0.5;
+}
+.THIS {
+	margin-top:35px;
+}
+.THIS .newAppointmentButton {
+	margin-top:-3px;
+}
+
+.THIS .dateTime-inputDate.form-element.form-element__control {
+    pointer-events: none;
+     opacity: 0.5;
+}
+.THIS #Appointment-table .uiInput--datetime {
+	width:100%;
+	min-height:37px;
+	height:37px;
+}
+.THIS #Appointment-table input {
+	width:100%;
+    height:100%;
+	font-size:12px;
+}
+.THIS .dateTime {
+	width:200px;
+}
+.THIS .saveCancel a {
+	display:inline-block;
+	cursor:pointer;
+}
+.THIS .saveCancel a:last-child{
+	float:right;
+}
+.THIS .saveCancel a.marginRight {
+	margin-right:20px;
+}
+.THIS .saveCancel {
+	min-width:165px;
+	padding-top:19px;
+}
+.THIS .startLabel {
+	margin-top:-17px;
+}
+.THIS .customerColumn {
+	width:100px;
+	padding-top:16px;
+}
+.THIS .subjectColumn {
+	padding-top:16px;
+}
+.THIS .customerColumn input, .THIS .subjectColumn input, .THIS .dateTime input {
+	padding-left:5px !important;
+	padding-right:5px !important;
+}

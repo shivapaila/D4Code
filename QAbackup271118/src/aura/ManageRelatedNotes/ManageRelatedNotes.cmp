@@ -1,0 +1,82 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:appHostable" controller="ManageRelatedNotesController">
+    <ltng:require scripts="{!$Resource.Jquery224}"  />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    <aura:handler name="deleteNoteEvent" event="c:DeleteNoteEvent" action="{!c.removeDeletedNote}" includeFacets="true" />
+    <aura:handler name="editNoteEvent" event="c:EditNoteEvent" action="{!c.showEditNote}" includeFacets="true" />
+
+    <!-- expected attribs -->
+    <aura:attribute name="parentId" type="Id" />
+    <aura:attribute name="inSvcConsole" type="Boolean" default="false" />
+    
+    <!-- internal attribs -->
+    <aura:attribute name="notes" type="Object[]" default="[]" />
+    <aura:attribute name="newTitle" type="String" default="" />
+    <aura:attribute name="newNote" type="String" default="" />
+    
+    <!-- helper attribs -->
+    <aura:attribute name="message" type="String" default="" />
+    <aura:attribute name="messageType" type="String" default="" />
+    <aura:attribute name="editIndex" type="Integer" />
+    <aura:attribute name="editNoteId" type="String" />
+    <aura:attribute name="noteButtonMsgDefault" type="String" default="Add Note" />
+    <aura:attribute name="noteButtonMsg" type="String" default="Add Note" />
+    <aura:attribute name="noteFormMsgDefault" type="String" default="Create a new note" />
+    <aura:attribute name="noteFormMsg" type="String" default="Create a new note" />
+
+    
+    <div class="container">
+        <i class="far fa-sticky-note headerIcon float-left"></i> <h3>Notes</h3>
+        <div class="cardWrapper">
+            <div class="cardContent">
+                
+                <!-- notes list --> 
+                <aura:iteration items="{!v.notes}" var="n" indexVar="index"> 
+                    <c:NoteListItem note="{!n}" rowIndex="{!index}" />
+                </aura:iteration>
+
+                <hr class="lineBreak" />
+    
+
+                <!-- input form -->
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h5 class="createNoteHeader">{!v.noteFormMsg}</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-5">
+                        <lightning:input aura:id="title" label="Note Title"
+                                    class="input"
+                                    name="title"
+                                    value="{!v.newTitle}"
+                                    placeholder=""
+                                    required="true"/> 
+                    </div>
+
+                    <div class="col-sm-7">
+                        <lightning:textarea aura:id="note" label="Note Body"
+                                    class="input"
+                                    name="note"
+                                    value="{!v.newNote}"
+                                    placeholder=""
+                                    required="true"/>  
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button onclick="{!c.createNote}" class="orangeButton" style="margin-right:15px;">
+                            {!v.noteButtonMsg}
+                        </button>
+                        <button onclick="{!c.clearFields}" class="greyButton">
+                            Clear Fields
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div><!-- END CARD WRAPPER -->
+        
+    </div>
+</aura:component>

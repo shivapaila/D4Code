@@ -1,0 +1,5 @@
+<aura:event type="COMPONENT" description="A component based event to manage the product selection">
+	<aura:attribute name="parentCategoryId" type="String" />
+	<aura:attribute name="productDetailId" type="String" />
+	<aura:attribute name="searchKey" type="String" />
+</aura:event>

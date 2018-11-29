@@ -1,0 +1,294 @@
+<aura:component implements="flexipage:availableForRecordHome,force:appHostable" controller="SalesOrderLineItemDetailController">
+	<aura:attribute name="lineItemId" type="string"/>
+	<aura:attribute name="orderSfdcId" type="string"/>
+    <aura:attribute name="locationPO" type="string"/>
+    <aura:attribute name="estArrival" type="string"/>
+    <aura:attribute name="ackNo" type="string"/>
+    <aura:attribute name="quantityval" type="Integer"/>
+    <aura:attribute name="warehouseqty" type="Integer"/>
+    <aura:attribute name="quantityItem" type="Attributable"/>
+	<aura:attribute name="lineItemWrapper" type="Attributable"/>
+	<aura:attribute name="inEditMode" type="boolean" default="false"/>
+	<aura:attribute name="selectedDesiredDeliveryDate" type="Date"/>
+
+
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+	<aura:handler event="c:DeliveryDateSelected" action="{!c.updateDeliveryDate}"/>
+
+		
+	<section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+		
+		<div class="slds-modal__container">
+			<!-- modal header--> 	
+			<header class="slds-modal__header">
+			    {!$Label.c.Sales_Order_Line_Section_Title_Sales_Order_Line_Details}	      				
+			</header>
+
+			<!-- modal body--> 
+			<div class="slds-modal__content slds-p-around_medium">	
+				<aura:if isTrue="{!v.inEditMode == false}">
+					<lightning:accordion >
+					     <lightning:accordionSection name="fields" label="Line Details">
+					     	<div class="slds-form" >
+	        					<div class="slds-grid full slds-wrap"> 
+										
+	        						<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Sales_Order}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdSalesOrder__c}" />
+									  </div>									  
+									</div>
+
+	        						<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Item_SKU}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdItemSKU__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Item_Description}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdItemDesc__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Quantity}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdQuantity__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_FPP_Coverage}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputCheckBox value="{!v.lineItemWrapper.lineItem.phdIsFPP__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Warranty_Days_Left}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdWarrantyDaysLeft__c}" />
+									  </div>									  
+									</div>
+									
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Status}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdItemStatus__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Warranty_End_Date}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputDateTime value="{!v.lineItemWrapper.lineItem.phdWarrantyExpiredOn__c}"/>
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Estimated_Arrival}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputDate value="{!v.lineItemWrapper.lineItem.phdDeliveryDueDate__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Returned_Reason}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdReturnedReason__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_LOC_PO}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdLOC_PO__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_In_Store_Qty}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.quantityval}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_In_Warehouse_Qty}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.warehouseqty}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Delivery_Type}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdDeliveryTypeDesc__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Sale_Status}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdSaleType__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Ack_No}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdAckNo__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Item_Seq}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdItemSeq__c}" />
+									  </div>									  
+									</div>
+
+                                    <div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Order_Type}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdOrderType__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_RSA}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdRSA__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Delivered_Date}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputDateTime value="{!v.lineItemWrapper.lineItem.phdPurchaseDate__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Payment_Type}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdPaymentType__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Invoice_No}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdInvoiceNo__c}" />
+									  </div>									  
+									</div>
+
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Customer_Po}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdCustomerPo__c}" />
+									  </div>									  
+									</div>
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Discount_Reason_Code}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdDiscountReasonCode__c}" />
+									  </div>									  
+									</div>
+									<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">Price</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdAmount__c}" />
+									  </div>									  
+									</div>
+	        					</div>
+	        				</div>
+					     </lightning:accordionSection>
+					     <lightning:accordionSection name="shipping" label="Shipping Information">
+					     	<div class="slds-form" >
+	        					<div class="slds-grid full slds-wrap"> 
+	        					    <div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Field_Label_Ship_Customer_Name}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.Ship_Customer_Name__c}" />
+									  </div>									  
+									</div>
+										<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Ship_City}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdShipCity__c}" />
+									  </div>									  
+									</div>
+								</div>
+								<div class="slds-grid full slds-wrap"> 
+	        						<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Ship_Address_1}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdShipAddress1__c}" />
+									  </div>									  
+									</div>
+		    						<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Ship_State}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdShipState__c}" />
+									  </div>									  
+									</div>
+                                </div>
+                                <div class="slds-grid full slds-wrap"> 
+                                   	<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2 slds-p-top_medium">
+									  <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Ship_Address_2}</label>
+									  <div class="slds-form-element__control">
+									    <ui:outputText value="{!v.lineItemWrapper.lineItem.phdShipAddress2__c}" />
+									  </div>									  
+									</div>
+                                </div>
+                                	<div class="slds-form-element slds-size--1-of-2 slds-small-size--1-of-1 slds-medium-size--1-of-2 slds-large-size--1-of-2">									  
+									    <label class="slds-form-element__label">{!$Label.c.Sales_Order_Line_Field_Label_Ship_Zipcode}</label>
+									    <div class="slds-form-element__control">
+									        <ui:outputText value="{!v.lineItemWrapper.lineItem.phdShipZip__c}" />
+									    </div>									  
+									</div>									
+	        				</div>
+					     </lightning:accordionSection>
+					</lightning:accordion>
+				</aura:if>
+				<aura:if isTrue="{!v.inEditMode == true}">
+					<div class="slds-form" >
+            			<div class="slds-grid full slds-wrap">
+            				<lightning:input aura:id="deliveryDateEdit" label="Delivery Date" name="deliveryDate" value="{!v.lineItemWrapper.lineItem.phdDeliveryDueDate__c}"
+                			disabled="true" class="slds-size--1-of-3 slds-p-horizontal_x-small"/>  
+            			</div>
+            			<lightning:input aura:id="desiredDeliveryDate" label="Desired Delivery Date" type="date"
+                                     class="slds-size--1-of-3 slds-p-horizontal_x-small"
+                                     name="desiredDeliveryDate" value="{!v.selectedDesiredDeliveryDate}"
+                                     />     
+        				<div class="slds-size--1-of-3 slds-p-horizontal_x-small" onclick="{!c.launchDeliveryDateLookup}"><a>Get Available Dates</a></div>
+			            
+            		</div>
+
+					<div aura:id="deliveryWindowLookupPlaceHolder" />
+				</aura:if>
+			</div>
+			<!-- end modal body--> 
+
+			<!-- modal footer--> 
+			<footer class="slds-modal__footer">
+				<aura:if isTrue="{!v.inEditMode == false}">
+					<!-- Order line edit functionality will be available for Ashcomm Line items in the future-->
+					<!--<lightning:button label="Edit" onclick="{!c.setToEditMode}" /> -->
+					<lightning:button variant="neutral" label="{!$Label.c.Sales_Order_Line_Button_Label_Close}" onclick="{!c.defaultCloseAction}" />
+					
+				</aura:if>
+				<aura:if isTrue="{!v.inEditMode == true}">
+					<lightning:button variant="brand" label="Save" onclick="{!c.saveChanges}" />
+					<lightning:button variant="neutral" label="Cancel" onclick="{!c.setToDetailMode}" />
+				</aura:if>
+			</footer>
+		</div>
+	</section>
+	<div class="slds-modal-backdrop slds-modal-backdrop--open"></div>
+</aura:component>

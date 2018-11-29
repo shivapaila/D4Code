@@ -1,0 +1,5 @@
+<aura:component implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global" >
+	<c:concierge_header />
+    <c:MyCustomers />
+    <c:NavigatorCmp />
+</aura:component>

@@ -1,0 +1,79 @@
+<aura:component controller="ProductDetailCheckCmpCtrl"  access="global">
+   
+    <aura:attribute name="parentCategoryId" type="String" />
+    <aura:attribute name="productDetailId" type="String" />
+    <aura:attribute name="productDetail" type="ProductWrapper" />
+    <aura:attribute name="productPrice" type="ProductPriceWrapper"/>
+    
+    <aura:attribute name="isValidProduct" type="Boolean" default="false"/>
+    <aura:attribute name="isValidProductPrice" type="Boolean" default="false"/>
+    <aura:handler event="force:refreshView" action="{!c.isRefreshed}" />
+
+    <!-- initialization -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:registerEvent name="productEvent" type="c:ProductEvent" />
+    <!-- event return isValidProductPrice value --> 
+    <aura:registerEvent name="ProductDetailCheckNotifyToProductList" type="c:NotifyParentComponentEvent"/>
+    <aura:registerEvent name="NotifyParentOpenCustomerModal" type="c:NotifyParentComponentEvent"/>
+    
+    <c:ToastErrorHandler aura:id="toastErrorHandler" /> 
+    <aura:if isTrue="{!v.isValidProductPrice}">
+        <li class="col-sm-4 productCardWrapper"> 
+            <div class="productCard">
+                <a data-record="{!v.productDetail.sku}" onclick="{!c.goToProductDetail}">
+                    
+                    <aura:if isTrue="{!v.productDetail.largeImageUrl != null}">
+                        <div class="productImage"
+                             style="{! 'background-image:url(' + v.productDetail.largeImageUrl +')'}" ></div>
+                        
+                        <aura:set attribute="else">
+                            <div class="productImage placeholderProductImage">
+                                <i class="far fa-image"></i>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                </a>
+                    <div class="productCardDetails">
+                        <a data-record="{!v.productDetail.sku}" onclick="{!c.goToProductDetail}">
+                 
+                        <h5>{!v.productDetail.productTitle}</h5>
+                        <div class="row">
+                            <div class="col-sm-12">
+                            	<c:ProductReviewAndRating productDetailId="{!v.productDetail.sku}" onlyRating="true" starSize="Large"/>
+                               
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <aura:iteration items="{!v.productDetail.swatchesimageUrl}" var="swatch" >
+                                    <div class="productSwatchImage" style="{! 'background-image:url(' + swatch +')'}"></div>
+                                </aura:iteration>
+                                <!-- <aura:iteration items="{!v.productDetail.swatches}" var="swatch" >
+                                <div class="productSwatchImage" style="{! 'background-image:url(' + swatch.imageSource +')'}"></div>
+                            </aura:iteration>-->
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <c:ProductPriceForProductList productPrice="{!v.productPrice}" />
+                            </div>
+                        </div>
+                        
+                        <div class="availableQtyWrapper">
+                            <c:ProductOrderAvailableQtyForProductList productPrice="{!v.productPrice}" />
+                        </div>
+                    </a>
+                    
+                    <button class="orangeButton smallButton float-right" onclick="{!c.addToCart}">
+                        Add to Cart
+                    </button>
+                    
+                </div>
+            </div>
+        </li>
+    </aura:if>
+</aura:component>

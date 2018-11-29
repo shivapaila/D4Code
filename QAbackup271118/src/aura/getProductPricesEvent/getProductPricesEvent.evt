@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event template" >
+<!--Using this Attribute to get the prices for addtocart functionality-->
+    <aura:attribute name="productPrice" type="ProductPriceWrapper"/>
+</aura:event>

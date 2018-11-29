@@ -1,0 +1,5 @@
+<aura:event type="COMPONENT" description="Event template" >
+    <aura:attribute type="String" name="selectedTermCode" default=""/>
+    <aura:attribute type="String" name="selectedTermDescription" default=""/>
+    <aura:attribute type="String" name="selectedThirdPartyTermCode" default=""/>
+</aura:event>

@@ -1,0 +1,8 @@
+<aura:component implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global" >
+    
+    <div style="height:100%;overflow: auto;">
+        <c:concierge_header />
+        <c:SuspendSaleComplete/>
+        <c:NavigatorCmp />
+    </div>
+</aura:component>

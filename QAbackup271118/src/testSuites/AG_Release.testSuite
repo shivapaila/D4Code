@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexTestSuite xmlns="http://soap.sforce.com/2006/04/metadata">
+    <testClassName>AddCustomerController_Test</testClassName>
+    <testClassName>API_ATCClient_Test</testClassName>
+    <testClassName>API_PaymentType_Test</testClassName>
+    <testClassName>API_StoreInformation_Test</testClassName>
+    <testClassName>CheckoutControllerTest</testClassName>
+    <testClassName>CommissionsCtrl_Test</testClassName>
+    <testClassName>ConciergeCashPaymentController_Test</testClassName>
+    <testClassName>ConciergeCCPaymentController_Test</testClassName>
+    <testClassName>ConciergeCheckPaymentController_Test</testClassName>
+    <testClassName>ConciergeFinancingPaymentController_Test</testClassName>
+    <testClassName>ConciergeServiceControllerTest</testClassName>
+    <testClassName>ConciergeTaskNewControllerTest</testClassName>
+    <testClassName>CreateSalesOrderHelperTest</testClassName>
+    <testClassName>DeliveryWindowLookupController_Test</testClassName>
+    <testClassName>Manage_AppointmentsAndTasksCtrlTest</testClassName>
+    <testClassName>MyCustomerControllerTest</testClassName>
+    <testClassName>PaymentControllerTest</testClassName>
+    <testClassName>PaymentTypeHelper_Test</testClassName>
+    <testClassName>ProductDetailCmpCtrl_Test</testClassName>
+    <testClassName>ProductHomeCmpCtrl_Test</testClassName>
+    <testClassName>ProductListCmpCtrl_Test</testClassName>
+    <testClassName>ProductPriceCmpCtrl_Test</testClassName>
+    <testClassName>RSAAccountInfoControllerTest</testClassName>
+    <testClassName>ShoppingCartDetailCmpCtrl_Test</testClassName>
+    <testClassName>ShoppingCartDiscountModalCtrl_Test</testClassName>
+    <testClassName>ShoppingCartLineItemCmpCtrl_Test</testClassName>
+    <testClassName>ShoppingCartLineItemDiscountCtrl_Test</testClassName>
+    <testClassName>TextOptInControllerTest</testClassName>
+    <testClassName>TsAndCsCtrl_Test</testClassName>
+    <testClassName>ViewCustomerController_Test</testClassName>
+</ApexTestSuite>

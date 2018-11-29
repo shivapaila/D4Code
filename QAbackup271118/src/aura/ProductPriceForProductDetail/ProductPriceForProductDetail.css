@@ -1,0 +1,10 @@
+.THIS .expandPricesButton {
+	width:30px;
+	height:30px;
+	border-radius:50%;
+	background:#999;
+	color:#fff;
+	border:none;
+	margin-top:16px;
+	float:right;
+}

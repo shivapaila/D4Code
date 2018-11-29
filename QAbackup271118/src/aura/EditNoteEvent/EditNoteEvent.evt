@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="indexVar" type="Integer" description="index of note to edit from list" />
+    <aura:attribute name="noteId" type="String" description="id of note to edit from list" />
+    <aura:attribute name="title" type="String" description="title of note to edit from list" />
+    <aura:attribute name="body" type="String" description="body of note to edit from list" />
+</aura:event>

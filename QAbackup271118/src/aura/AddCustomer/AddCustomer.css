@@ -1,0 +1,25 @@
+.THIS  .slds-input{
+	width:100%;
+}
+.THIS label.slds-form-element__label.slds-no-flex,
+.THIS label.slds-form-element__label {
+	font-size:14px;
+	display:block;
+	color:#999;
+	font-weight:400;
+	line-height:21px;
+	margin-top:15px;
+}
+.THIS .slds-form-element.col-sm-12.lightningInput {
+	margin-top:15px;
+}
+.THIS .noteWrapper {
+	width:100%;
+	margin-bottom:15px;
+}
+.THIS .noteHeader {
+	width:100%;
+	display:block;
+	margin-top:35px;
+	padding:0 15px;
+}

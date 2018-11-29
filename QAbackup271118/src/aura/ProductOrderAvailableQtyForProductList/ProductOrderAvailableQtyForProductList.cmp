@@ -1,0 +1,12 @@
+<aura:component extends="c:ProductPriceBase">
+    <aura:attribute name="productDetailId" type="String"/>
+    <aura:attribute name="productPrice" type="ProductPriceWrapper"/>
+    
+    <aura:if isTrue="{!v.productPrice.NailedDamagedQty > 0}">
+        <div class="row" align="left">
+            <div class="col-sm-12">
+                In store ({!v.productPrice.NailedDamagedQty})
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

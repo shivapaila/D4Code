@@ -1,0 +1,11 @@
+<aura:component controller="ProductPriceCmpCtrl" access="global"  extensible="true">
+	<aura:attribute name="productDetailId" type="String"/>
+    <aura:attribute name="productPrice" type="ProductPriceWrapper"/>
+    <!--Event to store the product price-->
+	<aura:registerEvent name="getProductPrices" type="c:getProductPricesEvent"/>
+    <c:ToastErrorHandler aura:id="toastErrorHandler" />
+    
+    <!-- initialization -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+     {!v.body}
+</aura:component>

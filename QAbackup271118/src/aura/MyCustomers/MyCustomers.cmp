@@ -1,0 +1,58 @@
+<aura:component controller="MyCustomerController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" access="global" >
+   <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="rsaAccountInfo" type="RSAAccountInfoWrapper" access="PRIVATE" />  
+    <aura:attribute name="showModal" type="Boolean" default="false" /><!-- used for modal -->
+    <aura:attribute name="showSignatureListModal" type="Boolean" default="false" /><!-- used for modal -->
+    
+    <aura:attribute name="showSelectButton" type="Boolean" default="false" />
+    <aura:attribute name="productDetail" type="ProductWrapper" />
+    <aura:attribute name="productPrice" type="ProductPriceWrapper"/>
+    <aura:attribute name="showView" type="String" default="My Guests"/>
+    <!--aura:attribute name="productDetail" type="Integer"/-->
+    <aura:attribute name="quantity" type="Integer" default="1" />
+    <aura:handler name="NotifyParentCloseModal" event="c:CloseModalEvent" action="{!c.closeModal}"/>
+    <aura:handler name="NotifyParentOpenModal" event="c:NotifyParentComponentEvent" action="{!c.openSignatureListModal}"/>
+ 	<aura:handler name="NotifyParentAddToCart" event="c:NotifyParentComponentEvent" action="{!c.addtocart}"/>
+    <aura:registerEvent name="FinishedAddToCart" type="c:NotifyParentComponentEvent"/>
+    <aura:registerEvent name="NavigateToWrapperComponentAppEvent" type="c:NavigateToWrapperComponentAppEvent" />
+    <aura:attribute name="signatureForCustomer" type="String" />
+
+    <c:ConciergeService aura:id="conciergeService" />
+     
+    <div class="container">
+        <div class="guestTypeWrapper">
+            <div class="float-right">
+                <a href="" onclick="{!c.addCustomer}" class="orangeButton"><i class="far fa-user"></i> ADD A GUEST</a>
+            </div>
+        
+        
+        <!--aura:if isTrue="{!v.showSelectButton}">
+            
+            <aura:set attribute="else"-->
+                <!-- viewing Guest based on this dropdown-->
+                
+            <ui:inputSelect aura:id="viewDropDown" change="{!c.changeView}" label="My or All Guests">
+                <ui:inputSelectOption text="My Guests" label="My Guests" value="true"/>
+                <ui:inputSelectOption text="All Guests" label="All Guests"/>
+            </ui:inputSelect>
+        </div>
+            <!--/aura:set>
+        </aura:if-->
+		<!-- FindCustomer component --> 
+        {!v.body}        
+        
+        <!-- create customer modal --> 
+        <aura:if isTrue="{!v.showModal}">
+            <!-- adding new customer cart (DEF-0191)-->
+            <c:AddCustomer productDetail="{!v.productDetail}" productPrice="{!v.productPrice}" quantity="{!v.quantity}" addNewCustomerCart="{!v.showSelectButton}"/>
+            <!-- end of adding new customer cart (DEF-0191)-->
+        </aura:if>
+        <aura:if isTrue="{!v.showSignatureListModal}">
+            <!-- showing signature list (REQ-299)-->
+            <c:SignatureList customerId="{!v.signatureForCustomer}"/>
+            <!-- end of showing signature list (REQ-299)-->
+        </aura:if>
+        <div class="slds-backdrop" aura:id="overlay"></div>    
+        
+    </div>
+</aura:component>

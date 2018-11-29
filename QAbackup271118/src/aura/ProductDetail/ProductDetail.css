@@ -1,0 +1,213 @@
+.THIS {
+	padding-bottom:95px;
+	min-height:100vh;
+}
+.THIS .mainProductImage {
+	width:100%;
+	height:300px;
+	background-repeat:no-repeat;
+	background-size:cover;
+	margin-bottom:10px;
+	background-position:center;
+}
+.THIS .productThumbImage {
+	width:100%;
+	height:75px;
+	background-repeat:no-repeat;
+	background-size:cover;
+}
+.THIS .descriptionWrapper {
+	margin:25px 0;	
+}
+.THIS .descriptionWrapper h4,
+.THIS .dimensionWrapper h4 {
+	margin-bottom:5px;
+}
+.THIS .productThumbWrapper {
+	margin-right:0;
+	margin-left:0;
+}
+.THIS .productThumb {
+	padding-right:3px;
+	padding-left:0;
+	width:116px;
+	height:75px;
+	display:inline-block;
+}
+.THIS .productThumb:last-child {
+	padding-right:0;
+}
+.THIS .chevronWrapper {
+	display:inline-block;
+	width:10%;
+	height:75px;
+	vertical-align:middle;
+	text-align:center;
+	position:absolute;
+}
+.THIS .chevronWrapper.right {
+	right:-28px;
+}
+.THIS .chevronWrapper .slds-button {
+    background:transparent;
+    padding:0;
+    color: #999;
+    margin-top: 21px;
+}
+.THIS .chevronWrapper.left {
+	left:-28px;
+}
+.THIS .chevronWrapper i {
+    font-size: 24px;
+    margin-top: 25px;
+    text-shadow: 0 0 15px rgba(255,255,255,0.9);
+}
+.THIS .productTitle {
+	margin-bottom:0;
+}
+.THIS .overallRatingWrapper {
+	margin:10px 0;
+}
+.THIS .colorWrapper {
+	margin:10px 0;
+}
+.THIS .priceWrapper {
+	margin:10px 0 7px;
+}
+.THIS .productSKU {
+	font-size:12px;
+}
+.THIS .quantityWrapper {
+	width:100%;
+	display:block;
+	margin-bottom:15px;
+}
+.THIS .quantityButtonWrapper {
+	display:block;
+	width:100%;
+}
+.THIS .quantityButtonWrapper button {
+	height:40px;
+	width:40px;
+	background:#999;
+	color:#fff;
+	border:none;
+}
+.THIS .quantityButtonWrapper .quantityNumber {
+	height:40px;
+	width:30px;
+	background:#fff;
+	padding-top:10px;
+	text-align:center;
+}
+.THIS .addToCartWrapper {
+	width:100%;
+	display:block;
+	margin-bottom:8px;
+}
+.THIS .estimatedDeliveryDateWrapper {
+	margin-bottom:25px;	
+}
+.THIS .reviewDetailsWrapper {
+	margin-bottom:25px;
+	display:block;
+	position:relative;
+}
+.THIS .paddRightOff {
+	padding-right:3px;
+}
+.THIS .paddRightOff .orangeButtonLarge {
+	width:100%;
+}
+.THIS .paddLeftOff {
+	padding-left:3px;
+}
+.THIS .qtyNumber {
+    background: #999;
+    color: #fff;
+    padding: 1px 6px;
+    display: inline-block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    vertical-align: top;
+}
+.THIS .completeTheSetItem {
+	line-height:14px;
+	color:#353534 ;
+	font-weight:bold;
+	font-size:12px;
+	margin-top:5px;
+}
+.THIS .productSwatchImage {
+	display:inline-block;
+	margin-right:10px;
+	border-radius:50%;
+	width:28px;
+	height:28px;
+	cursor:pointer;
+}
+.THIS .selected {
+    border: 3px solid #353534;
+    width: 32px;
+    height: 32px;
+    margin-bottom: -3px;
+    box-shadow:0 0 2px #fff;
+}
+.THIS .details {
+    overflow:hidden;
+    height:40px;
+}
+.THIS .selectedColorWrapper {
+	width:100%;
+	height:20px;
+}
+.THIS .modalProductImage {
+	margin:0 auto;
+}
+.THIS .scroll-horizontal{
+  overflow-x: scroll;
+  overflow-y: hidden;
+  
+  width:100%;
+}
+.THIS .scrollWrapper {
+	position:relative;
+}
+.THIS .noLineBreaks {
+	white-space:nowrap;
+	width:auto;
+}
+.THIS .cMyCustomers {
+	margin-top:5px;
+}
+.THIS .otherSizes select {
+	min-height:auto;
+	height:35px !important;
+	line-height:100% !important;
+}
+.THIS div.uiInput--select label:after {
+	width:5%;
+	right:8px; 
+}
+.THIS .slds-modal__container {
+	max-width:45rem;
+}
+.THIS .slds-modal__header h4 {
+	margin-bottom:0;
+}
+.THIS .completeTheSet {
+	margin-bottom:8px;
+}
+
+.THIS .modalFix {
+	overflow:visible !important;
+}
+.THIS .modalFix .cAddCustomer {
+	z-index:9999;
+}
+.THIS .modalFix .cAddCustomer .slds-fade-in-open {
+	z-index:9999;
+}
+.THIS .modalFix .cAddCustomer .slds-fade-in-open .slds-modal__container {
+	margin-top:0 !important;
+}

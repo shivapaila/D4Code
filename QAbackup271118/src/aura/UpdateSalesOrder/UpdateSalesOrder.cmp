@@ -1,0 +1,174 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,lightning:actionOverride,force:lightningQuickAction" access="global" controller="UpdateSalesOrderController">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="salesOrder" type="Attributable" />
+    <aura:attribute name="isLoading" type="Boolean" default="false"/>
+    <aura:attribute name="isGetDates" type="Boolean" default="true"/>
+    <aura:attribute name="isTime" type="Boolean" default="true"/>
+    <aura:attribute name="isDelDate" type="Boolean" default="false"/>
+    <aura:attribute name="selectedDesiredDeliveryDate" type="Date"/>
+    <aura:attribute name="deliveryDateUpdated" type="Boolean" default="false"/>
+    <aura:attribute name="selectedDeliveryDate" type="Date"/>
+    <aura:attribute name="deliverydate" type="Date"/>
+    <aura:attribute name="LevelTHD" type="Boolean" default="false"/>
+    <aura:attribute name="LevelPDI" type="Boolean" default="false"/>
+    <aura:attribute name="serLevel" type="Boolean"/>
+    <aura:attribute name="serLvl" type="string"/>
+    <!-- EDQ added Validation attributes -->
+    <ltng:require styles="{!$Resource.LightningValidationStylesheet}" />
+    <aura:attribute name="timeoutIdentifier" type="Integer" access="private"/>
+    <aura:attribute name="suggestions" type="Object[]" access="private" description="Suggestions"/>
+    <aura:attribute name="hasSuggestions" type="Boolean" access="private" default="false"/>
+    <aura:attribute name="ShippingAddressObjectSnapshot" type="sObject" access="private" default="null"/>
+    
+    <aura:attribute name="salesOrderObj" type="SalesOrder__x" default="{ 'sobjectType': 'SalesOrder__x' }"/> 
+    <aura:attribute name="isResch" type="Boolean" default="true"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="c:DeliveryDateSelected" action="{!c.updateDeliveryDate}"/>
+    <aura:if isTrue="{!v.isLoading}">
+        <lightning:spinner aura:id="spinner" alternativeText="loading..."/>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.salesOrder.isEditable}">
+        <div class="slds-p-around--large"> 
+            <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_2-of-3 slds-p-horizontal_x-small">
+                        <!-- EDQ added DIV container for address suggestions -->
+                        <div class="search-result-wrapper search-result-wrapper-wider" onfocusout="{!c.onElementFocusedOut}">
+                            <!-- EDQ added SPAN wrapper -->
+                            <span onkeydown="{!c.handleSuggestionNavigation}" >
+                                <!-- EDQ added onchange attribute -->
+                                <lightning:input aura:id="shipToStreet1" label="{!$Label.c.Sales_Order_Field_Label_Ship_Address_1}"
+                                                 name="shipToStreet1"
+                                                 value="{!v.salesOrder.shipToStreet1}"
+                                                 onchange="{!c.handleSearchChange}" />
+                            </span>
+                            <!-- EDQ added Shipping validation loader -->
+                            <div aura:id="loader" class="slds-spinner_container spinner-inner invisible">
+                                <div class="slds-spinner slds-spinner--small" aria-hidden="false" role="alert">
+                                    <div class="slds-spinner__dot-a"></div>
+                                    <div class="slds-spinner__dot-b"></div>
+                                </div>
+                            </div>
+                            <!-- EDQ added Shipping validation search results dropdown -->
+                            <div class="searchResults">
+                                <aura:renderif isTrue="{!v.hasSuggestions}">
+                                    <ul class="searchResults">
+                                        <aura:iteration items="{!v.suggestions}" var="suggestion">
+                                            <li class="resultItem">
+                                                <a id="{!globalId + '-suggestion-index-' + suggestion.index}"
+                                                   tabindex="0"
+                                                   href="javascript:void(0);"
+                                                   title="{!suggestion.format}"
+                                                   onclick="{!c.handleResultSelect}"
+                                                   onkeyup="{!c.onSuggestionKeyUp}">{!suggestion.suggestion}</a>
+                                            </li>
+                                        </aura:iteration>
+                                    </ul>
+                                </aura:renderif>
+                            </div>
+                        </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3 slds-p-horizontal_x-small">
+                        <!-- EDQ added onchange attribute -->
+                        <lightning:input aura:id="shipToStreet2" label="{!$Label.c.Sales_Order_Field_Label_Ship_Address_2}"
+                                         name="shipToStreet2"
+                                         value="{!v.salesOrder.shipToStreet2}"
+                                         onchange="{!c.onAddressChanged}" />
+                        </div>
+                    </div> 
+            <div class="slds-form" >
+                <div class="slds-grid full slds-wrap">
+                    
+            		<!-- EDQ added onchange attribute -->
+                    <lightning:input aura:id="shipToCity" label="{!$Label.c.Sales_Order_Field_Label_Ship_City}"
+                                     name="shipToCity"
+                                     value="{!v.salesOrder.shipToCity}"
+                                     class="slds-size--1-of-3 slds-p-horizontal_x-small"
+                                     onchange="{!c.onAddressChanged}" />
+                    
+                    <!-- EDQ added onchange attribute -->
+                    <lightning:input aura:id="shipToState" label="{!$Label.c.Sales_Order_Field_Label_Ship_State}"
+                                     name="shipToState"
+                                     value="{!v.salesOrder.shipToState}"
+                                     class="slds-size--1-of-3 slds-p-horizontal_x-small"
+                                     onchange="{!c.onAddressChanged}" />
+                    
+                    <!-- EDQ added onchange attribute -->
+                    <lightning:input aura:id="shipToPostalcode" label="{!$Label.c.Sales_Order_Field_Label_Ship_ZipCode}"
+                                     name="shipToPostalcode"
+                                     value="{!v.salesOrder.shipToPostalcode}"
+                                     class="slds-size--1-of-3 slds-p-horizontal_x-small"
+                                     onchange="{!c.onAddressChanged}" />
+                    
+                    <lightning:textarea name="deliveryComments" value="{!v.salesOrder.deliveryComments}" label="{!$Label.c.Sales_Order_Field_Label_Delivery_Comments}" 
+                                        class="slds-size--1-of-1 slds-p-horizontal_x-small slds-p-vertical_x-small" maxlength="350"/>   
+                    <lightning:input aura:id="hot" type="checkbox" label="{!$Label.c.Sales_Order_Field_Label_Hot}" name="Hot" checked="{!v.salesOrder.hot}"
+                                     class="slds-size--1-of-3 slds-p-horizontal_x-small slds-p-vertical_x-small" onchange="{!c.checkHot}"/>
+                    <lightning:input format="24" aura:id="wBegin" type="time" label="Window Begin" name="WindowBegin" value="{!v.salesOrder.WindowBegin}"  
+                                     class="slds-size--1-of-3 slds-p-horizontal_x-small slds-p-vertical_x-small" disabled="{!if(v.isTime,true,false)}" onchange="{!c.validateStartTime}"/>
+                    <lightning:input aura:id="wEnd" type="time" label="Window End" name="WindowEnd" value="{!v.salesOrder.WindowEnd}"
+                                     class="slds-size--1-of-3 slds-p-horizontal_x-small slds-p-vertical_x-small" disabled="{!if(v.isTime,true,false)}" onchange="{!c.validateEndTime}"/>
+                    
+                    <lightning:input aura:id="asap" type="checkbox" label="ASAP" name="ASAP" checked="{!v.salesOrder.asap}"
+                                     class="slds-size--1-of-3 slds-p-horizontal_x-small slds-p-vertical_x-small" onchange="{!c.checkASAP}"/>
+                    <lightning:input aura:id="lib" type="checkbox" label="{!$Label.c.DO_NOT_OPEN}" name="lib" disabled="{!if(v.LevelTHD,true,false)}" checked="{!v.salesOrder.lib}"
+                                     class="slds-size--1-of-3 slds-p-horizontal_x-small slds-p-vertical_x-small"/>
+                    <lightning:input aura:id="vip" type="checkbox" label="{!$Label.c.VIP}" name="vip"   checked="{!v.salesOrder.vip}"
+                                     class="slds-size--1-of-3 slds-p-horizontal_x-small slds-p-vertical_x-small"/>
+                    
+                    <lightning:input aura:id="deliveryDate" label="{!$Label.c.Sales_Order_Field_Label_Delivery_Date}" name="deliveryDate" value="{!v.salesOrder.currentDeliverydate}"
+                                     disabled="{!if(v.isDelDate,true,false)}" class="slds-size--1-of-2 slds-p-horizontal_x-small " onchange="{!c.checkDeliveryDate}"/>  
+                    
+                    
+                    <lightning:select name="rescheduleReason" label="{!$Label.c.Sales_Order_Field_Label_Reschedule_Reason}" aura:id="rescheduleReason" value="{!v.salesOrder.rescheduleReasonCodeId}" disabled="{!v.isResch}" class="slds-size--1-of-2 slds-p-horizontal_x-small">
+                        <option value="">-- None --</option>
+                        <aura:iteration items="{!v.salesOrder.rescheduleReasonOptions}" var="reason">
+                            <option value="{!reason.Id}" text="{!reason.Reschedule_Reason__c}"></option>
+                        </aura:iteration>
+                    </lightning:select>                      
+                </div>
+                <!--       
+            <lightning:input aura:id="desiredDeliveryDate" label="{!$Label.c.Sales_Order_Field_Label_Desired_Delivery_Date}" type="date"
+                                     class="slds-siz1-of-3 slds-p-horizontal_x-small"
+                                     name="desiredDeliveryDate" value="{!v.selectedDesiredDeliveryDate}"
+                                     />    
+  --> 
+                <aura:if isTrue="{!v.isGetDates}">
+                    <div class="slds-size--1-of-3 slds-p-horizontal_x-small" onclick="{!c.launchDeliveryDateLookup}"><a>{!$Label.c.Update_Sales_Order_Link_Get_Available_Dates}</a></div>            
+                </aura:if>
+            </div>
+            <aura:if isTrue="{!v.isGetDates}">
+                <div aura:id="deliveryWindowLookupPlaceHolder" />
+            </aura:if>
+            <div id="error" class="alert alert-danger slds-theme_alert-texture slds-theme_warning slds-align_absolute-center" aria-hidden="true" role="alert">
+            </div>
+            <!-- 
+            <fieldset class="slds-form-element">
+                <legend class="slds-form-element__legend slds-form-element__label">ServiceLevel</legend>
+                <div class="slds-form-element__control">
+                    <span class="slds-radio">
+                        <input type="radio" id="radio3"  name="options"  checked="{!v.LevelTHD}"/>
+                        <label class="slds-radio__label" for="radio3">
+                            <span class="slds-radio_faux"></span>
+                            <span class="slds-form-element__label">Threshold Delivery</span>
+                        </label>
+                        <input type="radio" id="radio4" name="options" checked="{!v.LevelPDI}"/>
+                        <label class="slds-radio__label" for="radio4">
+                            <span class="slds-radio_faux"></span>
+                            <span class="slds-form-element__label">Premium Delivery</span>
+                        </label>
+                    </span>
+                </div>
+            </fieldset>
+            -->
+            <div class="slds-text-align_center">
+                <lightning:button label="Save" class="slds-m-top--medium" variant="brand" onclick="{!c.saveChanges}"/>
+            </div>
+        </div>
+        <aura:set attribute="else">
+            {!$Label.c.Update_Sales_Order_Message_Order_Not_Editable}
+        </aura:set>
+    </aura:if>
+    
+</aura:component>

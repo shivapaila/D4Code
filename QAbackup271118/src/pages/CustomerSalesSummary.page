@@ -1,0 +1,15 @@
+<apex:page showHeader="false" sidebar="false" standardcontroller="Account">
+    <apex:includeLightning />
+
+    <div id="lightning" />
+
+    <script>
+        var accountId = "{!Account.id}";
+        $Lightning.use("c:CustomerSalesSummaryApp", function() {
+          $Lightning.createComponent("c:AggregateOrderDetails",{recordId : accountId},
+          "lightning",
+          function(cmp) {}
+          );
+        });
+    </script>
+</apex:page>

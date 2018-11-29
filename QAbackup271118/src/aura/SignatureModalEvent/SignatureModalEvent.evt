@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Singature modal firing events" >
+    <aura:attribute name="eventType" type="String"/>
+    <aura:attribute name="ContactId" type="Id" />
+</aura:event>

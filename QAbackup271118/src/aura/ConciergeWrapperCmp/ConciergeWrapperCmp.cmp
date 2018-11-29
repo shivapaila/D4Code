@@ -1,0 +1,16 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:isUrlAddressable,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/> 
+    
+    <div class="homeWrapper">
+        <c:RSAAccountInfo />
+        <c:concierge_header />
+        
+        <c:QuickActions />
+        <c:ManageAppointments />
+        <c:ManageTasks />
+        <c:surveryButton />
+        
+        <c:NavigatorCmp />
+    </div>
+</aura:component>

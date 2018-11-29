@@ -1,0 +1,100 @@
+<aura:component  controller="ConciergeCheckPaymentController" implements="flexipage:availableForAllPageTypes" access="global" extends="c:PaymentBase">
+    
+    <aura:attribute name="guestId" type="String" />
+    <aura:attribute name="pm" type="PaymentMethodWrapper"/> 
+    <aura:attribute name="targetAmount" type="Double" /> 
+    <aura:attribute name="totalAmount" type="Double" default="0" />
+    <aura:attribute name="indexNum" type="Integer" />
+    <aura:attribute name="showVoidConfirmation" type="Boolean" default="false" />
+    <aura:registerEvent name="addAnotherPaymentEvent" type="c:AddAnotherPayment" />
+    <aura:registerEvent name="updateAmount" type="c:AmountAppliedEvent" />
+    <aura:registerEvent name="NotifyParentPmtAdded" type="c:PaymentChangeEvent" />
+    <lightning:spinner aura:id="largeSpinner" variant="brand" size="small" class="slds-hide"/>
+    <!-- REQ-461 Check Payment Type Request to hide nested modals-->
+    <aura:handler name="change" value="{!v.showVoidConfirmation}" action="{!c.toggleFlags}"/>
+    <aura:attribute name="showPaymentSection" type="Boolean" default="true" />
+    <!-- DEF-0874 fix -->
+    <aura:attribute name="paidAmt" type="Double" default="0"/>
+    
+    <div class="singlePaymentMethod">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="paymentMethodLabel">{!v.pm.paymentTrans.Payment_Type__c}</div>
+            </div>
+            <div class="col-sm-8">
+                <aura:if isTrue ="{!v.showVoidConfirmation}">
+
+                    <div>
+                        Are you sure you want to void this transaction?
+                    </div>
+                    <div style="margin-top:15px;">
+                            <lightning:button label="Cancel" onclick="{!c.Cancel}" class="greyButton"/> &nbsp;
+                            <lightning:button label="Yes" onclick="{!c.proceedtoVoid}" class="orangeButton"/>
+                    </div>
+
+
+                    <aura:set attribute="else">
+                        <aura:if isTrue="{!and(v.pm.paymentTrans.Transaction_Number__c != null,v.pm.paymentTrans.Transaction_Number__c != '')}">
+                            <div style="margin-bottom:15px;">
+                                <a onclick="{!c.showVoidConfirmation}" class="orangeButton smallButton" style="background:red !important;"><i class="fas fa-trash-alt"></i> Delete</a>  
+                            </div>   
+                            <small class="paymentInputLabel">Check Number:</small>
+                            <ui:outputText  value="{!v.pm.paymentTrans.Check_DocumentNumber__c}"/>
+                            <small class="paymentInputLabel">Amount:</small>
+                            <ui:outputNumber  value="{!v.pm.paymentTrans.Payment_Amount__c}" format="#,###,##0.00"/>
+                            <div class="addNewButtonWrapper text-right">
+                                <a class="orangeButton" onclick="{!c.addCardPayment}"> Add Another Check +<i class="fa far-plus"></i></a>
+                            </div> 
+                        </aura:if>
+                        <aura:if isTrue="{!or(v.pm.paymentTrans.Transaction_Number__c == null, v.pm.paymentTrans.Transaction_Number__c == '')}">
+                            <lightning:input type="checkbox" label="Apply Total Balance to Check" name="{!'applybalance-' + indexNum}" onchange="{!c.ApplyAmount}" aura:id="auraApplyBalance"/>
+                            <!-- <small class="paymentInputLabel">Enter Check Number</small>
+                        <ui:inputNumber aura:id="checkNum" class="slds-input"  value="{!v.pm.paymentTrans.Check_DocumentNumber__c}" maxlength="9"/>-->
+                            <!-- DEF-0787 remove comma from check number -->
+                            <!--
+                            <lightning:input type="number" aura:id="checkNum"  name="checkNum" value="{!v.pm.paymentTrans.Check_DocumentNumber__c}"
+                                        label="Enter Check Number"    maxlength="9" />-->
+                            <small class="paymentInputLabel">Enter Check Number</small>
+                            <ui:inputText aura:id="checkNum"  class="slds-input" value="{!v.pm.paymentTrans.Check_DocumentNumber__c}" keypress="{!c.validateNumber}" keyup="{!c.validateNumber}" keydown="{!c.validateNumber}"  updateOn="keypress, keyup, keydown" maxlength="9"/>
+                            <small class="paymentInputLabel">Amount</small>
+                            <ui:inputNumber aura:id="amt" class="slds-input"  value="{!v.pm.paymentTrans.Payment_Amount__c}" change="{!c.checkAmount}"  format="#,###,##0.00"/>
+                            <small class="warningText">Pay at customer service desk</small>
+                                
+                            <div style="display: inline-grid;float: right;">
+                            <div class="addNewButtonWrapper text-right" style="margin-left: 17px;">
+                                <a class="orangeButton" data-record="{!indexNum}" onclick="{!c.processPayment}">Process Payment <i class="fa far-plus"></i></a>
+                                
+                            </div>
+                            <div class="addNewButtonWrapper text-right">                                    
+                                <a class="orangeButton" onclick="{!c.addCardPayment}"> Add Another Check +<i class="fa far-plus"></i></a>
+                            </div>                  
+                            </div>              
+                        </aura:if>   
+                    </aura:set>  
+                </aura:if>
+            </div>
+        </div>
+        <!-- REQ-461 Check Payment Type Request to hide nested modals-->
+        
+       
+    </div>
+    <!-- REQ-461 Check Payment Type Request to hide nested modals, Code commented and added to parent div-->
+        <!--<aura:if isTrue ="{!v.showVoidConfirmation}">
+        
+        <div class="demo-only" style="height:700px">
+            <section role="dialog" tabindex="-1" aria-label="Meaningful description of the modal content" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="">
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p>Are you sure you want to cancel this transaction?</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button label="Cancel" onclick="{!c.Cancel}" class="slds-button slds-button_neutral"/>
+                        <lightning:button label="Yes" onclick="{!c.proceedtoVoid}" class="slds-button slds-button-brand"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>-->
+    
+</aura:component>

@@ -1,0 +1,8 @@
+.THIS.modalContentWrapper{
+	padding:15px 25px;
+}
+.THIS .itemRow {
+	margin:0;
+	padding:15px 0;
+	border-bottom:1px solid #e1e1e1;
+}

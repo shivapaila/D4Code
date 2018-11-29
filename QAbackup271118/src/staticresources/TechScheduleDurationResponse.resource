@@ -1,0 +1,1 @@
+{"Minimum": "1","Maximum": "5","Increments": "10"}
